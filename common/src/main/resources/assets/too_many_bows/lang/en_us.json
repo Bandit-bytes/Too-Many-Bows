@@ -1,0 +1,37 @@
+{
+  "item.too_many_bows.arcane_bow": "Arcane Bow",
+  "item.too_many_bows.dark_bow": "Dark Bow",
+  "item.too_many_bows.verdant_viper": "Verdant Viper",
+  "item.too_many_bows.shadow_bow": "Shadow Bow",
+  "item.too_many_bows.spectral_bow": "Spectral Bow",
+  "item.too_many_bows.phantom_bow": "Phantom Bow",
+  "item.too_many_bows.ember_bow": "Ember Bow",
+  "item.too_many_bows.frostbite": "Frostbite",
+  "item.too_many_bows.arc_heavens": "Arc Of The Heavens",
+  "item.too_many_bows.solar_bow": "Solar Flare",
+  "item.too_many_bows.dragons_breath": "Dragons Breath",
+
+  "too_many_bows_tab": "Too Many Bows",
+  "category.many_bows": "Too Many Bows",
+
+  "item.many_bows.arcane_bow.tooltip": "§6An ancient bow imbued with arcane energy",
+  "item.many_bows.arcane_bow.tooltip.ability": "§dShoots magical arrows that deal extra damage",
+
+  "item.many_bows.solar_bow.tooltip": "§eA powerful bow charged by the sun",
+  "item.many_bows.solar_bow.tooltip.ability": "§cShoots flaming solar arrows on full charge.",
+
+  "item.many_bows.frostbite_bow.tooltip": "A bow forged from the chilling essence of ice.",
+  "item.many_bows.frostbite_bow.tooltip.ability": "Shoots frost arrows that slow and freeze enemies on full charge.",
+
+  "item.too_many_bows.arc_heavens.tooltip": "Unleash the power of the storm.",
+  "item.too_many_bows.arc_heavens.tooltip.ability": "Strikes foes with lightning on a direct hit.",
+  "item.too_many_bows.sonic_bow.tooltip": "Harness the destructive force of the Warden's roar",
+  "item.too_many_bows.sonic_bow.tooltip.ability": "Shoots a powerful shockwave that pierces enemies with immense force",
+  "item.too_many_bows.sonic_bow.tooltip.legend": "Forged from the echoes of the Deep Dark, this bow unleashes pure devastation.",
+  "item.many_bows.dragons_breath_bow.tooltip": "Power of the Dragon",
+  "item.many_bows.dragons_breath_bow.tooltip.ability": "Fires a charged arrow that spawns dragon's breath upon impact.",
+  "item.too_many_bows.verdant_viper_bow.tooltip": "A bow that harnesses the venom of nature.",
+  "item.too_many_bows.verdant_viper_bow.tooltip.ability": "Shoots arrows that leave behind a poisonous cloud.",
+  "item.too_many_bows.verdant_viper_bow.tooltip.legend": "It is said this bow was forged from the fangs of the great serpent king."
+
+}

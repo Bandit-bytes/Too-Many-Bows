@@ -1,0 +1,6 @@
+{
+  "parent": "too_many_bows:item/arc_heavens",
+  "textures": {
+    "layer0": "too_many_bows:item/arc_heavens_pulling_2"
+  }
+}

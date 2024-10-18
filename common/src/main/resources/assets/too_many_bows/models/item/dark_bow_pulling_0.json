@@ -1,0 +1,6 @@
+{
+  "parent": "too_many_bows:item/dark_bow",
+  "textures": {
+    "layer0": "too_many_bows:item/dark_bow_pulling_0"
+  }
+}
