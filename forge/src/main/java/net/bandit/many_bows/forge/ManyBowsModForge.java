@@ -1,6 +1,7 @@
 package net.bandit.many_bows.forge;
 
 import dev.architectury.platform.forge.EventBuses;
+import net.bandit.many_bows.client.renderer.DragonsBreathArrowRenderer;
 import net.bandit.many_bows.client.renderer.FrostbiteArrowRenderer;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.client.renderer.VenomArrowRenderer;
@@ -44,5 +45,6 @@ public class ManyBowsModForge {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.VENOM_ARROW.get(), VenomArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.DRAGONS_BREATH_ARROW.get(), DragonsBreathArrowRenderer::new);
     }
 }

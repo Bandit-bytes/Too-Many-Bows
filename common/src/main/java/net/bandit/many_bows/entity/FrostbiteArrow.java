@@ -1,26 +1,30 @@
 package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
+import java.util.List;
 
 public class FrostbiteArrow extends AbstractArrow {
+
+    private boolean hasHit = false;
+    private int hitTimer = 0;
 
     public FrostbiteArrow(EntityType<? extends FrostbiteArrow> entityType, Level level) {
         super(entityType, level);
@@ -31,80 +35,96 @@ public class FrostbiteArrow extends AbstractArrow {
     }
 
     @Override
-    protected void onHitEntity(EntityHitResult result) {
-        super.onHitEntity(result);
-        if (result.getEntity() instanceof LivingEntity target) {
-            // Apply Slowness effect
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 3));
-
-            // Create snow particles around the hit entity
-            createImpactParticles(target);
-
-            // Instantly spawn snow layers around the hit entity
-            spawnSnowAroundTarget(target);
-
-            // Ensure snowflake cloud is spawned every time
-            spawnSnowflakeCloud(target);
+    public void tick() {
+        super.tick();
+        if (hasHit) {
+            hitTimer++;
+            if (hitTimer > 40) {
+                return;
+            }
         }
-    }
+        if (this.level().isClientSide()) {
+            double speedFactor = 0.1D;
+            Vec3 motion = this.getDeltaMovement();
 
-    private void createImpactParticles(LivingEntity target) {
-        Random random = new Random();
+            // Create a frosty trail behind the arrow
+            for (int i = 0; i < 5; i++) {
+                double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
+                double yOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
+                double zOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
 
-        // Larger spread of particles for visual effect
-        for (int i = 0; i < 50; i++) {
-            double offsetX = random.nextGaussian() * 0.75D; // Increased randomness for spread
-            double offsetY = random.nextGaussian() * 0.75D;
-            double offsetZ = random.nextGaussian() * 0.75D;
+                // Ice-themed particles: Snowflake and cloud particles for frost trail
+                this.level().addParticle(ParticleTypes.SNOWFLAKE,
+                        this.getX() + motion.x * i * speedFactor,
+                        this.getY() + motion.y * i * speedFactor,
+                        this.getZ() + motion.z * i * speedFactor,
+                        xOffset, yOffset, zOffset);
 
-            // Spawning snowflake particles with randomized positions
-            target.level().addParticle(ParticleTypes.SNOWFLAKE,
-                    target.getX() + offsetX,
-                    target.getY() + target.getBbHeight() / 2.0 + offsetY,
-                    target.getZ() + offsetZ,
-                    0.0D, -0.05D, 0.0D); // Adds a slight downward motion for falling effect
-        }
-    }
-
-    private void spawnSnowAroundTarget(LivingEntity target) {
-        Level level = target.level();
-        BlockPos targetPos = target.blockPosition();
-        int radius = 3; // Slightly increased radius for effect
-        Random random = new Random();
-
-        if (!level.isClientSide()) {
-            // Instantly place snow layers around the target in a more random pattern
-            for (int x = -radius; x <= radius; x++) {
-                for (int z = -radius; z <= radius; z++) {
-                    // Randomize snow layer placement for more natural look
-                    if (random.nextFloat() < 0.6) { // 60% chance to place snow in each block
-                        BlockPos pos = targetPos.offset(x, 0, z);
-
-                        // Ensure snow is placed on valid blocks
-                        if (level.getBlockState(pos).isAir() && level.getBlockState(pos.below()).isSolidRender(level, pos.below())) {
-                            level.setBlock(pos, Blocks.SNOW.defaultBlockState(), 3); // Set flag to 3 to notify clients
-                        }
-                    }
-                }
+                this.level().addParticle(ParticleTypes.CLOUD,
+                        this.getX(), this.getY(), this.getZ(),
+                        0.0D, 0.0D, 0.0D);
             }
         }
     }
 
-    private void spawnSnowflakeCloud(LivingEntity target) {
-        Level level = target.level();
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        super.onHitEntity(result);
+        if (!this.level().isClientSide()) {
+            LivingEntity hitEntity = (LivingEntity) result.getEntity();
+            // Apply slowness effect to the entity hit
+            hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 75, 5));
 
-        if (!level.isClientSide()) { // Ensure this runs only on the server side
-            // Create and spawn an AreaEffectCloud
-            AreaEffectCloud snowCloud = new AreaEffectCloud(level, target.getX(), target.getY(), target.getZ());
-            snowCloud.setParticle(ParticleTypes.SNOWFLAKE); // Use snowflake particles
-            snowCloud.setRadius(3.0F); // Set radius
-            snowCloud.setDuration(200); // Cloud lasts for 10 seconds (200 ticks)
-            snowCloud.setRadiusPerTick(-0.02F); // Shrink radius over time
-            snowCloud.setWaitTime(0); // No delay before starting
-            snowCloud.setFixedColor(0xFFFFFF); // White color for snowflakes (optional)
-
-            level.addFreshEntity(snowCloud); // Add cloud to the world
+            createFrostExplosion(result.getLocation(), hitEntity);
+            this.hasHit = true;
         }
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        super.onHitBlock(result);
+
+        if (!this.level().isClientSide()) {
+            createFrostExplosion(result.getLocation(), null);
+            this.hasHit = true;
+        }
+    }
+
+    private void createFrostExplosion(Vec3 position, @Nullable LivingEntity entityHit) {
+        int radius = 4;
+        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
+        for (LivingEntity entity : entities) {
+            if (entity != this.getOwner() && entity != entityHit) {
+                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 75, 5)); // Apply slowness
+            }
+        }
+
+        // Create snowflake and cloud particles for the frost explosion
+        for (int i = 0; i < 100; i++) {
+            double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
+            double yOffset = random.nextDouble();
+            double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
+            this.level().addParticle(ParticleTypes.SNOWFLAKE,
+                    position.x + xOffset,
+                    position.y + yOffset,
+                    position.z + zOffset,
+                    0, 0.1D, 0);
+        }
+
+        for (int i = 0; i < 30; i++) {
+            double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
+            double yOffset = random.nextDouble() * 0.5D;
+            double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
+            this.level().addParticle(ParticleTypes.CLOUD,
+                    position.x + xOffset,
+                    position.y + yOffset,
+                    position.z + zOffset,
+                    0, 0, 0);
+        }
+
+        // Play a frosty sound when explosion occurs
+        this.level().playSound(null, position.x, position.y, position.z,
+                SoundEvents.GLASS_BREAK, this.getSoundSource(), 1.0F, 0.8F);
     }
 
     @Override

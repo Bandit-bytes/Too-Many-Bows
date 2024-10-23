@@ -33,7 +33,7 @@ public class FrostbiteBow extends BowItem {
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 4.0F, 1.0F);
 
             // Add extra damage to the arrow
-            arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);  // Add 4.0 extra damage to the arrow
+            arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
 
             level.addFreshEntity(arrow);
 
