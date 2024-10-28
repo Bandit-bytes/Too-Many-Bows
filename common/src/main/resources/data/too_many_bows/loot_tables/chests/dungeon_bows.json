@@ -6,7 +6,7 @@
         {
           "type": "item",
           "name": "too_many_bows:solar_bow",
-          "weight": 5
+          "weight": 3
         },
         {
           "type": "item",
@@ -32,12 +32,26 @@
           "type": "item",
           "name": "too_many_bows:dragons_breath",
           "weight": 1
-        }
-      ,
+        },
         {
           "type": "item",
           "name": "too_many_bows:verdant_viper",
           "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:skull",
+          "weight": 2
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:flame_bow",
+          "weight": 2
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:tidal_bow",
+          "weight": 2
         }
       ]
     }

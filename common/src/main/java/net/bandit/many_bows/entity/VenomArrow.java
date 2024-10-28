@@ -25,19 +25,23 @@ public class VenomArrow extends AbstractArrow {
 
     private boolean hasHit = false;
     private int hitTimer = 0;
+    private final int maxHitDuration = 40;
 
     public VenomArrow(EntityType<? extends VenomArrow> entityType, Level level) {
         super(entityType, level);
     }
+
     public VenomArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.VENOM_ARROW.get(), shooter, level);
     }
+
     @Override
     public void tick() {
         super.tick();
         if (hasHit) {
             hitTimer++;
-            if (hitTimer > 40) {
+            if (hitTimer >= maxHitDuration) {
+                this.discard();
                 return;
             }
         }
@@ -69,7 +73,6 @@ public class VenomArrow extends AbstractArrow {
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
-
         if (!this.level().isClientSide()) {
             createPoisonExplosion(result.getLocation(), null);
             this.hasHit = true;
@@ -78,6 +81,7 @@ public class VenomArrow extends AbstractArrow {
     private void createPoisonExplosion(Vec3 position, @Nullable LivingEntity entityHit) {
         int radius = 4;
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
+
         for (LivingEntity entity : entities) {
             if (entity != this.getOwner() && entity != entityHit) {
                 entity.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 1));
@@ -97,12 +101,15 @@ public class VenomArrow extends AbstractArrow {
         }
         this.level().playSound(null, position.x, position.y, position.z, SoundEvents.SLIME_SQUISH, this.getSoundSource(), 1.0F, 0.8F);
     }
+
     @Override
     protected ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);
     }
 }
+

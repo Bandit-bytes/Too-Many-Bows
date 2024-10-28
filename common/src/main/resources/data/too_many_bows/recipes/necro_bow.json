@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SWS",
+    "SBS",
+    "SWS"
+  ],
+  "key": {
+    "S": {
+      "item": "too_many_bows:skull"
+    },
+    "W": {
+      "item": "minecraft:wither_skeleton_skull"
+    },
+    "B": {
+      "item": "minecraft:bow"
+    }
+  },
+  "result": {
+    "item": "too_many_bows:necro_flame_bow",
+    "count": 1
+  }
+}

@@ -2,10 +2,7 @@ package net.bandit.many_bows.client;
 
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
-import net.bandit.many_bows.client.renderer.DragonsBreathArrowRenderer;
-import net.bandit.many_bows.client.renderer.FrostbiteArrowRenderer;
-import net.bandit.many_bows.client.renderer.SonicBoomProjectileRenderer;
-import net.bandit.many_bows.client.renderer.VenomArrowRenderer;
+import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +19,10 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.DARK_BOW.get());
         registerBowProperties(ItemRegistry.DRAGONS_BREATH.get());
         registerBowProperties(ItemRegistry.VERDANT_VIPER.get());
+        registerBowProperties(ItemRegistry.FLAME_BOW.get());
+        registerBowProperties(ItemRegistry.TIDAL_BOW.get());
+        registerBowProperties(ItemRegistry.NECRO_FLAME_BOW.get());
+        registerBowProperties(ItemRegistry.SCATTER_BOW.get());
 
         registerEntityRenderers();
     }
@@ -41,6 +42,9 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DRAGONS_BREATH_ARROW.get(), DragonsBreathArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.VENOM_ARROW.get(), VenomArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.FLAME_ARROW.get(), FlameArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.TIDAL_ARROW.get(), TidalArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.CURSED_FLAME_ARROW.get(), CursedFlameArrowRenderer::new);
 
     }
 }

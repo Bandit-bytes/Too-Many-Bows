@@ -4,18 +4,21 @@
   "item.too_many_bows.verdant_viper": "Verdant Viper",
   "item.too_many_bows.shadow_bow": "Shadow Bow",
   "item.too_many_bows.spectral_bow": "Spectral Bow",
-  "item.too_many_bows.phantom_bow": "Phantom Bow",
-  "item.too_many_bows.ember_bow": "Ember Bow",
+  "item.too_many_bows.flame_bow": "Pyre's Embrace",
+  "item.too_many_bows.necro_flame_bow": "Necro Flame Bow",
+  "item.too_many_bows.tidal_bow": "Tidal Bow",
   "item.too_many_bows.frostbite": "Frostbite",
   "item.too_many_bows.arc_heavens": "Arc Of The Heavens",
   "item.too_many_bows.solar_bow": "Solar Flare",
   "item.too_many_bows.dragons_breath": "Dragons Breath",
+  "item.too_many_bows.skull": "Necro Skull",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
 
-  "item.many_bows.arcane_bow.tooltip": "§6An ancient bow imbued with arcane energy",
-  "item.many_bows.arcane_bow.tooltip.ability": "§dShoots magical arrows that deal extra damage",
+  "item.many_bows.arcane_bow.tooltip": "Unleashes a mystical spread of arrows with arcane energy.",
+  "item.many_bows.arcane_bow.tooltip.ability": "Ability: Fires three arrows in a spread pattern, dealing extra arcane damage.",
+  "item.many_bows.arcane_bow.tooltip.legend": "Ancient secrets lie within its enchanted limbs...",
 
   "item.many_bows.solar_bow.tooltip": "§eA powerful bow charged by the sun",
   "item.many_bows.solar_bow.tooltip.ability": "§cShoots flaming solar arrows on full charge.",
@@ -32,6 +35,25 @@
   "item.many_bows.dragons_breath_bow.tooltip.ability": "Fires a charged arrow that spawns dragon's breath upon impact.",
   "item.too_many_bows.verdant_viper_bow.tooltip": "A bow that harnesses the venom of nature.",
   "item.too_many_bows.verdant_viper_bow.tooltip.ability": "Shoots arrows that leave behind a poisonous cloud.",
-  "item.too_many_bows.verdant_viper_bow.tooltip.legend": "It is said this bow was forged from the fangs of the great serpent king."
+  "item.too_many_bows.verdant_viper_bow.tooltip.legend": "It is said this bow was forged from the fangs of the great serpent king.",
+
+  "item.too_many_bows.flame_bow.tooltip": "Harness the Power of Fire",
+  "item.too_many_bows.flame_bow.tooltip.ability": "Shoots flaming arrows that cause fiery explosions.",
+  "item.too_many_bows.flame_bow.tooltip.legend": "A legendary bow forged in the heart of a volcano.",
+
+  "item.too_many_bows.tidal_bow.tooltip": "The power of the ocean flows through this bow.",
+  "item.too_many_bows.tidal_bow.tooltip.ability": "Shoots arrows imbued with the force of waves.",
+  "item.too_many_bows.tidal_bow.tooltip.legend": "A bow that harnesses the ancient power of the seas.",
+
+  "item.too_many_bows.cursed_flame_bow.tooltip": "A bow imbued with cursed flames, known to halt regeneration and burn with inextinguishable fury.",
+  "item.too_many_bows.cursed_flame_bow.tooltip.ability": "Ignites foes with cursed fire: blocks all regen, can't be extinguished by water, and deals a heart of damage per tick.",
+  "item.too_many_bows.cursed_flame_bow.tooltip.legend": "Forged in dark, forbidden flames.",
+
+  "effect.too_many_bows.cursed_flame": "Cursed Flame",
+
+  "item.too_many_bows.scatter_bow": "Scatter Shot",
+  "item.many_bows.scatter_bow.tooltip": "A bow that shoots arrows in all directions",
+  "item.many_bows.scatter_bow.tooltip.ability": "Releases a burst of arrows",
+  "item.many_bows.scatter_bow.tooltip.legend": "Crafted by the greatest archers"
 
 }

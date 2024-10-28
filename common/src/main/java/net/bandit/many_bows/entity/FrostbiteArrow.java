@@ -25,6 +25,7 @@ public class FrostbiteArrow extends AbstractArrow {
 
     private boolean hasHit = false;
     private int hitTimer = 0;
+    private final int maxHitDuration = 40;
 
     public FrostbiteArrow(EntityType<? extends FrostbiteArrow> entityType, Level level) {
         super(entityType, level);
@@ -37,23 +38,23 @@ public class FrostbiteArrow extends AbstractArrow {
     @Override
     public void tick() {
         super.tick();
+
         if (hasHit) {
             hitTimer++;
-            if (hitTimer > 40) {
+            if (hitTimer >= maxHitDuration) {
+                this.discard();
                 return;
             }
         }
+
         if (this.level().isClientSide()) {
             double speedFactor = 0.1D;
             Vec3 motion = this.getDeltaMovement();
-
-            // Create a frosty trail behind the arrow
             for (int i = 0; i < 5; i++) {
                 double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
                 double yOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
                 double zOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
 
-                // Ice-themed particles: Snowflake and cloud particles for frost trail
                 this.level().addParticle(ParticleTypes.SNOWFLAKE,
                         this.getX() + motion.x * i * speedFactor,
                         this.getY() + motion.y * i * speedFactor,
@@ -72,7 +73,6 @@ public class FrostbiteArrow extends AbstractArrow {
         super.onHitEntity(result);
         if (!this.level().isClientSide()) {
             LivingEntity hitEntity = (LivingEntity) result.getEntity();
-            // Apply slowness effect to the entity hit
             hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 75, 5));
 
             createFrostExplosion(result.getLocation(), hitEntity);
@@ -99,7 +99,6 @@ public class FrostbiteArrow extends AbstractArrow {
             }
         }
 
-        // Create snowflake and cloud particles for the frost explosion
         for (int i = 0; i < 100; i++) {
             double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
             double yOffset = random.nextDouble();
@@ -122,7 +121,6 @@ public class FrostbiteArrow extends AbstractArrow {
                     0, 0, 0);
         }
 
-        // Play a frosty sound when explosion occurs
         this.level().playSound(null, position.x, position.y, position.z,
                 SoundEvents.GLASS_BREAK, this.getSoundSource(), 1.0F, 0.8F);
     }
@@ -137,3 +135,4 @@ public class FrostbiteArrow extends AbstractArrow {
         return new ClientboundAddEntityPacket(this);
     }
 }
+

@@ -11,10 +11,12 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-
 
 import java.util.List;
 
@@ -23,44 +25,54 @@ public class SolarBow extends BowItem {
     public SolarBow(Properties properties) {
         super(properties);
     }
+
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        super.releaseUsing(stack, level, entity, timeCharged);
-
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(stack) - timeCharged;
-
-            // Play custom sound on release
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 0.4F, 0.3F);
 
-            // Fire a flaming arrow if fully charged
-            if (charge >= 20) {
-                fireFlamingArrow(level, player);
+            // Check for Infinity enchantment or Creative mode
+            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+
+            // Fire arrow if charge is adequate and arrows are consumed or Infinity is enabled
+            if (charge >= 20 && (hasInfinity || consumeArrow(player))) {
+                fireFlamingArrow(level, player, hasInfinity);
+                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            } else {
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
     }
 
-    private void fireFlamingArrow(Level level, Player player) {
+    private void fireFlamingArrow(Level level, Player player, boolean hasInfinity) {
         if (!level.isClientSide()) {
-            // Create an arrow entity
             Arrow arrow = new Arrow(level, player);
-            arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
 
-            // Set the arrow on fire
-            arrow.setSecondsOnFire(100); // Fire for 5 seconds
+            // Set pickup status to DISALLOWED if Infinity is enabled
+            if (hasInfinity) {
+                arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+            }
 
-            // Increase velocity (from 1.5F to 3.0F for faster speed)
+            arrow.setSecondsOnFire(100);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 1.0F);
-
-            // Increase base damage of the arrow (set higher base damage)
-            arrow.setBaseDamage(arrow.getBaseDamage() + 4.0); // Increase damage by 4.0
-
-            // Spawn the flaming arrow in the world
+            arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
             level.addFreshEntity(arrow);
-
-            // Play a sound for the flaming arrow firing
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.8F, 1.2F);
         }
+    }
+
+    private boolean consumeArrow(Player player) {
+        if (player.getAbilities().instabuild) {
+            return true; // Creative mode doesn't consume arrows
+        }
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() == Items.ARROW) {
+                stack.shrink(1); // Reduce arrow count by 1
+                return true;
+            }
+        }
+        return false; // No arrows found
     }
 
     @Override
@@ -74,11 +86,11 @@ public class SolarBow extends BowItem {
             }
         }
     }
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.many_bows.solar_bow.tooltip").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         tooltip.add(Component.translatable("item.many_bows.solar_bow.tooltip.ability")
-                .withStyle(style -> style.withColor(TextColor.fromRgb(0xFF4500)))); // Bright Flaming Orange
+                .withStyle(style -> style.withColor(TextColor.fromRgb(0xFF4500))));
     }
-
 }

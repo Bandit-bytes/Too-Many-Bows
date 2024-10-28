@@ -12,6 +12,8 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,21 +27,43 @@ public class DragonsBreathBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        super.releaseUsing(stack, level, entity, timeCharged);
-
         if (entity instanceof Player player) {
             int charge = this.getUseDuration(stack) - timeCharged;
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.4F, 0.3F);
-            if (charge >= 20) {
-                fireDragonArrow(level, player);
+
+            // Check for Infinity enchantment or Creative mode
+            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+
+            // Only fire arrow if an arrow is available or Infinity is present
+            if (charge >= 20 && (hasInfinity || consumeArrow(player))) {
+                fireDragonArrow(level, player, hasInfinity);
+                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             }
         }
     }
 
-    private void fireDragonArrow(Level level, Player player) {
+    private boolean consumeArrow(Player player) {
+        if (player.getAbilities().instabuild) {
+            return true; // Creative mode doesn't consume arrows
+        }
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() == net.minecraft.world.item.Items.ARROW) {
+                stack.shrink(1); // Reduce arrow count by 1
+                return true;
+            }
+        }
+        return false; // Return false if no arrows were found
+    }
+
+    private void fireDragonArrow(Level level, Player player, boolean hasInfinity) {
         if (!level.isClientSide()) {
             DragonsBreathArrow arrow = new DragonsBreathArrow(level, player);
-            arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+
+            // Prevent pickup if Infinity is present
+            if (hasInfinity) {
+                arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+            }
+
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 4.0F, 1.0F);
             arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
             level.addFreshEntity(arrow);
@@ -51,6 +75,6 @@ public class DragonsBreathBow extends BowItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.many_bows.dragons_breath_bow.tooltip").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD));
         tooltip.add(Component.translatable("item.many_bows.dragons_breath_bow.tooltip.ability")
-                .withStyle(style -> style.withColor(TextColor.fromRgb(0x8B0000)))); // Dark Red
+                .withStyle(style -> style.withColor(TextColor.fromRgb(0x8B0000))));
     }
 }
