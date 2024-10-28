@@ -24,6 +24,7 @@ public class SonicBoomBow extends BowItem {
     public SonicBoomBow(Properties properties) {
         super(properties);
     }
+
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
         if (entity instanceof Player player && !level.isClientSide()) {
@@ -32,10 +33,27 @@ public class SonicBoomBow extends BowItem {
 
             // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
             // Fire the Sonic Boom Projectile if power is adequate and arrows are consumed or Infinity is enabled
-            if (power >= 0.1F && (hasInfinity || consumeArrow(player))) {
+            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 SonicBoomProjectile sonicBoom = new SonicBoomProjectile(level, player);
+
+                // Apply enchantments to the projectile
+                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                if (powerLevel > 0) {
+                    sonicBoom.setBaseDamage(sonicBoom.getBaseDamage() + powerLevel * 0.5 + 0.5);
+                }
+
+                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                if (punchLevel > 0) {
+                    sonicBoom.setKnockback(punchLevel);
+                }
+
+                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                    sonicBoom.setSecondsOnFire(100);
+                }
+
                 sonicBoom.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 5.0F, 0.5F);
 
                 // Prevent pickup if Infinity is enabled
@@ -48,25 +66,22 @@ public class SonicBoomBow extends BowItem {
 
                 // Damage the bow if Infinity isn't enabled
                 if (!hasInfinity) {
-                    stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                    arrowStack.shrink(1);
                 }
+                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else if (power >= 0.1F) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
     }
 
-    private boolean consumeArrow(Player player) {
-        if (player.getAbilities().instabuild) {
-            return true; // Creative mode doesn't consume arrows
-        }
+    private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
             if (stack.getItem() == Items.ARROW) {
-                stack.shrink(1);
-                return true;
+                return stack;
             }
         }
-        return false;
+        return ItemStack.EMPTY;
     }
 
     @Override

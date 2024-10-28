@@ -32,17 +32,28 @@ public class CursedFlameBow extends BowItem {
             float power = getPowerForTime(charge);
 
             if (power >= 0.1F) {
-                // Check for Creative mode or Infinity enchantment
                 boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
                 ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
-                // Proceed if arrow is available or Infinity is enabled
                 if (hasInfinity || !arrowStack.isEmpty()) {
                     CursedFlameArrow cursedFlameArrow = new CursedFlameArrow(level, player);
                     cursedFlameArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                    cursedFlameArrow.setBaseDamage(cursedFlameArrow.getBaseDamage() * 2.25);
 
-                    // Prevent pickup if Infinity is present
+                    // Apply enchantment effects
+                    int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                    if (powerLevel > 0) {
+                        cursedFlameArrow.setBaseDamage(cursedFlameArrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
+                    }
+
+                    int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                    if (punchLevel > 0) {
+                        cursedFlameArrow.setKnockback(punchLevel);
+                    }
+
+                    if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                        cursedFlameArrow.setSecondsOnFire(100);
+                    }
+
                     if (hasInfinity) {
                         cursedFlameArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                     }
@@ -50,7 +61,7 @@ public class CursedFlameBow extends BowItem {
                     level.addFreshEntity(cursedFlameArrow);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SKELETON_AMBIENT, SoundSource.PLAYERS, 1.0F, 1.2F);
 
-                    // Consume arrow if not in Creative mode or with Infinity enchantment
+                    // Consume an arrow if not in Creative mode or with Infinity
                     if (!hasInfinity) {
                         arrowStack.shrink(1);
                     }
@@ -74,9 +85,7 @@ public class CursedFlameBow extends BowItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip").withStyle(ChatFormatting.DARK_PURPLE));
-        tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip.ability")
-                .withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip.legend")
-                .withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
+        tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip.ability").withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip.legend").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
     }
 }

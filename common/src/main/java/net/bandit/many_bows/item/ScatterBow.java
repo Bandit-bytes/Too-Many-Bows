@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
@@ -34,19 +35,31 @@ public class ScatterBow extends BowItem {
 
             // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-
-            // Determine the number of arrows to shoot based on inventory (up to a max of 8)
             int arrowsToShoot = hasInfinity ? NUM_ARROWS : Math.min(NUM_ARROWS, countArrows(player));
 
-            // Proceed if power is adequate and arrows are consumed or player has Infinity
             if (power >= 0.1F && (hasInfinity || consumeArrow(player, arrowsToShoot))) {
                 for (int i = 0; i < arrowsToShoot; i++) {
                     Arrow arrow = new Arrow(level, player);
-                    arrow.setBaseDamage(1.0); // Set each arrow’s base damage
+                    arrow.setBaseDamage(1.0);
+
+                    // Apply enchantments
+                    int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                    if (powerLevel > 0) {
+                        arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
+                    }
+
+                    int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                    if (punchLevel > 0) {
+                        arrow.setKnockback(punchLevel);
+                    }
+
+                    if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                        arrow.setSecondsOnFire(100);
+                    }
 
                     // Prevent pickup if Infinity is enabled
                     if (hasInfinity) {
-                        arrow.pickup = Arrow.Pickup.DISALLOWED;
+                        arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                     }
 
                     // Slightly randomize the shooting direction
@@ -56,6 +69,7 @@ public class ScatterBow extends BowItem {
 
                     level.addFreshEntity(arrow);
                 }
+
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else {
@@ -64,10 +78,9 @@ public class ScatterBow extends BowItem {
         }
     }
 
-    // Adjust consumeArrow to account for multiple arrows
     private boolean consumeArrow(Player player, int count) {
         if (player.getAbilities().instabuild) {
-            return true; // Creative mode doesn't consume arrows
+            return true;
         }
 
         int arrowsRemoved = 0;
@@ -81,7 +94,6 @@ public class ScatterBow extends BowItem {
         return arrowsRemoved >= count;
     }
 
-    // Count total arrows in the player’s inventory
     private int countArrows(Player player) {
         int arrowCount = 0;
         for (ItemStack stack : player.getInventory().items) {

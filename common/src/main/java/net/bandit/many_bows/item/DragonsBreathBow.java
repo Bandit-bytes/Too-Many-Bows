@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -27,48 +28,57 @@ public class DragonsBreathBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(stack) - timeCharged;
+            float power = getPowerForTime(charge);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.4F, 0.3F);
 
-            // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
-            // Only fire arrow if an arrow is available or Infinity is present
-            if (charge >= 20 && (hasInfinity || consumeArrow(player))) {
-                fireDragonArrow(level, player, hasInfinity);
+            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
+                DragonsBreathArrow arrow = new DragonsBreathArrow(level, player);
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+                arrow.setBaseDamage(arrow.getBaseDamage() * 2.5);
+
+                // Enchantment effects
+                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                if (powerLevel > 0) {
+                    arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerLevel * 0.5 + 0.5);
+                }
+
+                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                if (punchLevel > 0) {
+                    arrow.setKnockback(punchLevel);
+                }
+
+                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                    arrow.setSecondsOnFire(100);
+                }
+
+                // Infinity pickup handling
+                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
+                level.addFreshEntity(arrow);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.8F, 1.2F);
+
+                // Consume arrow if not in Creative mode or with Infinity
+                if (!hasInfinity) {
+                    arrowStack.shrink(1);
+                }
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            } else {
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
     }
 
-    private boolean consumeArrow(Player player) {
-        if (player.getAbilities().instabuild) {
-            return true; // Creative mode doesn't consume arrows
-        }
+    private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == net.minecraft.world.item.Items.ARROW) {
-                stack.shrink(1); // Reduce arrow count by 1
-                return true;
+            if (stack.getItem() == Items.ARROW) {
+                return stack;
             }
         }
-        return false; // Return false if no arrows were found
-    }
-
-    private void fireDragonArrow(Level level, Player player, boolean hasInfinity) {
-        if (!level.isClientSide()) {
-            DragonsBreathArrow arrow = new DragonsBreathArrow(level, player);
-
-            // Prevent pickup if Infinity is present
-            if (hasInfinity) {
-                arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-            }
-
-            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 4.0F, 1.0F);
-            arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
-            level.addFreshEntity(arrow);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.8F, 1.2F);
-        }
+        return ItemStack.EMPTY;
     }
 
     @Override

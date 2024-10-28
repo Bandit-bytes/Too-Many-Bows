@@ -40,13 +40,24 @@ public class FlameBow extends BowItem {
                 flameArrow.setBaseDamage(flameArrow.getBaseDamage() * 2.0);
                 flameArrow.setSecondsOnFire(100);
 
-                if (hasInfinity) {
-                    flameArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+                // Enchantment effects
+                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                if (powerLevel > 0) {
+                    flameArrow.setBaseDamage(flameArrow.getBaseDamage() + (double) powerLevel * 0.5 + 0.5);
                 }
+
+                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                if (punchLevel > 0) {
+                    flameArrow.setKnockback(punchLevel);
+                }
+
+                // Set pickup behavior
+                flameArrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
 
                 level.addFreshEntity(flameArrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
+                // Consume arrow if Infinity is not active
                 if (!hasInfinity) {
                     arrowStack.shrink(1);
                 }

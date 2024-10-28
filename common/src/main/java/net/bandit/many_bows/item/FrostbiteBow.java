@@ -42,12 +42,23 @@ public class FrostbiteBow extends BowItem {
             if (charge >= MIN_CHARGE_REQUIRED && power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 FrostbiteArrow arrow = new FrostbiteArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
+
+                // Base damage and custom enchantments
                 arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
+                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+                if (powerLevel > 0) {
+                    arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
+                }
+                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+                if (punchLevel > 0) {
+                    arrow.setKnockback(punchLevel);
+                }
+                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                    arrow.setSecondsOnFire(100);
+                }
 
                 // Prevent pickup if Infinity is enabled
-                if (hasInfinity) {
-                    arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-                }
+                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
 
                 level.addFreshEntity(arrow);
                 createSnowBurstParticles(level, player);

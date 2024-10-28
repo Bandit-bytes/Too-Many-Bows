@@ -27,6 +27,11 @@ public class BowLootInjectorPlatformImpl {
                 || id.equals(BuiltInLootTables.ABANDONED_MINESHAFT)
                 || id.equals(BuiltInLootTables.STRONGHOLD_CORRIDOR)
                 || id.equals(BuiltInLootTables.JUNGLE_TEMPLE)
+                || id.equals(BuiltInLootTables.END_CITY_TREASURE)
+                || id.equals(BuiltInLootTables.RUINED_PORTAL)
+                || id.equals(BuiltInLootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY)
+                || id.equals(BuiltInLootTables.BASTION_TREASURE)
+                || id.equals(BuiltInLootTables.PILLAGER_OUTPOST)
                 || id.equals(BuiltInLootTables.NETHER_BRIDGE);
     }
 

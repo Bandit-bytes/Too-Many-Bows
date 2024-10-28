@@ -34,20 +34,41 @@ public class SolarBow extends BowItem {
 
             // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
             // Fire arrow if charge is adequate and arrows are consumed or Infinity is enabled
-            if (charge >= 20 && (hasInfinity || consumeArrow(player))) {
-                fireFlamingArrow(level, player, hasInfinity);
+            if (charge >= 20 && (hasInfinity || !arrowStack.isEmpty())) {
+                fireFlamingArrow(level, player, hasInfinity, stack);
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+
+                // Consume arrow if not in Creative mode or with Infinity
+                if (!hasInfinity) {
+                    arrowStack.shrink(1);
+                }
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
     }
 
-    private void fireFlamingArrow(Level level, Player player, boolean hasInfinity) {
+    private void fireFlamingArrow(Level level, Player player, boolean hasInfinity, ItemStack stack) {
         if (!level.isClientSide()) {
             Arrow arrow = new Arrow(level, player);
+
+            // Apply enchantments
+            int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+            if (powerLevel > 0) {
+                arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
+            }
+
+            int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+            if (punchLevel > 0) {
+                arrow.setKnockback(punchLevel);
+            }
+
+            if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                arrow.setSecondsOnFire(100);
+            }
 
             // Set pickup status to DISALLOWED if Infinity is enabled
             if (hasInfinity) {
@@ -62,17 +83,13 @@ public class SolarBow extends BowItem {
         }
     }
 
-    private boolean consumeArrow(Player player) {
-        if (player.getAbilities().instabuild) {
-            return true; // Creative mode doesn't consume arrows
-        }
+    private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
             if (stack.getItem() == Items.ARROW) {
-                stack.shrink(1); // Reduce arrow count by 1
-                return true;
+                return stack;
             }
         }
-        return false; // No arrows found
+        return ItemStack.EMPTY;
     }
 
     @Override
