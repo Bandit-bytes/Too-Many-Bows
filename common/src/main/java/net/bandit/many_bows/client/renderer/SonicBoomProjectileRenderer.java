@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
 public class SonicBoomProjectileRenderer extends EntityRenderer<SonicBoomProjectile> {
+    private static final ResourceLocation SONIC_BOOM_TEXTURE = new ResourceLocation("too_many_bows", "textures/entity/sonic_boom.png");
 
     public SonicBoomProjectileRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -24,6 +25,6 @@ public class SonicBoomProjectileRenderer extends EntityRenderer<SonicBoomProject
     }
     @Override
     public ResourceLocation getTextureLocation(SonicBoomProjectile entity) {
-        return null;
+        return SONIC_BOOM_TEXTURE;
     }
 }

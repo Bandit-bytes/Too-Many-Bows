@@ -1,6 +1,7 @@
 {
   "item.too_many_bows.arcane_bow": "Arcane Bow",
   "item.too_many_bows.dark_bow": "Dark Bow",
+  "item.too_many_bows.ancient_sage_bow": "Ancient Sage Bow",
   "item.too_many_bows.verdant_viper": "Verdant Viper",
   "item.too_many_bows.shadow_bow": "Shadow Bow",
   "item.too_many_bows.spectral_bow": "Spectral Bow",
@@ -54,6 +55,11 @@
   "item.too_many_bows.scatter_bow": "Scatter Shot",
   "item.many_bows.scatter_bow.tooltip": "A bow that shoots arrows in all directions",
   "item.many_bows.scatter_bow.tooltip.ability": "Releases a burst of arrows",
-  "item.many_bows.scatter_bow.tooltip.legend": "Crafted by the greatest archers"
+  "item.many_bows.scatter_bow.tooltip.legend": "Crafted by the greatest archers",
+
+  "item.many_bows.ancient_sage_bow.tooltip": "An ancient weapon of unmatched power.",
+  "item.many_bows.ancient_sage_bow.tooltip.ability": "Pierces through 90% of armor defenses.",
+  "item.many_bows.ancient_sage_bow.tooltip.legend": "Only the wise can wield its true might."
+
 
 }

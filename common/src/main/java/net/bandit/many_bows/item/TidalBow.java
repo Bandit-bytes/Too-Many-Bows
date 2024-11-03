@@ -31,11 +31,9 @@ public class TidalBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
             ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
-            // Fire the Tidal Arrow if power is adequate and arrows are consumed or Infinity is enabled
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 TidalArrow tidalArrow = new TidalArrow(level, player);
 
@@ -56,7 +54,6 @@ public class TidalBow extends BowItem {
 
                 tidalArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-                // Prevent pickup if Infinity is enabled
                 if (hasInfinity) {
                     tidalArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                 }
@@ -64,7 +61,6 @@ public class TidalBow extends BowItem {
                 level.addFreshEntity(tidalArrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, SoundSource.PLAYERS, 0.3F, 1.0F);
 
-                // Consume arrow if not in Creative mode or with Infinity
                 if (!hasInfinity) {
                     arrowStack.shrink(1);
                 }

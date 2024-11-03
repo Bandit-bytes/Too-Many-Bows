@@ -23,6 +23,7 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.TIDAL_BOW.get());
         registerBowProperties(ItemRegistry.NECRO_FLAME_BOW.get());
         registerBowProperties(ItemRegistry.SCATTER_BOW.get());
+        registerBowProperties(ItemRegistry.ANCIENT_SAGE_BOW.get());
 
         registerEntityRenderers();
     }
@@ -44,6 +45,7 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.VENOM_ARROW.get(), VenomArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.FLAME_ARROW.get(), FlameArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.TIDAL_ARROW.get(), TidalArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.LIGHTNING_ARROW.get(), LightningArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.CURSED_FLAME_ARROW.get(), CursedFlameArrowRenderer::new);
 
     }

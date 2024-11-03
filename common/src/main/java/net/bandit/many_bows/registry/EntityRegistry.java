@@ -22,10 +22,12 @@ public class EntityRegistry {
             () -> EntityType.Builder.<DragonsBreathArrow>of(DragonsBreathArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "dragons_breath_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<SonicBoomProjectile>> SONIC_BOOM_PROJECTILE = ENTITY_TYPES.register("sonic_boom_projectile",
             () -> EntityType.Builder.<SonicBoomProjectile>of(SonicBoomProjectile::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "sonic_boom_projectile").toString()));
+
     public static final RegistrySupplier<EntityType<VenomArrow>> VENOM_ARROW = ENTITY_TYPES.register("venom_arrow",
             () -> EntityType.Builder.<VenomArrow>of(VenomArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
@@ -42,6 +44,11 @@ public class EntityRegistry {
             () -> EntityType.Builder.<CursedFlameArrow>of(CursedFlameArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build("cursed_flame_arrow"));
+    public static final RegistrySupplier<EntityType<LightningArrow>> LIGHTNING_ARROW = ENTITY_TYPES.register("lightning_arrow",
+            () -> EntityType.Builder.<LightningArrow>of(LightningArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "lightning_arrow").toString()));
+
 
     public static void register() {
         ENTITY_TYPES.register();

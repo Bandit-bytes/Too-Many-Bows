@@ -1,6 +1,7 @@
 package net.bandit.many_bows.forge;
 
 import dev.architectury.platform.forge.EventBuses;
+import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.forge.loot.BowLootInjectorPlatformImpl;
@@ -46,6 +47,8 @@ public class ManyBowsModForge {
         event.registerEntityRenderer(EntityRegistry.FLAME_ARROW.get(), FlameArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.CURSED_FLAME_ARROW.get(), CursedFlameArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.TIDAL_ARROW.get(), TidalArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.LIGHTNING_ARROW.get(), LightningArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.DRAGONS_BREATH_ARROW.get(), DragonsBreathArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);
     }
 }

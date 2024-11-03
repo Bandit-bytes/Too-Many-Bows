@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -16,7 +17,6 @@ import net.minecraft.world.phys.EntityHitResult;
 public class SonicBoomProjectile extends AbstractArrow {
 
     private int lifetime = 60;
-    private int pulseInterval = 5;
     private int tickCount = 0;
 
     public SonicBoomProjectile(EntityType<? extends SonicBoomProjectile> entityType, Level level) {
@@ -25,7 +25,7 @@ public class SonicBoomProjectile extends AbstractArrow {
     }
 
     public SonicBoomProjectile(Level level, LivingEntity shooter) {
-        super(EntityType.ARROW, shooter, level);
+        super(EntityRegistry.SONIC_BOOM_PROJECTILE.get(), shooter, level);
         this.setNoGravity(true);
     }
 
@@ -33,9 +33,9 @@ public class SonicBoomProjectile extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (result.getEntity() instanceof LivingEntity target) {
-            target.hurt(damageSources().sonicBoom(this), 20.0F); // High damage
+            target.hurt(damageSources().sonicBoom(this), 20.0F); // Adjusted damage
             target.knockback(2.0F, Math.sin(this.getYRot() * Math.PI / 180.0F), -Math.cos(this.getYRot() * Math.PI / 180.0F));
-            target.level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);
+            level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);
             this.discard(); // Remove after hitting an entity
         }
     }
@@ -45,33 +45,35 @@ public class SonicBoomProjectile extends AbstractArrow {
         super.tick();
         tickCount++;
 
-        // Check lifetime expiration to despawn the projectile
+        // Server-side lifetime control
         if (!this.level().isClientSide && --this.lifetime <= 0) {
             this.discard();
         }
 
-        // Create particle effect pulse every pulseInterval ticks
-        if (this.level().isClientSide && tickCount % pulseInterval == 0) {
-            createSonicBoomPulse();
+        // Client-side particle effect for sonic boom animation
+        if (this.level().isClientSide) {
+            createSonicBoomSpiral();
         }
     }
-
-    // Creates a particle ring expanding outward to simulate the sonic boom effect
-    private void createSonicBoomPulse() {
-        int particles = 15; // Number of particles per ring
-        double radius = 0.5 + (tickCount / 5.0); // Expanding radius over time
+    // Enhanced particle effect for warden-like sonic boom
+    private void createSonicBoomSpiral() {
+        int particles = 25; // Increased particle density
+        double radius = 0.5;
+        double spiralExpansionRate = 0.15;
 
         for (int i = 0; i < particles; i++) {
-            double angle = 2 * Math.PI * i / particles;
+            double angle = 2 * Math.PI * (i + tickCount * 0.1);
             double offsetX = radius * Math.cos(angle);
             double offsetZ = radius * Math.sin(angle);
+            double offsetY = tickCount * 0.05 - (i * 0.01);
 
-            // Generate particles in a ring around the arrow
-            this.level().addParticle(ParticleTypes.SONIC_BOOM,
+            this.level().addParticle(ParticleTypes.ELECTRIC_SPARK,  // Alternative to SONIC_BOOM
                     this.getX() + offsetX,
-                    this.getY(),
+                    this.getY() + offsetY,
                     this.getZ() + offsetZ,
                     0.0D, 0.0D, 0.0D);
+
+            radius += spiralExpansionRate; // Expanding spiral
         }
     }
 

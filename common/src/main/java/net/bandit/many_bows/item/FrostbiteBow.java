@@ -2,6 +2,7 @@ package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.FrostbiteArrow;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -16,6 +17,8 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -23,6 +26,7 @@ import java.util.List;
 public class FrostbiteBow extends BowItem {
 
     private static final int MIN_CHARGE_REQUIRED = 10;
+    private static final double BASE_DAMAGE = 2.0;
     private boolean hasPlayedPullSound = false;
 
     public FrostbiteBow(Properties properties) {
@@ -35,7 +39,6 @@ public class FrostbiteBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
             ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
@@ -43,11 +46,10 @@ public class FrostbiteBow extends BowItem {
                 FrostbiteArrow arrow = new FrostbiteArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
 
-                // Base damage and custom enchantments
-                arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
+                arrow.setBaseDamage(BASE_DAMAGE);
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
-                    arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
+                    arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.25);
                 }
                 int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
                 if (punchLevel > 0) {
@@ -57,14 +59,11 @@ public class FrostbiteBow extends BowItem {
                     arrow.setSecondsOnFire(100);
                 }
 
-                // Prevent pickup if Infinity is enabled
                 arrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
-
                 level.addFreshEntity(arrow);
                 createSnowBurstParticles(level, player);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F, 1.2F);
 
-                // Consume arrow if not in Creative mode or with Infinity
                 if (!hasInfinity) {
                     arrowStack.shrink(1);
                 }
@@ -76,13 +75,27 @@ public class FrostbiteBow extends BowItem {
         hasPlayedPullSound = false;
     }
 
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
-                return stack;
+    public void inventoryTick(ItemStack stack, Level level, LivingEntity entity, int slot, boolean selected) {
+        if (selected && entity instanceof Player player && !level.isClientSide()) {
+            applyFrostWalkerEffect(player, level);
+        }
+        super.inventoryTick(stack, level, entity, slot, selected);
+    }
+
+    private void applyFrostWalkerEffect(Player player, Level level) {
+        BlockPos playerPos = player.blockPosition().below();
+
+        // Loop around a 3x3 area under the player for better coverage
+        for (BlockPos pos : BlockPos.betweenClosed(playerPos.offset(-1, 0, -1), playerPos.offset(1, 0, 1))) {
+            BlockState state = level.getBlockState(pos);
+
+            if (state.is(Blocks.WATER) && level.getBlockState(pos.above()).isAir()) {
+                level.setBlockAndUpdate(pos, Blocks.FROSTED_ICE.defaultBlockState());
+
+                // Schedule to melt the ice naturally over time
+                level.scheduleTick(pos, Blocks.FROSTED_ICE, 60);
             }
         }
-        return ItemStack.EMPTY;
     }
 
     @Override
@@ -103,6 +116,15 @@ public class FrostbiteBow extends BowItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip.ability").withStyle(ChatFormatting.DARK_AQUA));
+    }
+
+    private ItemStack findArrowInInventory(Player player) {
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() == Items.ARROW) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private void createPullingSnowParticles(Level level, LivingEntity entity) {
