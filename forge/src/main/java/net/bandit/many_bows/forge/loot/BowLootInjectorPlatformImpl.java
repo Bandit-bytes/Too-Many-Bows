@@ -39,6 +39,7 @@ public class BowLootInjectorPlatformImpl {
         return LootPool.lootPool()
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/dungeon_bows")))
+                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/bow_items")))
                 .build();
     }
 }
