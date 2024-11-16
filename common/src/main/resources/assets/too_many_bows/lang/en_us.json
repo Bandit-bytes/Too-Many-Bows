@@ -12,6 +12,7 @@
   "item.too_many_bows.necro_flame_bow": "Necro Flame Bow",
   "item.too_many_bows.tidal_bow": "Tidal Bow",
   "item.too_many_bows.hunter_bow": "Hunter's Bow",
+  "item.too_many_bows.sentinels_wrath": "Sentinel's Wrath",
   "item.too_many_bows.frostbite": "Frostbite",
   "item.too_many_bows.burnt_relic": "Burnt Relic",
   "item.too_many_bows.ironclad_bow": "Ironclad Bow",
@@ -21,6 +22,7 @@
   "item.too_many_bows.skull": "Necro Skull",
   "item.too_many_bows.ancient_sage": "Ancient Sage",
   "item.too_many_bows.frozenite": "Frozenite",
+  "item.too_many_bows.shulker_blast": "Shulker's Blast",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
@@ -87,11 +89,30 @@
   "item.too_many_bows.ironclad_bow.tooltip.legend": "Infinite arrows and magnetic force",
 
   "item.too_many_bows.hunter_bow_bow": "The Hunter's trusty bow.",
-  "item.too_many_bows.hunter_bow.tooltip": "A hunter's bow that increases drops from passive mobs."
+  "item.too_many_bows.hunter_bow.tooltip": "§7Effective against passive mobs.",
+  "item.too_many_bows.hunter_bow.hold_shift": "§8[Hold §eShift§8] for more info",
+  "item.too_many_bows.hunter_bow.shift_title": "§6Strong against:",
+  "item.too_many_bows.hunter_bow.mob1": "§7Cows",
+  "item.too_many_bows.hunter_bow.mob2": "§7Pigs",
+  "item.too_many_bows.hunter_bow.mob3": "§7Sheep",
+  "item.too_many_bows.hunter_bow.mob4": "§7Chickens",
+  "item.too_many_bows.hunter_bow.mob5": "§7Rabbits",
 
+  "item.too_many_bows.emerald_sage_bow": "Emerald Sage Bow",
+  "item.too_many_bows.emerald_sage_bow.tooltip": "Grants bonus XP upon hitting enemies",
 
+  "item.too_many_bows.sentinels_wrath.tooltip": "§7Effective against raiders.",
+  "item.too_many_bows.sentinels_wrath.hold_shift": "§8[Hold §eShift§8] for more info",
+  "item.too_many_bows.sentinels_wrath.shift_title": "§6Strong against:",
+  "item.too_many_bows.sentinels_wrath.mob1": "§7Pillagers",
+  "item.too_many_bows.sentinels_wrath.mob2": "§7Vindicators",
+  "item.too_many_bows.sentinels_wrath.mob3": "§7Evokers",
+  "item.too_many_bows.sentinels_wrath.mob4": "§7Ravagers",
+  "item.too_many_bows.sentinels_wrath.mob5": "§7Illusioners",
+  "item.too_many_bows.sentinels_wrath.mob6": "§7Witches",
 
-
+  "item.too_many_bows.shulker_blast_bow.tooltip": "Shoots homing shulker blasts",
+  "item.too_many_bows.shulker_blast_bow.description": "A powerful bow that fires shulker homing projectiles."
 
 
 }

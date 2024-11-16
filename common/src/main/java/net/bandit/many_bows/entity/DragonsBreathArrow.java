@@ -14,11 +14,16 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import org.joml.Vector3f;
 
 public class DragonsBreathArrow extends AbstractArrow {
+    private static final int PARTICLE_LIFESPAN = 40;
+    private static final int MAX_LIFETIME = 100; // Maximum lifetime in ticks (100 ticks = 5 seconds)
+    private int particleTicksRemaining = PARTICLE_LIFESPAN;
+    private int lifetime = 0; // Counter for the projectile's lifetime
 
     public DragonsBreathArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
@@ -27,17 +32,15 @@ public class DragonsBreathArrow extends AbstractArrow {
     public DragonsBreathArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.DRAGONS_BREATH_ARROW.get(), shooter, level);
     }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (result.getEntity() instanceof LivingEntity target) {
             Level level = target.level();
-
-            // Play sound on impact
             level.playSound(null, target.getX(), target.getY(), target.getZ(),
                     SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-            // Apply damage to nearby entities
             level.getEntities((Entity) null, target.getBoundingBox().inflate(2.0D), e -> e instanceof LivingEntity)
                     .forEach(entity -> {
                         if (entity != target) {
@@ -45,35 +48,58 @@ public class DragonsBreathArrow extends AbstractArrow {
                         }
                     });
 
-            // Create an AreaEffectCloud for lingering particles
             AreaEffectCloud areaEffectCloud = new AreaEffectCloud(level, target.getX(), target.getY(), target.getZ());
             areaEffectCloud.setParticle(ParticleTypes.DRAGON_BREATH);
-            areaEffectCloud.setRadius(5.0F); // Smaller radius to avoid lingering too long
-            areaEffectCloud.setDuration(300); // Reduced duration
-            areaEffectCloud.setRadiusPerTick(-0.1F); // Faster shrink rate
-            areaEffectCloud.setWaitTime(0);
-            areaEffectCloud.setFixedColor(0x00FF00);
-            areaEffectCloud.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.HARM, 40, 1));
+            areaEffectCloud.setRadius(3.0F);
+            areaEffectCloud.setDuration(100);
+            areaEffectCloud.setRadiusPerTick(-0.05F);
+            areaEffectCloud.setWaitTime(10);
+            areaEffectCloud.addEffect(new net.minecraft.world.effect.MobEffectInstance(
+                    net.minecraft.world.effect.MobEffects.HARM, 40, 1));
 
-            // Add the AreaEffectCloud to the level
             level.addFreshEntity(areaEffectCloud);
-
-            // Create green dust particles for visual effect
-            for (int i = 0; i < 20; i++) {
-                double xOffset = (random.nextDouble() - 0.5D) * 1.5D;
-                double yOffset = random.nextDouble() * 1.5D;
-                double zOffset = (random.nextDouble() - 0.5D) * 1.5D;
-                level.addParticle(new DustParticleOptions(new Vector3f(0.0F, 1.0F, 0.0F), 1.0F),
-                        target.getX() + xOffset, target.getY() + yOffset, target.getZ() + zOffset,
-                        0.0D, 0.0D, 0.0D);
-            }
+            createImpactParticles(target.getX(), target.getY(), target.getZ());
         }
+        this.discard();
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        // Increment the lifetime counter
+        lifetime++;
+        if (lifetime > MAX_LIFETIME) {
+            this.discard();
+            return;
+        }
+
+        // Handle particles and effects
+        if (level().isClientSide() && particleTicksRemaining > 0) {
+            createTrailParticles();
+            particleTicksRemaining--;
+        }
+    }
+
+    private void createImpactParticles(double x, double y, double z) {
+        for (int i = 0; i < 20; i++) {
+            double xOffset = (random.nextDouble() - 0.5D) * 1.5D;
+            double yOffset = random.nextDouble() * 1.5D;
+            double zOffset = (random.nextDouble() - 0.5D) * 1.5D;
+            level().addParticle(new DustParticleOptions(new Vector3f(0.0F, 1.0F, 0.0F), 1.0F),
+                    x + xOffset, y + yOffset, z + zOffset, 0.0D, 0.0D, 0.0D);
+        }
+    }
+
+    private void createTrailParticles() {
+        level().addParticle(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 0.0D, -0.05D, 0.0D);
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return ItemStack.EMPTY;
+        return new ItemStack(Items.ARROW);
     }
+
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);

@@ -3,6 +3,7 @@ package net.bandit.many_bows.client;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.entity.SentinelArrow;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.resources.ResourceLocation;
@@ -31,6 +32,9 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.BURNT_RELIC.get());
         registerBowProperties(ItemRegistry.IRONCLAD_BOW.get());
         registerBowProperties(ItemRegistry.HUNTER_BOW.get());
+        registerBowProperties(ItemRegistry.SENTINELS_WRAITH.get());
+        registerBowProperties(ItemRegistry.EMERALD_SAGE_BOW.get());
+        registerBowProperties(ItemRegistry.SHULKER_BLAST.get());
 
         registerEntityRenderers();
     }
@@ -57,6 +61,9 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.LIGHTNING_ARROW.get(), LightningArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.CURSED_FLAME_ARROW.get(), CursedFlameArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.HUNTER_ARROW.get(), HunterArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.SENTINEL_ARROW.get(), SentinelArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.SHULKER_BLAST_PROJECTILE.get(), ShulkerBlastArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.HUNTER_XP_ARROW.get(), HunterXPArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.ANCIENT_SAGE_ARROW.get(), AncientSageArrowRenderer::new);
 
     }

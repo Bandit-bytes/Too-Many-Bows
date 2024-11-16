@@ -4,6 +4,7 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.bandit.many_bows.entity.*;
 import net.bandit.many_bows.item.AncientSageBow;
+import net.bandit.many_bows.item.SentinelsWrathBow;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -65,10 +66,26 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "hunter_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<HunterXPArrow>> HUNTER_XP_ARROW = ENTITY_TYPES.register("hunter_xp_arrow",
+            () -> EntityType.Builder.<HunterXPArrow>of(HunterXPArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "hunter_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<AncientSageArrow>> ANCIENT_SAGE_ARROW = ENTITY_TYPES.register("ancient_sage_arrow",
             () -> EntityType.Builder.<AncientSageArrow>of(AncientSageArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "ancient_sage_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<SentinelArrow>> SENTINEL_ARROW = ENTITY_TYPES.register("sentinel_arrow",
+            () -> EntityType.Builder.<SentinelArrow>of(SentinelArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "sentinel_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<ShulkerBlastProjectile>> SHULKER_BLAST_PROJECTILE = ENTITY_TYPES.register("shulker_blast_projectile",
+            () -> EntityType.Builder.<ShulkerBlastProjectile>of(ShulkerBlastProjectile::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "shulker_blast_projectile").toString()));
+
 
 
 

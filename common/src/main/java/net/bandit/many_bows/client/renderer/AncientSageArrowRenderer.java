@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class AncientSageArrowRenderer extends ArrowRenderer<AncientSageArrow> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/entity/ancient_arrow.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation("too_many_bows", "textures/entity/ancient_sage_arrow.png");
 
     public AncientSageArrowRenderer(EntityRendererProvider.Context context) {
         super(context);

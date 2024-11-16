@@ -55,7 +55,7 @@ public class BurntRelicBow extends BowItem {
                 level.addFreshEntity(arrow);
 
                 // Play a custom shooting sound
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SKELETON_AMBIENT, SoundSource.PLAYERS, 1.0F, 1.2F);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.2F);
 
                 // Damage the bow after each shot
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));

@@ -15,7 +15,7 @@ public class TabRegistry {
             "too_many_bows_tab",
             () -> CreativeTabRegistry.create(
                     Component.translatable("category.many_bows"),
-                    () -> new ItemStack(ItemRegistry.ARCANE_BOW.get())
+                    () -> new ItemStack(ItemRegistry.WIND_BOW.get())
             )
     );
     public static void init() {

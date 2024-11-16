@@ -1,12 +1,27 @@
 {
+  "type": "minecraft:chest",
   "pools": [
     {
-      "rolls": 2,
+      "rolls": {
+        "min": 1,
+        "max": 3,
+        "type": "minecraft:uniform"
+      },
+      "bonus_rolls": 1,
       "entries": [
         {
           "type": "item",
           "name": "too_many_bows:solar_bow",
-          "weight": 3
+          "weight": 3,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
         },
         {
           "type": "item",
@@ -36,7 +51,18 @@
         {
           "type": "item",
           "name": "too_many_bows:dragons_breath",
-          "weight": 1
+          "weight": 1,
+          "conditions": [
+            {
+              "condition": "minecraft:entity_properties",
+              "entity": "this",
+              "predicate": {
+                "effects": {
+                  "minecraft:hero_of_the_village": {}
+                }
+              }
+            }
+          ]
         },
         {
           "type": "item",
@@ -47,6 +73,17 @@
           "type": "item",
           "name": "too_many_bows:aethers_call",
           "weight": 4
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:sentinels_wrath",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:enchant_randomly",
+              "enchantments": ["minecraft:power", "minecraft:punch"]
+            }
+          ]
         },
         {
           "type": "item",
@@ -66,7 +103,13 @@
         {
           "type": "item",
           "name": "too_many_bows:demons_grasp",
-          "weight": 4
+          "weight": 4,
+          "conditions": [
+            {
+              "condition": "minecraft:random_chance",
+              "chance": 0.1
+            }
+          ]
         },
         {
           "type": "item",
@@ -76,6 +119,11 @@
         {
           "type": "item",
           "name": "too_many_bows:tidal_bow",
+          "weight": 2
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:shulker_blast",
           "weight": 2
         }
       ]

@@ -39,9 +39,10 @@ public class IcicleJavelin extends AbstractArrow {
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4)); // Apply slowness
         }
 
+        // Place ice on impact
         freezeAreaAround(this.getX(), this.getY(), this.getZ());
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.SNOW_STEP, SoundSource.PLAYERS, 1.0F, 1.0F);
         createIceExplosion();
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.SNOW_STEP, SoundSource.PLAYERS, 1.0F, 1.0F);
         this.discard();
     }
 
@@ -49,31 +50,61 @@ public class IcicleJavelin extends AbstractArrow {
     public void tick() {
         super.tick();
 
+        // Freeze the area if the javelin is in the ground and hasn't frozen already
         if (!level().isClientSide() && this.inGround && !hasFrozen) {
             freezeAreaAround(this.getX(), this.getY(), this.getZ());
             hasFrozen = true;
             this.discard();
         }
 
+        // Create particles while in flight
         if (level().isClientSide()) {
             createTrailParticles();
         }
     }
 
+    /**
+     * Method to freeze the area around the impact.
+     */
     private void freezeAreaAround(double x, double y, double z) {
         BlockPos impactPos = new BlockPos((int) x, (int) y, (int) z);
 
-        if (level().getBlockState(impactPos).is(Blocks.WATER)) {
-            level().setBlockAndUpdate(impactPos, Blocks.ICE.defaultBlockState());
-            return;
-        }
-
-        BlockPos blockBelow = impactPos.below();
-        if (level().getBlockState(impactPos).isAir() && level().getBlockState(blockBelow).isSolid()) {
+        // Always try to place ice at the impact position
+        if (level().getBlockState(impactPos).isAir() || level().getBlockState(impactPos).canBeReplaced()) {
             level().setBlockAndUpdate(impactPos, Blocks.PACKED_ICE.defaultBlockState());
+        } else {
+            // If the block at the impact position is solid, try placing ice on an adjacent block
+            BlockPos adjacentPos = findAdjacentBlock(impactPos);
+            if (adjacentPos != null) {
+                level().setBlockAndUpdate(adjacentPos, Blocks.PACKED_ICE.defaultBlockState());
+            }
         }
     }
 
+    /**
+     * Helper method to find an adjacent block to place ice if the impact position is occupied.
+     */
+    private BlockPos findAdjacentBlock(BlockPos impactPos) {
+        BlockPos[] adjacentPositions = {
+                impactPos.above(),
+                impactPos.below(),
+                impactPos.north(),
+                impactPos.south(),
+                impactPos.east(),
+                impactPos.west()
+        };
+
+        for (BlockPos pos : adjacentPositions) {
+            if (level().getBlockState(pos).isAir() || level().getBlockState(pos).canBeReplaced()) {
+                return pos;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Creates an ice explosion effect.
+     */
     private void createIceExplosion() {
         for (int i = 0; i < 20; i++) {
             double offsetX = (this.random.nextDouble() - 0.5) * 0.5;
@@ -83,6 +114,9 @@ public class IcicleJavelin extends AbstractArrow {
         }
     }
 
+    /**
+     * Creates a trail of particles while the javelin is in flight.
+     */
     private void createTrailParticles() {
         for (int i = 0; i < 5; i++) {
             double offsetX = (this.random.nextDouble() - 0.5) * 0.2;

@@ -15,9 +15,12 @@ public class DragonsBreathArrowRenderer extends EntityRenderer<DragonsBreathArro
     public DragonsBreathArrowRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
+
     @Override
     public void render(DragonsBreathArrow entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         Vec3 entityPos = entity.position();
+
+        // Use level's random instead
         for (int i = 0; i < 5; i++) {
             double offsetX = Mth.nextDouble(entity.level().random, -0.2, 0.2);
             double offsetY = Mth.nextDouble(entity.level().random, -0.2, 0.2);
@@ -25,6 +28,7 @@ public class DragonsBreathArrowRenderer extends EntityRenderer<DragonsBreathArro
             entity.level().addParticle(ParticleTypes.DRAGON_BREATH, entityPos.x + offsetX, entityPos.y + offsetY, entityPos.z + offsetZ, 0.0D, -0.05D, 0.0D);
         }
     }
+
     @Override
     public ResourceLocation getTextureLocation(DragonsBreathArrow entity) {
         return null;

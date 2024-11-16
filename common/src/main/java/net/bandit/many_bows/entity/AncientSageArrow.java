@@ -5,7 +5,7 @@ import net.bandit.many_bows.util.AncientSageDamageSource;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -17,7 +17,9 @@ import net.minecraft.world.phys.EntityHitResult;
 public class AncientSageArrow extends AbstractArrow {
 
     private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.33f;
+    private static final int PARTICLE_LIFESPAN = 60; // Number of ticks to show particles
     private float armorPenetration = DEFAULT_ARMOR_PENETRATION_FACTOR;
+    private int particleTicksRemaining = PARTICLE_LIFESPAN;
 
     public AncientSageArrow(EntityType<? extends AncientSageArrow> entityType, Level level) {
         super(entityType, level);
@@ -27,7 +29,6 @@ public class AncientSageArrow extends AbstractArrow {
         super(EntityRegistry.ANCIENT_SAGE_ARROW.get(), shooter, level);
     }
 
-    // Setter for armor penetration
     public void setArmorPenetration(float armorPenetration) {
         this.armorPenetration = armorPenetration;
     }
@@ -39,23 +40,25 @@ public class AncientSageArrow extends AbstractArrow {
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             float baseDamage = (float) this.getBaseDamage();
             float armorReducedDamage = baseDamage * (1 - armorPenetration);
-
             target.hurt(AncientSageDamageSource.create(this.level(), this, this.getOwner()), armorReducedDamage);
         }
 
-        createParticles();
+        createHitParticles();
         this.discard();
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide()) {
+
+        // Only create trail particles for a limited number of ticks
+        if (particleTicksRemaining > 0) {
             createTrailParticles();
+            particleTicksRemaining--;
         }
     }
 
-    private void createParticles() {
+    private void createHitParticles() {
         for (int i = 0; i < 15; i++) {
             double offsetX = (this.random.nextDouble() - 0.5) * 0.5;
             double offsetY = this.random.nextDouble() * 0.5;

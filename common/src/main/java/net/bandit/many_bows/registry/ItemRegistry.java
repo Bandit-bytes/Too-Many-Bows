@@ -13,12 +13,22 @@ import net.minecraft.world.item.Rarity;
 public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ManyBowsMod.MOD_ID, Registries.ITEM);
 
+    //item
+    public static final RegistrySupplier<Item> SKULL = ITEMS.register("skull",
+            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> ANCIENT_SAGE = ITEMS.register("ancient_sage",
+            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> FROZENITE = ITEMS.register("frozenite",
+            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+
     //BOWS
+    public static final RegistrySupplier<Item> ANCIENT_SAGE_BOW = ITEMS.register("ancient_sage_bow",
+            () -> new AncientSageBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+
     public static final RegistrySupplier<Item> ARCANE_BOW = ITEMS.register("arcane_bow",
             () -> new ArcaneBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
-
-    public static final RegistrySupplier<Item> SOLAR_BOW = ITEMS.register("solar_bow",
-            () -> new SolarBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> DARK_BOW = ITEMS.register("dark_bow",
+            () -> new SonicBoomBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
 
     public static final RegistrySupplier<Item> FROSTBITE = ITEMS.register("frostbite",
             () -> new FrostbiteBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
@@ -35,17 +45,11 @@ public class ItemRegistry {
     public static final RegistrySupplier<Item> FLAME_BOW = ITEMS.register("flame_bow",
             () -> new FlameBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
 
-    public static final RegistrySupplier<Item> DARK_BOW = ITEMS.register("dark_bow",
-            () -> new SonicBoomBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
-
     public static final RegistrySupplier<Item> TIDAL_BOW = ITEMS.register("tidal_bow",
             () -> new TidalBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 
     public static final RegistrySupplier<Item> NECRO_FLAME_BOW = ITEMS.register("necro_flame_bow",
             () -> new CursedFlameBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
-
-    public static final RegistrySupplier<Item> ANCIENT_SAGE_BOW = ITEMS.register("ancient_sage_bow",
-            () -> new AncientSageBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 
     public static final RegistrySupplier<Item> SCATTER_BOW = ITEMS.register("scatter_bow",
             () -> new ScatterBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
@@ -53,7 +57,13 @@ public class ItemRegistry {
     public static final RegistrySupplier<Item> WIND_BOW = ITEMS.register("wind_bow",
             () -> new WindBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
 
-    //regular bows
+    //Flash Art Bows
+    public static final RegistrySupplier<Item> SOLAR_BOW = ITEMS.register("solar_bow",
+            () -> new SolarBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> SHULKER_BLAST = ITEMS.register("shulker_blast",
+            () -> new ShulkerBlastBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> EMERALD_SAGE_BOW = ITEMS.register("emerald_sage_bow",
+            () -> new EmeraldSageBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
     public static final RegistrySupplier<Item> DEMONS_GRASP = ITEMS.register("demons_grasp",
             () -> new BowItem(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
     public static final RegistrySupplier<Item> AETHERS_CALL = ITEMS.register("aethers_call",
@@ -66,14 +76,9 @@ public class ItemRegistry {
             () -> new BurntRelicBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
     public static final RegistrySupplier<Item> CYROHEART_BOW = ITEMS.register("cyroheart_bow",
             () -> new IcicleJavelinBow(new Properties().durability(850).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> SENTINELS_WRAITH = ITEMS.register("sentinels_wrath",
+            () -> new SentinelsWrathBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
 
-//item
-    public static final RegistrySupplier<Item> SKULL = ITEMS.register("skull",
-            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
-    public static final RegistrySupplier<Item> ANCIENT_SAGE = ITEMS.register("ancient_sage",
-            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
-    public static final RegistrySupplier<Item> FROZENITE = ITEMS.register("frozenite",
-            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
 
     public static void register() {
         ITEMS.register();

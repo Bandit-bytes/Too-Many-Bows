@@ -2,6 +2,7 @@ package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.HunterArrow;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -82,11 +83,29 @@ public class HunterBow extends BowItem {
         return ItemStack.EMPTY;
     }
 
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        // Default tooltip that always shows
         tooltip.add(Component.translatable("item.too_many_bows.hunter_bow_bow").withStyle(ChatFormatting.GOLD));
         tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.tooltip").withStyle(ChatFormatting.GREEN));
+
+        // Check if the player is holding the Shift key
+        if (Screen.hasShiftDown()) {
+            // Display list of passive mobs the bow is effective against
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.shift_title").withStyle(ChatFormatting.YELLOW));
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.mob1").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.mob2").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.mob3").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.mob4").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.mob5").withStyle(ChatFormatting.GREEN));
+        } else {
+            // Prompt to hold Shift for more information
+            tooltip.add(Component.translatable("item.too_many_bows.hunter_bow.hold_shift").withStyle(ChatFormatting.GRAY));
+        }
     }
+
+
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
