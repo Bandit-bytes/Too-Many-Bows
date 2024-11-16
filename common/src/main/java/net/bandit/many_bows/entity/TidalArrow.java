@@ -25,14 +25,16 @@ public class TidalArrow extends AbstractArrow {
     public TidalArrow(EntityType<? extends TidalArrow> entityType, Level level) {
         super(entityType, level);
     }
+
     public TidalArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.TIDAL_ARROW.get(), shooter, level);
     }
+
     @Override
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide()) {
+        if (this.level().isClientSide() && this.isInWater()) {
             Vec3 motion = this.getDeltaMovement();
             for (int i = 0; i < 5; i++) {
                 double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
@@ -46,35 +48,41 @@ public class TidalArrow extends AbstractArrow {
             }
         }
     }
+
+    @Override
+    protected float getWaterInertia() {
+        return 1.0F; // Reduce water drag to allow underwater travel
+    }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!this.level().isClientSide()) {
-            LivingEntity hitEntity = (LivingEntity) result.getEntity();
+        if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
             hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 2));
             createWaterBindingEffect(hitEntity);
         }
     }
 
     private void createWaterBindingEffect(LivingEntity entity) {
-        ServerLevel serverLevel = (ServerLevel) entity.level();
-        BlockPos entityPos = entity.blockPosition();
-        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 4, false, false));
-        for (int i = 0; i < 30; i++) {
-            double angle = i * Math.PI / 15;
-            double xOffset = Math.cos(angle) * 0.5;
-            double zOffset = Math.sin(angle) * 0.5;
-            double yOffset = 0.3 * i;
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            BlockPos entityPos = entity.blockPosition();
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 4, false, false));
+            for (int i = 0; i < 30; i++) {
+                double angle = i * Math.PI / 15;
+                double xOffset = Math.cos(angle) * 0.5;
+                double zOffset = Math.sin(angle) * 0.5;
+                double yOffset = 0.3 * i;
 
-            serverLevel.sendParticles(
-                    ParticleTypes.SPLASH,
-                    entityPos.getX() + xOffset,
-                    entityPos.getY() + yOffset,
-                    entityPos.getZ() + zOffset,
-                    1, 0.0, 0.0, 0.0, 0.0
-            );
+                serverLevel.sendParticles(
+                        ParticleTypes.SPLASH,
+                        entityPos.getX() + xOffset,
+                        entityPos.getY() + yOffset,
+                        entityPos.getZ() + zOffset,
+                        1, 0.0, 0.0, 0.0, 0.0
+                );
+            }
+            this.level().playSound(null, entityPos, SoundEvents.GENERIC_SPLASH, this.getSoundSource(), 0.5F, 0.8F);
         }
-        this.level().playSound(null, entityPos, SoundEvents.GENERIC_SPLASH, this.getSoundSource(), 0.5F, 0.8F);
     }
 
     @Override
@@ -100,10 +108,12 @@ public class TidalArrow extends AbstractArrow {
             this.level().playSound(null, position.x, position.y, position.z, SoundEvents.SPLASH_POTION_BREAK, this.getSoundSource(), 1.0F, 1.0F);
         }
     }
+
     @Override
     protected ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         return new ClientboundAddEntityPacket(this);

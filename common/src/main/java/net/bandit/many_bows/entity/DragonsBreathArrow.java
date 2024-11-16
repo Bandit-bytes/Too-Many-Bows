@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
@@ -24,40 +25,51 @@ public class DragonsBreathArrow extends AbstractArrow {
     }
 
     public DragonsBreathArrow(Level level, LivingEntity shooter) {
-        super(EntityType.ARROW, shooter, level);
+        super(EntityRegistry.DRAGONS_BREATH_ARROW.get(), shooter, level);
     }
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (result.getEntity() instanceof LivingEntity target) {
             Level level = target.level();
-            level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-            level.getEntities((Entity) null, target.getBoundingBox().inflate(2.0D), e -> e instanceof LivingEntity).forEach(entity -> {
-                if (entity != target) {
-                    entity.hurt(target.damageSources().magic(), 4.0F);
-                }
-            });
+            // Play sound on impact
+            level.playSound(null, target.getX(), target.getY(), target.getZ(),
+                    SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+            // Apply damage to nearby entities
+            level.getEntities((Entity) null, target.getBoundingBox().inflate(2.0D), e -> e instanceof LivingEntity)
+                    .forEach(entity -> {
+                        if (entity != target) {
+                            entity.hurt(target.damageSources().magic(), 4.0F);
+                        }
+                    });
+
+            // Create an AreaEffectCloud for lingering particles
             AreaEffectCloud areaEffectCloud = new AreaEffectCloud(level, target.getX(), target.getY(), target.getZ());
             areaEffectCloud.setParticle(ParticleTypes.DRAGON_BREATH);
-            areaEffectCloud.setRadius(5.0F);
-            areaEffectCloud.setDuration(300);
-            areaEffectCloud.setRadiusPerTick(-0.05F);
+            areaEffectCloud.setRadius(5.0F); // Smaller radius to avoid lingering too long
+            areaEffectCloud.setDuration(300); // Reduced duration
+            areaEffectCloud.setRadiusPerTick(-0.1F); // Faster shrink rate
             areaEffectCloud.setWaitTime(0);
             areaEffectCloud.setFixedColor(0x00FF00);
-            areaEffectCloud.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.HARM, 50, 1));
+            areaEffectCloud.addEffect(new net.minecraft.world.effect.MobEffectInstance(net.minecraft.world.effect.MobEffects.HARM, 40, 1));
 
+            // Add the AreaEffectCloud to the level
             level.addFreshEntity(areaEffectCloud);
-            for (int i = 0; i < 50; i++) {
-                double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
-                double yOffset = random.nextDouble();
-                double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
+
+            // Create green dust particles for visual effect
+            for (int i = 0; i < 20; i++) {
+                double xOffset = (random.nextDouble() - 0.5D) * 1.5D;
+                double yOffset = random.nextDouble() * 1.5D;
+                double zOffset = (random.nextDouble() - 0.5D) * 1.5D;
                 level.addParticle(new DustParticleOptions(new Vector3f(0.0F, 1.0F, 0.0F), 1.0F),
                         target.getX() + xOffset, target.getY() + yOffset, target.getZ() + zOffset,
                         0.0D, 0.0D, 0.0D);
             }
         }
     }
+
     @Override
     protected ItemStack getPickupItem() {
         return ItemStack.EMPTY;

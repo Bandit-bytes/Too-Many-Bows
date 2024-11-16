@@ -1,7 +1,7 @@
 {
   "pools": [
     {
-      "rolls": 1,
+      "rolls": 2,
       "entries": [
         {
           "type": "item",
@@ -25,6 +25,11 @@
         },
         {
           "type": "item",
+          "name": "too_many_bows:scatter_bow",
+          "weight": 2
+        },
+        {
+          "type": "item",
           "name": "too_many_bows:arc_heavens",
           "weight": 1
         },
@@ -40,8 +45,28 @@
         },
         {
           "type": "item",
-          "name": "too_many_bows:skull",
+          "name": "too_many_bows:aethers_call",
+          "weight": 4
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:cyroheart_bow",
+          "weight": 4
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:burnt_relic",
           "weight": 2
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:ironclad_bow",
+          "weight": 2
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:demons_grasp",
+          "weight": 4
         },
         {
           "type": "item",

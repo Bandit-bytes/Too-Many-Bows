@@ -3,16 +3,24 @@
   "item.too_many_bows.dark_bow": "Dark Bow",
   "item.too_many_bows.ancient_sage_bow": "Ancient Sage Bow",
   "item.too_many_bows.verdant_viper": "Verdant Viper",
-  "item.too_many_bows.shadow_bow": "Shadow Bow",
+  "item.too_many_bows.wind_bow": "Wind Bow",
+  "item.too_many_bows.demons_grasp": "Demons Grasp",
+  "item.too_many_bows.aethers_call": "Aether's Call",
   "item.too_many_bows.spectral_bow": "Spectral Bow",
+  "item.too_many_bows.cyroheart_bow": "Cyroheart Bow",
   "item.too_many_bows.flame_bow": "Pyre's Embrace",
   "item.too_many_bows.necro_flame_bow": "Necro Flame Bow",
   "item.too_many_bows.tidal_bow": "Tidal Bow",
+  "item.too_many_bows.hunter_bow": "Hunter's Bow",
   "item.too_many_bows.frostbite": "Frostbite",
+  "item.too_many_bows.burnt_relic": "Burnt Relic",
+  "item.too_many_bows.ironclad_bow": "Ironclad Bow",
   "item.too_many_bows.arc_heavens": "Arc Of The Heavens",
   "item.too_many_bows.solar_bow": "Solar Flare",
   "item.too_many_bows.dragons_breath": "Dragons Breath",
   "item.too_many_bows.skull": "Necro Skull",
+  "item.too_many_bows.ancient_sage": "Ancient Sage",
+  "item.too_many_bows.frozenite": "Frozenite",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
@@ -26,12 +34,16 @@
 
   "item.many_bows.frostbite_bow.tooltip": "A bow forged from the chilling essence of ice.",
   "item.many_bows.frostbite_bow.tooltip.ability": "Shoots frost arrows that slow and freeze enemies on full charge.",
+  "item.many_bows.frostbite_bow.tooltip.frostwalker": "Applies Frost Walker effect when pulling back bow.",
+
 
   "item.too_many_bows.arc_heavens.tooltip": "Unleash the power of the storm.",
   "item.too_many_bows.arc_heavens.tooltip.ability": "Strikes foes with lightning on a direct hit.",
+
   "item.too_many_bows.sonic_bow.tooltip": "Harness the destructive force of the Warden's roar",
   "item.too_many_bows.sonic_bow.tooltip.ability": "Shoots a powerful shockwave that pierces enemies with immense force",
   "item.too_many_bows.sonic_bow.tooltip.legend": "Forged from the echoes of the Deep Dark, this bow unleashes pure devastation.",
+
   "item.many_bows.dragons_breath_bow.tooltip": "Power of the Dragon",
   "item.many_bows.dragons_breath_bow.tooltip.ability": "Fires a charged arrow that spawns dragon's breath upon impact.",
   "item.too_many_bows.verdant_viper_bow.tooltip": "A bow that harnesses the venom of nature.",
@@ -43,7 +55,7 @@
   "item.too_many_bows.flame_bow.tooltip.legend": "A legendary bow forged in the heart of a volcano.",
 
   "item.too_many_bows.tidal_bow.tooltip": "The power of the ocean flows through this bow.",
-  "item.too_many_bows.tidal_bow.tooltip.ability": "Shoots arrows imbued with the force of waves.",
+  "item.too_many_bows.tidal_bow.tooltip.ability": "You are able to shoot arrows underwater as normal arrows.",
   "item.too_many_bows.tidal_bow.tooltip.legend": "A bow that harnesses the ancient power of the seas.",
 
   "item.too_many_bows.cursed_flame_bow.tooltip": "A bow imbued with cursed flames, known to halt regeneration and burn with inextinguishable fury.",
@@ -58,8 +70,28 @@
   "item.many_bows.scatter_bow.tooltip.legend": "Crafted by the greatest archers",
 
   "item.many_bows.ancient_sage_bow.tooltip": "An ancient weapon of unmatched power.",
-  "item.many_bows.ancient_sage_bow.tooltip.ability": "Pierces through 90% of armor defenses.",
-  "item.many_bows.ancient_sage_bow.tooltip.legend": "Only the wise can wield its true might."
+  "item.many_bows.ancient_sage_bow.tooltip.ability": "Pierces through 33% of armor defenses.",
+  "item.many_bows.ancient_sage_bow.tooltip.legend": "Only the wise can wield its true might.",
+
+  "item.too_many_bows.wind_bow.tooltip": "Harness the power of the wind",
+  "item.too_many_bows.wind_bow.tooltip.ability": "Special Ability: Levitation Shot",
+  "item.too_many_bows.wind_bow.tooltip.effect": "Draw the bow to move swiftly; enemies hit may be lifted skyward",
+  "item.too_many_bows.wind_bow.tooltip.legend": "Ancient whispers say this bow was crafted from a storm's fury",
+
+  "item.many_bows.icicle_javelin_bow.tooltip": "A bow imbued with the power of freezing winds.",
+  "item.many_bows.icicle_javelin_bow.tooltip.ability": "Fires icicle javelins that pierce enemies.",
+  "item.many_bows.icicle_javelin_bow.tooltip.freeze": "summon ice upon block hit.",
+
+  "item.too_many_bows.ironclad_bow.tooltip": "Forged with iron, tempered in battle",
+  "item.too_many_bows.ironclad_bow.tooltip.ability": "Magnetic Pulse: Pulls enemies towards the point of impact",
+  "item.too_many_bows.ironclad_bow.tooltip.legend": "Infinite arrows and magnetic force",
+
+  "item.too_many_bows.hunter_bow_bow": "The Hunter's trusty bow.",
+  "item.too_many_bows.hunter_bow.tooltip": "A hunter's bow that increases drops from passive mobs."
+
+
+
+
 
 
 }

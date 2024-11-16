@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class DragonsBreathArrowRenderer extends EntityRenderer<DragonsBreathArrow> {
@@ -18,7 +19,10 @@ public class DragonsBreathArrowRenderer extends EntityRenderer<DragonsBreathArro
     public void render(DragonsBreathArrow entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         Vec3 entityPos = entity.position();
         for (int i = 0; i < 5; i++) {
-            entity.level().addParticle(ParticleTypes.DRAGON_BREATH, entityPos.x, entityPos.y, entityPos.z, 0.0D, 0.0D, 0.0D);
+            double offsetX = Mth.nextDouble(entity.level().random, -0.2, 0.2);
+            double offsetY = Mth.nextDouble(entity.level().random, -0.2, 0.2);
+            double offsetZ = Mth.nextDouble(entity.level().random, -0.2, 0.2);
+            entity.level().addParticle(ParticleTypes.DRAGON_BREATH, entityPos.x + offsetX, entityPos.y + offsetY, entityPos.z + offsetZ, 0.0D, -0.05D, 0.0D);
         }
     }
     @Override

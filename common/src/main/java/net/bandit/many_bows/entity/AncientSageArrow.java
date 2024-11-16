@@ -1,11 +1,11 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.util.AncientSageDamageSource;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -16,7 +16,7 @@ import net.minecraft.world.phys.EntityHitResult;
 
 public class AncientSageArrow extends AbstractArrow {
 
-    private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.9f;
+    private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.33f;
     private float armorPenetration = DEFAULT_ARMOR_PENETRATION_FACTOR;
 
     public AncientSageArrow(EntityType<? extends AncientSageArrow> entityType, Level level) {
@@ -24,7 +24,7 @@ public class AncientSageArrow extends AbstractArrow {
     }
 
     public AncientSageArrow(Level level, LivingEntity shooter) {
-        super(EntityType.ARROW, shooter, level);
+        super(EntityRegistry.ANCIENT_SAGE_ARROW.get(), shooter, level);
     }
 
     // Setter for armor penetration

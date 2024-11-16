@@ -38,9 +38,8 @@ public class AncientSageBow extends BowItem {
                 AncientSageArrow arrow = new AncientSageArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
 
-                // Set high armor-penetrating damage
                 arrow.setBaseDamage(8.0);
-                arrow.setArmorPenetration(0.9f);  // 90% armor penetration
+                arrow.setArmorPenetration(0.33f);
 
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {

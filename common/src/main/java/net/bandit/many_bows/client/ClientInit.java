@@ -24,6 +24,13 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.NECRO_FLAME_BOW.get());
         registerBowProperties(ItemRegistry.SCATTER_BOW.get());
         registerBowProperties(ItemRegistry.ANCIENT_SAGE_BOW.get());
+        registerBowProperties(ItemRegistry.WIND_BOW.get());
+        registerBowProperties(ItemRegistry.DEMONS_GRASP.get());
+        registerBowProperties(ItemRegistry.AETHERS_CALL.get());
+        registerBowProperties(ItemRegistry.CYROHEART_BOW.get());
+        registerBowProperties(ItemRegistry.BURNT_RELIC.get());
+        registerBowProperties(ItemRegistry.IRONCLAD_BOW.get());
+        registerBowProperties(ItemRegistry.HUNTER_BOW.get());
 
         registerEntityRenderers();
     }
@@ -42,11 +49,15 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DRAGONS_BREATH_ARROW.get(), DragonsBreathArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.ICICLE_JAVELIN.get(), IcicleJavelinRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.VENOM_ARROW.get(), VenomArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.FLAME_ARROW.get(), FlameArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.TIDAL_ARROW.get(), TidalArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.WIND_PROJECTILE.get(), WindArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.LIGHTNING_ARROW.get(), LightningArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.CURSED_FLAME_ARROW.get(), CursedFlameArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.HUNTER_ARROW.get(), HunterArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.ANCIENT_SAGE_ARROW.get(), AncientSageArrowRenderer::new);
 
     }
 }

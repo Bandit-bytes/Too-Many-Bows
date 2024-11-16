@@ -50,14 +50,13 @@ public class SonicBoomProjectile extends AbstractArrow {
             this.discard();
         }
 
-        // Client-side particle effect for sonic boom animation
         if (this.level().isClientSide) {
             createSonicBoomSpiral();
         }
     }
     // Enhanced particle effect for warden-like sonic boom
     private void createSonicBoomSpiral() {
-        int particles = 25; // Increased particle density
+        int particles = 25;
         double radius = 0.5;
         double spiralExpansionRate = 0.15;
 
@@ -67,13 +66,13 @@ public class SonicBoomProjectile extends AbstractArrow {
             double offsetZ = radius * Math.sin(angle);
             double offsetY = tickCount * 0.05 - (i * 0.01);
 
-            this.level().addParticle(ParticleTypes.ELECTRIC_SPARK,  // Alternative to SONIC_BOOM
+            this.level().addParticle(ParticleTypes.ELECTRIC_SPARK,
                     this.getX() + offsetX,
                     this.getY() + offsetY,
                     this.getZ() + offsetZ,
                     0.0D, 0.0D, 0.0D);
 
-            radius += spiralExpansionRate; // Expanding spiral
+            radius += spiralExpansionRate;
         }
     }
 

@@ -31,15 +31,12 @@ public class SonicBoomBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
             ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
 
-            // Fire the Sonic Boom Projectile if power is adequate and arrows are consumed or Infinity is enabled
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 SonicBoomProjectile sonicBoom = new SonicBoomProjectile(level, player);
 
-                // Apply enchantments to the projectile
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
                     sonicBoom.setBaseDamage(sonicBoom.getBaseDamage() + powerLevel * 0.5 + 0.5);
@@ -56,7 +53,6 @@ public class SonicBoomBow extends BowItem {
 
                 sonicBoom.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 5.0F, 0.5F);
 
-                // Prevent pickup if Infinity is enabled
                 if (hasInfinity) {
                     sonicBoom.pickup = AbstractArrow.Pickup.DISALLOWED;
                 }
@@ -64,7 +60,6 @@ public class SonicBoomBow extends BowItem {
                 level.addFreshEntity(sonicBoom);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-                // Damage the bow if Infinity isn't enabled
                 if (!hasInfinity) {
                     arrowStack.shrink(1);
                 }

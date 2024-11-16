@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ASA",
+    "ABA",
+    "ASA"
+  ],
+  "key": {
+    "A": {
+      "item": "too_many_bows:ancient_sage"
+    },
+    "B": {
+      "item": "minecraft:bow"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "too_many_bows:ancient_sage_bow",
+    "count": 1
+  }
+}

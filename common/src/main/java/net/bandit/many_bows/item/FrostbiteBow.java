@@ -75,17 +75,27 @@ public class FrostbiteBow extends BowItem {
         hasPlayedPullSound = false;
     }
 
-    public void inventoryTick(ItemStack stack, Level level, LivingEntity entity, int slot, boolean selected) {
-        if (selected && entity instanceof Player player && !level.isClientSide()) {
+    @Override
+    public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int count) {
+        if (livingEntity instanceof Player player) {
             applyFrostWalkerEffect(player, level);
+
+            if (level.isClientSide()) {
+                if (player.getRandom().nextFloat() < 0.2F) {
+                    createPullingSnowParticles(level, livingEntity);
+                }
+                if (!hasPlayedPullSound) {
+                    level.playSound(null, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 0.5F, 1.0F);
+                    hasPlayedPullSound = true;
+                }
+            }
         }
-        super.inventoryTick(stack, level, entity, slot, selected);
+        super.onUseTick(level, livingEntity, stack, count);
     }
 
     private void applyFrostWalkerEffect(Player player, Level level) {
         BlockPos playerPos = player.blockPosition().below();
 
-        // Loop around a 3x3 area under the player for better coverage
         for (BlockPos pos : BlockPos.betweenClosed(playerPos.offset(-1, 0, -1), playerPos.offset(1, 0, 1))) {
             BlockState state = level.getBlockState(pos);
 
@@ -99,23 +109,10 @@ public class FrostbiteBow extends BowItem {
     }
 
     @Override
-    public void onUseTick(Level level, LivingEntity livingEntity, ItemStack stack, int count) {
-        if (level.isClientSide() && livingEntity instanceof Player player) {
-            if (player.getRandom().nextFloat() < 0.2F) {
-                createPullingSnowParticles(level, livingEntity);
-            }
-            if (!hasPlayedPullSound) {
-                level.playSound(null, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), SoundEvents.SNOW_BREAK, SoundSource.PLAYERS, 0.5F, 1.0F);
-                hasPlayedPullSound = true;
-            }
-        }
-        super.onUseTick(level, livingEntity, stack, count);
-    }
-
-    @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip.ability").withStyle(ChatFormatting.DARK_AQUA));
+        tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip.frostwalker").withStyle(ChatFormatting.BLUE));
     }
 
     private ItemStack findArrowInInventory(Player player) {
