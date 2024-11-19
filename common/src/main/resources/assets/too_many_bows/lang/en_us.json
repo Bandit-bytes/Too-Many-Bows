@@ -111,8 +111,35 @@
   "item.too_many_bows.sentinels_wrath.mob5": "§7Illusioners",
   "item.too_many_bows.sentinels_wrath.mob6": "§7Witches",
 
-  "item.too_many_bows.shulker_blast_bow.tooltip": "Shoots homing shulker blasts",
-  "item.too_many_bows.shulker_blast_bow.description": "A powerful bow that fires shulker homing projectiles."
+  "item.too_many_bows.shulker_blast_bow.tooltip": "Fires homing Shulker blasts",
+  "item.too_many_bows.shulker_blast_bow.shift_title": "§6Special Effects",
+  "item.too_many_bows.shulker_blast_bow.effect1": "§7Homing projectiles",
+  "item.too_many_bows.shulker_blast_bow.hold_shift": "§8[Hold §eShift§8] for more info",
+  "item.too_many_bows.burnt_relic.tooltip":"Ancient relic bow",
+  "item.too_many_bows.burnt_relic.tooltip1": "Once used by Ancient Gods, still holds a flicker of power...",
+  "item.too_many_bows.burnt_relic.tooltip2":"Infinite arrows and enhanced damage",
 
 
+  "advancement.too_many_bows.root.title": "Too Many Bows",
+  "advancement.too_many_bows.root.description": "Begin your journey to become a master archer by obtaining your first bow.",
+  "advancement.too_many_bows.master_bow_collector.title": "Bow Collector Extraordinaire",
+  "advancement.too_many_bows.master_bow_collector.description": "Collect every unique bow in the Too Many Bows mod.",
+
+  "advancement.too_many_bows.necro_skull.title": "The Necro Skull",
+  "advancement.too_many_bows.necro_skull.description": "Obtain the legendary Necro Skull.",
+  "advancement.too_many_bows.necro_flame_bow.title": "Necro Flame Bow",
+  "advancement.too_many_bows.necro_flame_bow.description": "Wield the power of the Necro Flame Bow.",
+
+  "advancement.too_many_bows.ancient_sage.title": "Ancient Sage",
+  "advancement.too_many_bows.ancient_sage.description": "Discover the power of the Ancient Sage.",
+  "advancement.too_many_bows.frozenite.title": "Frozenite",
+  "advancement.too_many_bows.frozenite.description": "Obtain the mystical Frozenite ore.",
+  "advancement.too_many_bows.frostbite.title": "Frostbite",
+  "advancement.too_many_bows.frostbite.description": "Wield the chilling power of the Frostbite Bow",
+  "advancement.too_many_bows.sage_bow.title": "Ancient Sage's Legacy",
+  "advancement.too_many_bows.sage_bow.description": "Unleash the wisdom of the Ancient Sage Bow",
+  "advancement.shulker_blast.title": "Master of Shulker Blasts",
+  "advancement.shulker_blast.description": "Obtain the Shulker Blast Bow",
+  "advancement.shulker_shell.title": "Shulker's Gift",
+  "advancement.shulker_shell.description": "Collect a Shulker Shell"
 }

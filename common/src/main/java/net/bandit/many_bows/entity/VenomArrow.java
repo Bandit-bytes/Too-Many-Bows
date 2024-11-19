@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -63,13 +64,16 @@ public class VenomArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide()) {
-            LivingEntity hitEntity = (LivingEntity) result.getEntity();
-            hitEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 1));
-
-            createPoisonExplosion(result.getLocation(), hitEntity);
-            this.hasHit = true;
+            Entity entity = result.getEntity();
+            if (entity instanceof LivingEntity) {
+                LivingEntity hitEntity = (LivingEntity) entity;
+                hitEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 1));
+                createPoisonExplosion(result.getLocation(), hitEntity);
+                this.hasHit = true;
+            }
         }
     }
+
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);

@@ -72,9 +72,9 @@ public class BurntRelicBow extends BowItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.literal("Ancient relic bow").withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.literal("Once used by Ancient Gods, still holds a flicker of power...").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC));
-        tooltip.add(Component.literal("Infinite arrows and enhanced damage").withStyle(ChatFormatting.DARK_PURPLE).withStyle(ChatFormatting.ITALIC));
+        tooltip.add(Component.translatable("item.too_many_bows.burnt_relic.tooltip").withStyle(ChatFormatting.GOLD));
+        tooltip.add(Component.translatable("item.too_many_bows.burnt_relic.tooltip1").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.ITALIC));
+        tooltip.add(Component.translatable("item.too_many_bows.burnt_relic.tooltip2").withStyle(ChatFormatting.DARK_PURPLE).withStyle(ChatFormatting.ITALIC));
     }
 
     @Override

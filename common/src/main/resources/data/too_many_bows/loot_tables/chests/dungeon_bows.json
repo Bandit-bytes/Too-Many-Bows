@@ -30,11 +30,6 @@
         },
         {
           "type": "item",
-          "name": "too_many_bows:frostbite",
-          "weight": 2
-        },
-        {
-          "type": "item",
           "name": "too_many_bows:dark_bow",
           "weight": 2
         },
@@ -119,11 +114,6 @@
         {
           "type": "item",
           "name": "too_many_bows:tidal_bow",
-          "weight": 2
-        },
-        {
-          "type": "item",
-          "name": "too_many_bows:shulker_blast",
           "weight": 2
         }
       ]

@@ -1,0 +1,36 @@
+{
+  "display": {
+    "icon": {
+      "item": "too_many_bows:frozenite"
+    },
+    "title": {
+      "translate": "advancement.too_many_bows.frozenite.title"
+    },
+    "description": {
+      "translate": "advancement.too_many_bows.frozenite.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "too_many_bows:root",
+  "criteria": {
+    "get_frozenite": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["too_many_bows:frozenite"]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    ["get_frozenite"]
+  ],
+  "rewards": {
+    "experience": 500
+  }
+}

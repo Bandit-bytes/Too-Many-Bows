@@ -1,0 +1,41 @@
+{
+  "display": {
+    "icon": {
+      "item": "too_many_bows:frostbite"
+    },
+    "title": {
+      "translate": "advancement.too_many_bows.frostbite.title"
+    },
+    "description": {
+      "translate": "advancement.too_many_bows.frostbite.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "too_many_bows:frozenite",
+  "criteria": {
+    "get_frostbite": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["too_many_bows:frostbite"]
+          }
+        ],
+        "player": {
+          "advancements": {
+            "too_many_bows:frozenite": true
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    ["get_frostbite"]
+  ],
+  "rewards": {
+    "experience": 1000
+  }
+}

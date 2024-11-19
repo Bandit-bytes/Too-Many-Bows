@@ -1,0 +1,36 @@
+{
+  "display": {
+    "icon": {
+      "item": "too_many_bows:skull"
+    },
+    "title": {
+      "translate": "advancement.too_many_bows.necro_skull.title"
+    },
+    "description": {
+      "translate": "advancement.too_many_bows.necro_skull.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "too_many_bows:root",
+  "criteria": {
+    "get_necro_skull": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["too_many_bows:skull"]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    ["get_necro_skull"]
+  ],
+  "rewards": {
+    "experience": 500
+  }
+}

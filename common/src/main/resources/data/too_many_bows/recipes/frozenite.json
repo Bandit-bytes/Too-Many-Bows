@@ -1,15 +1,19 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    {
-      "item": "minecraft:ice"
-    },
-    {
-      "item": "minecraft:netherite_ingot"
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " L ",
+    " B ",
+    " L "
   ],
+  "key": {
+    "L": {
+      "item": "too_many_bows:frozenite"
+    },
+    "B": {
+      "item": "minecraft:bow"
+    }
+  },
   "result": {
-    "item": "too_many_bows:frozenite",
-    "count": 1
+    "item": "too_many_bows:frostbite"
   }
 }
