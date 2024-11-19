@@ -1,0 +1,145 @@
+{
+  "item.too_many_bows.arcane_bow": "Магічний лук",
+  "item.too_many_bows.dark_bow": "Темний лук",
+  "item.too_many_bows.ancient_sage_bow": "Стародавній лук мудреця",
+  "item.too_many_bows.verdant_viper": "Зелена гадюка",
+  "item.too_many_bows.wind_bow": "Лук Вітру",
+  "item.too_many_bows.demons_grasp": "Хватка демона",
+  "item.too_many_bows.aethers_call": "Поклик Ефіру",
+  "item.too_many_bows.spectral_bow": "Спектральний лук",
+  "item.too_many_bows.cyroheart_bow": "Крижаносердний лук",
+  "item.too_many_bows.flame_bow": "Обійми Жертовника",
+  "item.too_many_bows.necro_flame_bow": "Некровогняний лук",
+  "item.too_many_bows.tidal_bow": "Лук Приливу",
+  "item.too_many_bows.hunter_bow": "Мисливський лук",
+  "item.too_many_bows.sentinels_wrath": "Лють Вартового",
+  "item.too_many_bows.frostbite": "Морозний лук",
+  "item.too_many_bows.burnt_relic": "Спалена Реліквія",
+  "item.too_many_bows.ironclad_bow": "Залізний лук",
+  "item.too_many_bows.arc_heavens": "Небесна Дуга",
+  "item.too_many_bows.solar_bow": "Сонячний Спалах",
+  "item.too_many_bows.dragons_breath": "Подих дракона",
+  "item.too_many_bows.skull": "Некрочереп",
+  "item.too_many_bows.ancient_sage": "Стародавний Мудрець",
+  "item.too_many_bows.frozenite": "Замерзит",
+  "item.too_many_bows.shulker_blast": "Вибух Шалкера",
+
+  "too_many_bows_tab": "Занадто багато луків",
+  "category.many_bows": "Занадто багато луків",
+
+  "item.many_bows.arcane_bow.tooltip": "Вивільняє магічний розсип стріл з магічною енергією",
+  "item.many_bows.arcane_bow.tooltip.ability": "Здатність: Випускає три стріли з розмаху, завдаючи додаткової магічної шкоди.",
+  "item.many_bows.arcane_bow.tooltip.legend": "Стародавні таємниці ховаються в його зачарованих кінцівках...",
+
+  "item.many_bows.solar_bow.tooltip": "§eПотужний лук, заряджений сонцем",
+  "item.many_bows.solar_bow.tooltip.ability": "§cНа повному заряді стріляє вогняними сонячними стрілами.",
+
+  "item.many_bows.frostbite_bow.tooltip": "Лук, викуваний з крижаної сутності льоду",
+  "item.many_bows.frostbite_bow.tooltip.ability": "Стріляє крижаними стрілами, які уповільнюють і заморожують ворогів на повному заряді.",
+  "item.many_bows.frostbite_bow.tooltip.frostwalker": "Застосовує ефект Льодохрда при відтягуванні лука назад.",
+
+
+  "item.too_many_bows.arc_heavens.tooltip": "Випустіть на волю силу шторму",
+  "item.too_many_bows.arc_heavens.tooltip.ability": "Вражає ворогів блискавкою при прямому попаданні.",
+
+  "item.too_many_bows.sonic_bow.tooltip": "Використовуйте руйнівну силу реву Боронителя",
+  "item.too_many_bows.sonic_bow.tooltip.ability": "Стріляє потужною ударною хвилею, яка пронизує ворогів з величезною силою.",
+  "item.too_many_bows.sonic_bow.tooltip.legend": "Викуваний з відлуння глибокої темряви, цей лук вивільняє чисте спустошення.",
+
+  "item.many_bows.dragons_breath_bow.tooltip": "Сила дракона",
+  "item.many_bows.dragons_breath_bow.tooltip.ability": "Випускає заряджену стрілу, яка при ударі випускає дихання дракона.",
+  "item.too_many_bows.verdant_viper_bow.tooltip": "Лук, який використовує отруту природи",
+  "item.too_many_bows.verdant_viper_bow.tooltip.ability": "Стріляє стрілами, які залишають після себе отруйну хмару.",
+  "item.too_many_bows.verdant_viper_bow.tooltip.legend": "Кажуть, що цей лук був викуваний з іклів великого царя-змія.",
+
+  "item.too_many_bows.flame_bow.tooltip": "Використовуйте силу вогню",
+  "item.too_many_bows.flame_bow.tooltip.ability": "Стріляє вогняними стрілами, які спричиняють вогняні вибухи.",
+  "item.too_many_bows.flame_bow.tooltip.legend": "Легендарний лук, викуваний у самому серці вулкану.",
+
+  "item.too_many_bows.tidal_bow.tooltip": "Сила океану пронизує цей лук.",
+  "item.too_many_bows.tidal_bow.tooltip.ability": "Ви можете стріляти стрілами під водою, як звичайними стрілами.",
+  "item.too_many_bows.tidal_bow.tooltip.legend": "Лук, який використовує стародавню силу морів.",
+
+  "item.too_many_bows.cursed_flame_bow.tooltip": "Лук, просякнутий проклятим полум'ям, яке, як відомо, зупиняє регенерацію і горить з невгасимою люттю.",
+  "item.too_many_bows.cursed_flame_bow.tooltip.ability": "Запалює ворогів проклятим вогнем: блокує регенерацію, не гаситься водою і завдає серце шкоди за тік.",
+  "item.too_many_bows.cursed_flame_bow.tooltip.legend": "Викуваний у темному, забороненому полум'ї.",
+
+  "effect.too_many_bows.cursed_flame": "Прокляте полум'я",
+
+  "item.too_many_bows.scatter_bow": "Розсипний вистріл",
+  "item.many_bows.scatter_bow.tooltip": "Лук, що стріляє стрілами на всі боки",
+  "item.many_bows.scatter_bow.tooltip.ability": "Випускає серію стріл",
+  "item.many_bows.scatter_bow.tooltip.legend": "Створений найкращими лучниками",
+
+  "item.many_bows.ancient_sage_bow.tooltip": "Стародавня зброя неперевершеної сили.",
+  "item.many_bows.ancient_sage_bow.tooltip.ability": "Пробиває 33% броні.",
+  "item.many_bows.ancient_sage_bow.tooltip.legend": "Тільки мудрі можуть володіти його справжньою силою.",
+
+  "item.too_many_bows.wind_bow.tooltip": "Використовуйте силу вітру",
+  "item.too_many_bows.wind_bow.tooltip.ability": "Особлива Здібність: Левітуючий Вистріл",
+  "item.too_many_bows.wind_bow.tooltip.effect": "Натягніть лук, щоб рухатися швидко; вражені вороги можуть бути підняті в небо",
+  "item.too_many_bows.wind_bow.tooltip.legend": "Стародавні перекази кажуть, що цей лук був створений з люті шторму",
+
+  "item.many_bows.icicle_javelin_bow.tooltip": "Лук, просякнутий силою крижаних вітрів.",
+  "item.many_bows.icicle_javelin_bow.tooltip.ability": "Стріляє бурульками, які пронизують ворогів наскрізь.",
+  "item.many_bows.icicle_javelin_bow.tooltip.freeze": "Призиває лід при влучанні у блок.",
+
+  "item.too_many_bows.ironclad_bow.tooltip": "Кований з заліза, загартований в бою.",
+  "item.too_many_bows.ironclad_bow.tooltip.ability": "Магнітний імпульс: притягує ворогів до місця удару",
+  "item.too_many_bows.ironclad_bow.tooltip.legend": "Нескінечні стріли та магнітна сила",
+
+  "item.too_many_bows.hunter_bow_bow": "Надійний лук мисливця.",
+  "item.too_many_bows.hunter_bow.tooltip": "§7Ефективний проти пасивних мобів.",
+  "item.too_many_bows.hunter_bow.hold_shift": "§8[Зажми §eShift§8] для отримання додаткової інформації",
+  "item.too_many_bows.hunter_bow.shift_title": "§6Сильний проти:",
+  "item.too_many_bows.hunter_bow.mob1": "§7Корів",
+  "item.too_many_bows.hunter_bow.mob2": "§7Свиней",
+  "item.too_many_bows.hunter_bow.mob3": "§7Вівць",
+  "item.too_many_bows.hunter_bow.mob4": "§7Курей",
+  "item.too_many_bows.hunter_bow.mob5": "§7Кроликів",
+
+  "item.too_many_bows.emerald_sage_bow": "Смарагдовий лук Мудреця",
+  "item.too_many_bows.emerald_sage_bow.tooltip": "Дає додаткову досвід за ураження ворогів",
+
+  "item.too_many_bows.sentinels_wrath.tooltip": "§7Ефективний проти рейдерів.",
+  "item.too_many_bows.sentinels_wrath.hold_shift": "§8[Зажми §eShift§8] для отримання додаткової інформації",
+  "item.too_many_bows.sentinels_wrath.shift_title": "§6Сильний проти:",
+  "item.too_many_bows.sentinels_wrath.mob1": "§7Розбійників",
+  "item.too_many_bows.sentinels_wrath.mob2": "§7Поборників",
+  "item.too_many_bows.sentinels_wrath.mob3": "§7Заклиначів",
+  "item.too_many_bows.sentinels_wrath.mob4": "§7Спустошувачів",
+  "item.too_many_bows.sentinels_wrath.mob5": "§7Ілюзіоністів",
+  "item.too_many_bows.sentinels_wrath.mob6": "§7Відьм",
+
+  "item.too_many_bows.shulker_blast_bow.tooltip": "Стріляє самонаводячимися вибухами шалкера",
+  "item.too_many_bows.shulker_blast_bow.shift_title": "§6Спеціальний ефект",
+  "item.too_many_bows.shulker_blast_bow.effect1": "§7Самонавідні снаряди",
+  "item.too_many_bows.shulker_blast_bow.hold_shift": "§8[Зажми §eShift§8] для отримання додаткової інформації",
+  "item.too_many_bows.burnt_relic.tooltip":"Спалена Реліквія",
+  "item.too_many_bows.burnt_relic.tooltip1": "Колись використовуваний Стародавніми Богами, він все ще зберігає відблиск сили...",
+  "item.too_many_bows.burnt_relic.tooltip2":"Нескінченні стріли та посилена шкода",
+
+
+  "advancement.too_many_bows.root.title": "Початок історії",
+  "advancement.too_many_bows.root.description": "Почніть свій шлях до майстерності лучника, получивши свій перший лук.",
+  "advancement.too_many_bows.master_bow_collector.title": "Екстраординарний колекціонер луків",
+  "advancement.too_many_bows.master_bow_collector.description": "Зберіть кожен унікальний лук у моді Too Many Bows.",
+
+  "advancement.too_many_bows.necro_skull.title": "Некрочереп",
+  "advancement.too_many_bows.necro_skull.description": "Здобудьте легендарний некрочереп.",
+  "advancement.too_many_bows.necro_flame_bow.title": "Некровогняний лук",
+  "advancement.too_many_bows.necro_flame_bow.description": "Оволодіти силою Некровогняного Лука",
+
+  "advancement.too_many_bows.ancient_sage.title": "Стародавній мудрець",
+  "advancement.too_many_bows.ancient_sage.description": "Відкрийте для себе силу Стародавнього Мудреця.",
+  "advancement.too_many_bows.frozenite.title": "Замерзит",
+  "advancement.too_many_bows.frozenite.description": "Отримайте містичну руду Замерзит.",
+  "advancement.too_many_bows.frostbite.title": "Морозний лук",
+  "advancement.too_many_bows.frostbite.description": "Оволодійте крижаною силою Морозного лука",
+  "advancement.too_many_bows.sage_bow.title": "Спадщина стародавнього Мудреця",
+  "advancement.too_many_bows.sage_bow.description": "Розкрийте мудрість стародавнього лука мудреця",
+  "advancement.shulker_blast.title": "Майстер Шалкера",
+  "advancement.shulker_blast.description": "Отримайте Вибух Шалкера",
+  "advancement.shulker_shell.title": "Дар Шалкера",
+  "advancement.shulker_shell.description": "Зберіть парнцир шалкера"
+}

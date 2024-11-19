@@ -18,7 +18,7 @@
               "function": "minecraft:set_count",
               "count": {
                 "min": 1,
-                "max": 2
+                "max": 1
               }
             }
           ]
@@ -99,6 +99,17 @@
           "type": "item",
           "name": "too_many_bows:demons_grasp",
           "weight": 4,
+          "conditions": [
+            {
+              "condition": "minecraft:random_chance",
+              "chance": 0.1
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:skull",
+          "weight": 1,
           "conditions": [
             {
               "condition": "minecraft:random_chance",
