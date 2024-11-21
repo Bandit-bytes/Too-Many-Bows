@@ -85,8 +85,10 @@ public class FlameArrow extends AbstractArrow {
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
 
         for (LivingEntity entity : entities) {
-            if (entity != this.getOwner() && entity != entityHit) {
-                entity.setSecondsOnFire(5); // Ignite all nearby entities
+            if (entity != null && entity instanceof LivingEntity) { // Explicit check
+                if (entity != this.getOwner() && entity != entityHit) {
+                    entity.setSecondsOnFire(5); // Ignite all nearby entities
+                }
             }
         }
         for (int i = 0; i < 50; i++) {

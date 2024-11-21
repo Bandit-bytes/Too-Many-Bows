@@ -11,30 +11,59 @@ public class BowLootInjectorPlatformImpl {
 
     public static void registerLootTables() {
         LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
-            if (isDungeonLootTable(id)) {
-                LootPool.Builder customBowPool = createBowLootPool();
-                tableBuilder.pool(customBowPool.build());
+            if (isEasyLootTable(id)) {
+                tableBuilder.pool(createCommonBowPool().build());
+            } else if (isMediumLootTable(id)) {
+                tableBuilder.pool(createUncommonBowPool().build());
+            } else if (isHardLootTable(id)) {
+                tableBuilder.pool(createRareBowPool().build());
+            } else if (isEndGameLootTable(id)) {
+                tableBuilder.pool(createEpicBowPool().build());
             }
         });
     }
 
-    private static boolean isDungeonLootTable(ResourceLocation id) {
+    private static boolean isEasyLootTable(ResourceLocation id) {
         return id.equals(BuiltInLootTables.SIMPLE_DUNGEON)
-                || id.equals(BuiltInLootTables.ABANDONED_MINESHAFT)
-                || id.equals(BuiltInLootTables.STRONGHOLD_CORRIDOR)
-                || id.equals(BuiltInLootTables.JUNGLE_TEMPLE)
-                || id.equals(BuiltInLootTables.END_CITY_TREASURE)
-                || id.equals(BuiltInLootTables.RUINED_PORTAL)
-                || id.equals(BuiltInLootTables.OCEAN_RUIN_COLD_ARCHAEOLOGY)
-                || id.equals(BuiltInLootTables.BASTION_TREASURE)
-                || id.equals(BuiltInLootTables.PILLAGER_OUTPOST)
+                || id.equals(BuiltInLootTables.ABANDONED_MINESHAFT);
+    }
+
+    private static boolean isMediumLootTable(ResourceLocation id) {
+        return id.equals(BuiltInLootTables.JUNGLE_TEMPLE)
+                || id.equals(BuiltInLootTables.PILLAGER_OUTPOST);
+    }
+
+    private static boolean isHardLootTable(ResourceLocation id) {
+        return id.equals(BuiltInLootTables.STRONGHOLD_CORRIDOR)
                 || id.equals(BuiltInLootTables.NETHER_BRIDGE);
     }
 
-    private static LootPool.Builder createBowLootPool() {
+    private static boolean isEndGameLootTable(ResourceLocation id) {
+        return id.equals(BuiltInLootTables.END_CITY_TREASURE)
+                || id.equals(BuiltInLootTables.BASTION_TREASURE);
+    }
+
+    private static LootPool.Builder createCommonBowPool() {
         return LootPool.lootPool()
                 .setRolls(ConstantValue.exactly(1))
-                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/dungeon_bows")))
-                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/bow_items")));
+                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/common_bows")));
+    }
+
+    private static LootPool.Builder createUncommonBowPool() {
+        return LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/uncommon_bows")));
+    }
+
+    private static LootPool.Builder createRareBowPool() {
+        return LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/rare_bows")));
+    }
+
+    private static LootPool.Builder createEpicBowPool() {
+        return LootPool.lootPool()
+                .setRolls(ConstantValue.exactly(1))
+                .add(LootTableReference.lootTableReference(new ResourceLocation("too_many_bows", "chests/epic_bows")));
     }
 }
