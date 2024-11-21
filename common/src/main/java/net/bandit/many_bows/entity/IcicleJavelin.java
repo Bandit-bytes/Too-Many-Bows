@@ -33,16 +33,25 @@ public class IcicleJavelin extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
+        // Check if the hit entity is a LivingEntity
         if (result.getEntity() instanceof LivingEntity target) {
-            DamageSource damageSource = level().damageSources().playerAttack((Player) this.getOwner());
-            target.hurt(damageSource, 8.0f);
-            target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4)); // Apply slowness
+            // Safely create damage source only if the owner is a Player
+            if (this.getOwner() instanceof Player player) {
+                DamageSource damageSource = level().damageSources().playerAttack(player);
+                target.hurt(damageSource, 8.0f);
+                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4)); // Apply slowness effect
+            }
         }
 
-        // Place ice on impact
+        // Freeze area and create explosion effects
         freezeAreaAround(this.getX(), this.getY(), this.getZ());
         createIceExplosion();
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.SNOW_STEP, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                SoundEvents.SNOW_STEP, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+
         this.discard();
     }
 
@@ -50,30 +59,22 @@ public class IcicleJavelin extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        // Freeze the area if the javelin is in the ground and hasn't frozen already
+
         if (!level().isClientSide() && this.inGround && !hasFrozen) {
             freezeAreaAround(this.getX(), this.getY(), this.getZ());
             hasFrozen = true;
             this.discard();
         }
 
-        // Create particles while in flight
         if (level().isClientSide()) {
             createTrailParticles();
         }
     }
-
-    /**
-     * Method to freeze the area around the impact.
-     */
     private void freezeAreaAround(double x, double y, double z) {
         BlockPos impactPos = new BlockPos((int) x, (int) y, (int) z);
-
-        // Always try to place ice at the impact position
-        if (level().getBlockState(impactPos).isAir() || level().getBlockState(impactPos).canBeReplaced()) {
+           if (level().getBlockState(impactPos).isAir() || level().getBlockState(impactPos).canBeReplaced()) {
             level().setBlockAndUpdate(impactPos, Blocks.PACKED_ICE.defaultBlockState());
         } else {
-            // If the block at the impact position is solid, try placing ice on an adjacent block
             BlockPos adjacentPos = findAdjacentBlock(impactPos);
             if (adjacentPos != null) {
                 level().setBlockAndUpdate(adjacentPos, Blocks.PACKED_ICE.defaultBlockState());
@@ -81,9 +82,7 @@ public class IcicleJavelin extends AbstractArrow {
         }
     }
 
-    /**
-     * Helper method to find an adjacent block to place ice if the impact position is occupied.
-     */
+
     private BlockPos findAdjacentBlock(BlockPos impactPos) {
         BlockPos[] adjacentPositions = {
                 impactPos.above(),
@@ -102,9 +101,6 @@ public class IcicleJavelin extends AbstractArrow {
         return null;
     }
 
-    /**
-     * Creates an ice explosion effect.
-     */
     private void createIceExplosion() {
         for (int i = 0; i < 20; i++) {
             double offsetX = (this.random.nextDouble() - 0.5) * 0.5;
@@ -114,9 +110,6 @@ public class IcicleJavelin extends AbstractArrow {
         }
     }
 
-    /**
-     * Creates a trail of particles while the javelin is in flight.
-     */
     private void createTrailParticles() {
         for (int i = 0; i < 5; i++) {
             double offsetX = (this.random.nextDouble() - 0.5) * 0.2;
@@ -128,6 +121,6 @@ public class IcicleJavelin extends AbstractArrow {
 
     @Override
     protected ItemStack getPickupItem() {
-        return ItemStack.EMPTY; // Make it non-retrievable
+        return ItemStack.EMPTY;
     }
 }

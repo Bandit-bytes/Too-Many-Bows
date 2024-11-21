@@ -25,11 +25,17 @@ public class HunterXPArrow extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            int xpAmount = 10;
-            level().addFreshEntity(new ExperienceOrb(level(), target.getX(), target.getY(), target.getZ(), xpAmount));
+            spawnExperienceOrb(target, 10);
         }
         this.discard();
     }
+
+    private void spawnExperienceOrb(LivingEntity target, int xpAmount) {
+        if (xpAmount > 0) {
+            level().addFreshEntity(new ExperienceOrb(level(), target.getX(), target.getY(), target.getZ(), xpAmount));
+        }
+    }
+
 
     @Override
     public ItemStack getPickupItem() {

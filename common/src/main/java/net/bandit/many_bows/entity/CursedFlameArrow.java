@@ -10,7 +10,6 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -55,16 +54,19 @@ public class CursedFlameArrow extends AbstractArrow {
             }
         }
     }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!this.level().isClientSide()) {
-            LivingEntity hitEntity = (LivingEntity) result.getEntity();
-
+        if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
+            // Apply the Cursed Flame effect
             hitEntity.addEffect(new MobEffectInstance(EffectRegistry.CURSED_FLAME.get(), 200, 0));
+
+            // Create soul fire particles
             createCursedSoulFireParticles(hitEntity.position());
         }
     }
+
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);

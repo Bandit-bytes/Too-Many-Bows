@@ -22,11 +22,12 @@ public class HunterArrow extends Arrow {
         super.onHitEntity(result);
 
         if (result.getEntity() instanceof LivingEntity target) {
-            if (isPassiveMob(target) && this.getOwner() instanceof Player) {
-                improveDrops(target);
+            if (isPassiveMob(target) && this.getOwner() instanceof Player player) {
+                improveDrops(target, player);
             }
         }
     }
+
 
     private boolean isPassiveMob(LivingEntity entity) {
         return entity.getType() == EntityType.COW ||
@@ -36,7 +37,7 @@ public class HunterArrow extends Arrow {
                 entity.getType() == EntityType.RABBIT;
     }
 
-    private void improveDrops(LivingEntity entity) {
+    private void improveDrops(LivingEntity entity, Player player) {
         entity.spawnAtLocation(Items.LEATHER, 2);
         entity.spawnAtLocation(Items.COOKED_BEEF, 2);
     }

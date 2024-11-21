@@ -41,11 +41,13 @@ public class AncientSageArrow extends AbstractArrow {
             float baseDamage = (float) this.getBaseDamage();
             float armorReducedDamage = baseDamage * (1 - armorPenetration);
             target.hurt(AncientSageDamageSource.create(this.level(), this, this.getOwner()), armorReducedDamage);
+            createHitParticles();
         }
 
-        createHitParticles();
+        // Safely discard the arrow
         this.discard();
     }
+
 
     @Override
     public void tick() {

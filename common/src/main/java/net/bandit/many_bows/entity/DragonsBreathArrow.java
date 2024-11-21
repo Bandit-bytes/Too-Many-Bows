@@ -9,7 +9,6 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.AreaEffectCloud;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -21,9 +20,9 @@ import org.joml.Vector3f;
 
 public class DragonsBreathArrow extends AbstractArrow {
     private static final int PARTICLE_LIFESPAN = 40;
-    private static final int MAX_LIFETIME = 100; // Maximum lifetime in ticks (100 ticks = 5 seconds)
+    private static final int MAX_LIFETIME = 100;
     private int particleTicksRemaining = PARTICLE_LIFESPAN;
-    private int lifetime = 0; // Counter for the projectile's lifetime
+    private int lifetime = 0;
 
     public DragonsBreathArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
@@ -36,18 +35,20 @@ public class DragonsBreathArrow extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
         if (result.getEntity() instanceof LivingEntity target) {
             Level level = target.level();
             level.playSound(null, target.getX(), target.getY(), target.getZ(),
                     SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-            level.getEntities((Entity) null, target.getBoundingBox().inflate(2.0D), e -> e instanceof LivingEntity)
+            level.getEntities(this, target.getBoundingBox().inflate(2.0D), e -> e instanceof LivingEntity)
                     .forEach(entity -> {
-                        if (entity != target) {
-                            entity.hurt(target.damageSources().magic(), 4.0F);
+                        if (entity instanceof LivingEntity livingEntity && livingEntity != target) {
+                            livingEntity.hurt(target.damageSources().magic(), 4.0F);
                         }
                     });
 
+            // Create area effect cloud
             AreaEffectCloud areaEffectCloud = new AreaEffectCloud(level, target.getX(), target.getY(), target.getZ());
             areaEffectCloud.setParticle(ParticleTypes.DRAGON_BREATH);
             areaEffectCloud.setRadius(3.0F);
@@ -67,14 +68,12 @@ public class DragonsBreathArrow extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        // Increment the lifetime counter
         lifetime++;
         if (lifetime > MAX_LIFETIME) {
             this.discard();
             return;
         }
 
-        // Handle particles and effects
         if (level().isClientSide() && particleTicksRemaining > 0) {
             createTrailParticles();
             particleTicksRemaining--;

@@ -32,7 +32,7 @@ public class SonicBoomProjectile extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (result.getEntity() instanceof LivingEntity target) {
+        if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             target.hurt(damageSources().sonicBoom(this), 20.0F); // Adjusted damage
             target.knockback(2.0F, Math.sin(this.getYRot() * Math.PI / 180.0F), -Math.cos(this.getYRot() * Math.PI / 180.0F));
             level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);

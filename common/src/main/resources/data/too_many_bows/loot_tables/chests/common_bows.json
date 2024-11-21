@@ -8,22 +8,12 @@
           "type": "item",
           "name": "too_many_bows:ancient_sage",
           "weight": 1
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
+        },
         {
           "type": "item",
           "name": "too_many_bows:aethers_call",
           "weight": 1
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
+        },
         {
           "type": "item",
           "name": "too_many_bows:burnt_relic",

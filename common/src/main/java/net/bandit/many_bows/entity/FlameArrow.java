@@ -62,14 +62,16 @@ public class FlameArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide()) {
-            LivingEntity hitEntity = (LivingEntity) result.getEntity();
-            hitEntity.setSecondsOnFire(5);
-            hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 1));
-
-            createFireExplosion(result.getLocation(), hitEntity);
+            // Check if the hit entity is a LivingEntity before casting
+            if (result.getEntity() instanceof LivingEntity hitEntity) {
+                hitEntity.setSecondsOnFire(5);
+                hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 1));
+                createFireExplosion(result.getLocation(), hitEntity);
+            }
             this.hasHit = true;
         }
     }
+
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
@@ -85,12 +87,11 @@ public class FlameArrow extends AbstractArrow {
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
 
         for (LivingEntity entity : entities) {
-            if (entity != null && entity instanceof LivingEntity) { // Explicit check
-                if (entity != this.getOwner() && entity != entityHit) {
-                    entity.setSecondsOnFire(5); // Ignite all nearby entities
-                }
+            if (entity != this.getOwner() && entity != entityHit) {
+                entity.setSecondsOnFire(5); // Ignite all nearby entities
             }
         }
+
         for (int i = 0; i < 50; i++) {
             double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
             double yOffset = random.nextDouble();
@@ -105,8 +106,10 @@ public class FlameArrow extends AbstractArrow {
             this.level().addParticle(ParticleTypes.EXPLOSION, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0, 0);
             this.level().addParticle(ParticleTypes.LARGE_SMOKE, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0, 0);
         }
+
         this.level().playSound(null, position.x, position.y, position.z, SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 1.2F);
     }
+
     @Override
     protected ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);

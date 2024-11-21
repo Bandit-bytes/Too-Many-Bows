@@ -71,8 +71,7 @@ public class FrostbiteArrow extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!this.level().isClientSide()) {
-            LivingEntity hitEntity = (LivingEntity) result.getEntity();
+        if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
             hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 75, 5));
 
             createFrostExplosion(result.getLocation(), hitEntity);

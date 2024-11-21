@@ -25,10 +25,11 @@ public class LightningArrow extends AbstractArrow {
     public LightningArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.LIGHTNING_ARROW.get(), shooter, level);
     }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        System.out.println("onHitEntity triggered!");
         super.onHitEntity(result);
+
         if (!level().isClientSide() && !lightningStruck) {
             summonLightning(result.getLocation().x(), result.getLocation().y(), result.getLocation().z());
             lightningStruck = true;
@@ -39,14 +40,15 @@ public class LightningArrow extends AbstractArrow {
     @Override
     public void tick() {
         super.tick();
-        System.out.println("tick method called, inGround: " + this.inGround);
 
+        // Summon lightning if the arrow is stuck in the ground and hasn't struck yet
         if (!level().isClientSide() && this.inGround && !lightningStruck) {
             summonLightning(this.getX(), this.getY(), this.getZ());
             lightningStruck = true;
             this.discard();
         }
 
+        // Create visual effects on the client side
         if (level().isClientSide()) {
             createParticles();
         }
@@ -55,25 +57,17 @@ public class LightningArrow extends AbstractArrow {
     private void summonLightning(double x, double y, double z) {
         LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(level());
         if (lightningBolt == null) {
-            System.out.println("Lightning bolt creation failed!");
             return;
         }
         lightningBolt.moveTo(x, y, z);
 
-        // Optional owner check for cause
+        // Set the cause of the lightning bolt to the shooter if applicable
         if (this.getOwner() instanceof ServerPlayer player) {
             lightningBolt.setCause(player);
-        } else {
-            System.out.println("No valid owner found for lightning cause.");
         }
 
-        if (!level().isClientSide) {
-            level().addFreshEntity(lightningBolt);
-        } else {
-            System.out.println("Attempting to summon lightning on the client side, skipping.");
-        }
+        level().addFreshEntity(lightningBolt);
     }
-
 
     private void createParticles() {
         for (int i = 0; i < 10; i++) {

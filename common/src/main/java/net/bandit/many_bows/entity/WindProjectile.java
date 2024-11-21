@@ -35,7 +35,7 @@ public class WindProjectile extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
-        if (result.getEntity() instanceof LivingEntity target) {
+        if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             target.hurt(damageSources().magic(), (float) this.getBaseDamage());
             if (!target.hasEffect(MobEffects.LEVITATION)) {
                 target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, LEVITATION_DURATION, 1));

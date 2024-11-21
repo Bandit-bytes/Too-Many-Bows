@@ -35,16 +35,21 @@ public class HunterBow extends BowItem {
             if (power >= 0.1F) {
                 ItemStack arrowStack = findArrowInInventory(player);
 
-                // Ensure the player has arrows to shoot
-                if (!arrowStack.isEmpty()) {
+                // Creative mode: allow shooting without consuming arrows
+                boolean isCreative = player.getAbilities().instabuild;
+                boolean hasArrows = !arrowStack.isEmpty() || isCreative;
+
+                if (hasArrows) {
                     HunterArrow hunterArrow = new HunterArrow(level, player);
                     hunterArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
                     // Apply enchantment effects
                     applyEnchantments(stack, hunterArrow);
 
-                    // Consume the arrow from inventory
-                    arrowStack.shrink(1);
+                    // Consume the arrow from inventory only in Survival/Adventure
+                    if (!isCreative && !arrowStack.isEmpty()) {
+                        arrowStack.shrink(1);
+                    }
 
                     level.addFreshEntity(hunterArrow);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -52,11 +57,13 @@ public class HunterBow extends BowItem {
                     // Damage the bow on use
                     stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 } else {
+                    // Play an error sound if no arrows are available
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
             }
         }
     }
+
 
     private void applyEnchantments(ItemStack stack, HunterArrow hunterArrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);

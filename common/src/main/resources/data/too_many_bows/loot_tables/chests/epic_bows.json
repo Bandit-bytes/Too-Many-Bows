@@ -8,42 +8,22 @@
           "type": "item",
           "name": "too_many_bows:flame_bow",
           "weight": 1
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
+        },
         {
           "type": "item",
           "name": "too_many_bows:dark_bow",
           "weight": 1
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
+        },
         {
           "type": "item",
           "name": "too_many_bows:dragons_breath",
           "weight": 1
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
+        },
         {
           "type": "item",
           "name": "too_many_bows:wind_bow",
           "weight": 1
-        }
-      ]
-    },
-    {
-      "rolls": 1,
-      "entries": [
+        },
         {
           "type": "item",
           "name": "too_many_bows:shulker_blast",

@@ -27,23 +27,29 @@ public class SentinelArrow extends Arrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
-        if (result.getEntity() instanceof LivingEntity target) {
+        if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             if (isRaidMob(target)) {
-                float extraDamage = (float) this.getBaseDamage() * (DAMAGE_MULTIPLIER - 1);
+                float baseDamage = (float) this.getBaseDamage();
+                float extraDamage = baseDamage * (DAMAGE_MULTIPLIER - 1);
 
-                // Use the new method to get a damage source for arrows
+
                 Entity owner = this.getOwner();
-                DamageSource damageSource = owner != null
+                DamageSource damageSource = owner instanceof LivingEntity
                         ? this.level().damageSources().arrow(this, owner)
                         : this.level().damageSources().arrow(this, null);
 
                 target.hurt(damageSource, extraDamage);
 
-                // Play a special sound when hitting raid mobs
+
                 this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-                // Add particles for visual effect
-                this.level().addParticle(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
+
+                for (int i = 0; i < 10; i++) {
+                    double xOffset = (this.random.nextDouble() - 0.5) * 0.2;
+                    double yOffset = (this.random.nextDouble() - 0.5) * 0.2;
+                    double zOffset = (this.random.nextDouble() - 0.5) * 0.2;
+                    this.level().addParticle(ParticleTypes.CRIT, this.getX() + xOffset, this.getY() + yOffset, this.getZ() + zOffset, 0.0, 0.0, 0.0);
+                }
             }
         }
     }
