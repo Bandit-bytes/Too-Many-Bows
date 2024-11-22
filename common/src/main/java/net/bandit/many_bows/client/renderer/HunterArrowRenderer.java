@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 
 public class HunterArrowRenderer extends ArrowRenderer<HunterArrow> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/entity/arrow.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation("too_many_bows", "textures/entity/hunter_arrow.png");
 
     public HunterArrowRenderer(EntityRendererProvider.Context context) {
         super(context);

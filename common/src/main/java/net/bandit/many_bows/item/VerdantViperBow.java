@@ -39,7 +39,7 @@ public class VerdantViperBow extends BowItem {
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 VenomArrow venomArrow = new VenomArrow(level, player);
 
-                // Apply enchantments
+                // Apply enchantment
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
                     venomArrow.setBaseDamage(venomArrow.getBaseDamage() + (double) powerLevel * 0.5 + 0.5);

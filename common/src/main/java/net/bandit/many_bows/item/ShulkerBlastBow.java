@@ -41,7 +41,7 @@ public class ShulkerBlastBow extends BowItem {
                     ShulkerBlastProjectile projectile = new ShulkerBlastProjectile(level, player);
                     projectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-                    // Apply enchantments
+                    // Apply enchantment
                     applyEnchantments(stack, projectile);
 
                     level.addFreshEntity(projectile);

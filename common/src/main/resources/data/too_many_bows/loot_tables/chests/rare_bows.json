@@ -28,6 +28,16 @@
           "type": "item",
           "name": "too_many_bows:scatter_shot",
           "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:vitality_weaver",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:spectral_whisper",
+          "weight": 1
         }
       ]
     }

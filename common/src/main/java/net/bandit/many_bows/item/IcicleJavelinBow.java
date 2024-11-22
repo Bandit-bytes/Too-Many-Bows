@@ -47,7 +47,7 @@ public class IcicleJavelinBow extends BowItem {
                 IcicleJavelin javelin = new IcicleJavelin(level, player);
                 javelin.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.5F, 1.0F);
 
-                // Apply enchantments
+                // Apply enchantment
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
                     javelin.setBaseDamage(BASE_DAMAGE + powerLevel * 0.5);

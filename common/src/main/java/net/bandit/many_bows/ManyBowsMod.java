@@ -3,10 +3,7 @@ package net.bandit.many_bows;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.ClientInit;
 import net.bandit.many_bows.client.renderer.*;
-import net.bandit.many_bows.registry.EffectRegistry;
-import net.bandit.many_bows.registry.EntityRegistry;
-import net.bandit.many_bows.registry.ItemRegistry;
-import net.bandit.many_bows.registry.TabRegistry;
+import net.bandit.many_bows.registry.*;
 
 public final class ManyBowsMod {
     public static final String MOD_ID = "too_many_bows";
@@ -16,6 +13,7 @@ public final class ManyBowsMod {
         TabRegistry.init();
         EntityRegistry.register();
         EffectRegistry.register();
+        EnchantmentRegistry.register();
     }
 
     public static void initClient() {
@@ -36,5 +34,8 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.HUNTER_XP_ARROW.get(), HunterXPArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SHULKER_BLAST_PROJECTILE.get(), ShulkerBlastArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.ANCIENT_SAGE_ARROW.get(), AncientSageArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.VITALITY_ARROW.get(), VitalityArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.ASTRAL_ARROW.get(), AstralArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.SPECTRAL_ARROW.get(), SpectralArrowRenderer::new);
     }
 }

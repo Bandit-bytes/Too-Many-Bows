@@ -13,6 +13,8 @@ import net.minecraft.world.item.Rarity;
 public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ManyBowsMod.MOD_ID, Registries.ITEM);
 
+
+
     //item
     public static final RegistrySupplier<Item> SKULL = ITEMS.register("skull",
             () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
@@ -78,6 +80,14 @@ public class ItemRegistry {
             () -> new IcicleJavelinBow(new Properties().durability(850).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> SENTINELS_WRAITH = ITEMS.register("sentinels_wrath",
             () -> new SentinelsWrathBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
+    public static final RegistrySupplier<Item> VITALITY_WEAVER = ITEMS.register("vitality_weaver",
+            () -> new VitalityWeaverBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
+    public static final RegistrySupplier<Item> ASTRAL_BOUND = ITEMS.register("astral_bound",
+            () -> new AstralBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+    public static final RegistrySupplier<Item> SPECTRAL_WHISPER = ITEMS.register("spectral_whisper",
+            () -> new SpectralWhisperBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+//    public static final RegistrySupplier<Item> TEST_BOW = ITEMS.register("test_bow",
+//            () -> new BowItem(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
 
 
     public static void register() {

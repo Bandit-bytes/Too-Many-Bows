@@ -141,5 +141,30 @@
   "advancement.shulker_blast.title": "Master of Shulker Blasts",
   "advancement.shulker_blast.description": "Obtain the Shulker Blast Bow",
   "advancement.shulker_shell.title": "Shulker's Gift",
-  "advancement.shulker_shell.description": "Collect a Shulker Shell"
+  "advancement.shulker_shell.description": "Collect a Shulker Shell",
+
+  "item.too_many_bows.vitality_weaver": "Vitality Weaver",
+  "item.too_many_bows.vitality_weaver.tooltip": "A bow imbued with the power of life and death.",
+  "item.too_many_bows.vitality_weaver.details": "Leeching Arrows: Arrows steal health from enemies and heal the shooter.",
+  "item.too_many_bows.hold_shift": "§8[Hold §eShift§8] for more info",
+  "entity.too_many_bows.vitality_arrow": "Vitality Arrow",
+
+  "item.too_many_bows.astral_bound": "Astral Bound",
+  "item.too_many_bows.astral_bow": "They won't see it coming..",
+  "item.too_many_bows.astral_bow.tooltip": "Shoots strong arrows.",
+  "item.too_many_bows.astral_bow.details": "This bow fires arrows that ricochet, enchant with Ricochet for more surfaces.",
+
+  "enchantment.too_many_bows.ricochet": "Ricochet",
+  "enchantment.too_many_bows.ricochet.desc": "Allows arrows to ricochet off more surfaces for the Astral Bound Bow only.",
+  "enchantment.level.1": "I",
+  "enchantment.level.2": "II",
+  "enchantment.level.3": "III",
+
+  "item.too_many_bows.spectral_whisper": "Spectral Whisper",
+  "item.too_many_bows.spectral_whisper.tooltip": "Arrows pierce through the first obstacle.",
+  "item.too_many_bows.spectral_whisper.details": "This bow fires spectral arrows that pass through blocks, damaging entities.",
+
+  "entity.too_many_bows.spectral_arrow": "Spectral Arrow",
+  "enchantment.too_many_bows.spectral": "Spectral",
+  "enchantment.too_many_bows.spectral.desc": "Allows arrows to pass through additional obstacles."
 }

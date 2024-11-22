@@ -44,7 +44,7 @@ public class SentinelsWrathBow extends BowItem {
                     SentinelArrow sentinelArrow = new SentinelArrow(level, player);
                     sentinelArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-                    // Apply enchantments to the arrow
+                    // Apply enchantment to the arrow
                     applyEnchantments(stack, sentinelArrow);
 
                     // Extra damage against raid mobs

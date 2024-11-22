@@ -141,5 +141,31 @@
   "advancement.shulker_blast.title": "Майстер Шалкера",
   "advancement.shulker_blast.description": "Отримайте Вибух Шалкера",
   "advancement.shulker_shell.title": "Дар Шалкера",
-  "advancement.shulker_shell.description": "Зберіть парнцир шалкера"
+  "advancement.shulker_shell.description": "Зберіть парнцир шалкера",
+
+  "item.too_many_bows.vitality_weaver": "Ткач Життя",
+  "item.too_many_bows.vitality_weaver.tooltip": "Лук, сповнений силою життя та смерті.",
+  "item.too_many_bows.vitality_weaver.details": "Стріли, що висмоктують здоров'я ворогів і лікують стрільця.",
+  "item.too_many_bows.hold_shift": "§8[Натисніть §eShift§8] для детальної інформації",
+  "entity.too_many_bows.vitality_arrow": "Стріла Життя",
+
+  "item.too_many_bows.astral_bound": "Астральний Зв'язок",
+  "item.too_many_bows.astral_bow": "Вони цього не побачать...",
+  "item.too_many_bows.astral_bow.tooltip": "Стріляє потужними стрілами.",
+  "item.too_many_bows.astral_bow.details": "Цей лук випускає стріли, що рикошетять. Зачаруйте Рикошетом для більшої кількості відскоків.",
+
+  "enchantment.too_many_bows.ricochet": "Рикошет",
+  "enchantment.too_many_bows.ricochet.desc": "Дозволяє стрілам рикошетити більше разів, тільки для лука Астральний Зв'язок.",
+  "enchantment.level.1": "І",
+  "enchantment.level.2": "ІІ",
+  "enchantment.level.3": "ІІІ",
+
+  "item.too_many_bows.spectral_whisper": "Примарний Шепіт",
+  "item.too_many_bows.spectral_whisper.tooltip": "Стріли пронизують перешкоду.",
+  "item.too_many_bows.spectral_whisper.details": "Цей лук стріляє примарними стрілами, які проходять через блоки, завдаючи шкоди істотам.",
+
+  "entity.too_many_bows.spectral_arrow": "Примарна Стріла",
+  "enchantment.too_many_bows.spectral": "Примарний",
+  "enchantment.too_many_bows.spectral.desc": "Дозволяє стрілам проходити через додаткові перешкоди."
+
 }

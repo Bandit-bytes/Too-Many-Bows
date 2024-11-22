@@ -3,8 +3,6 @@ package net.bandit.many_bows.registry;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.bandit.many_bows.entity.*;
-import net.bandit.many_bows.item.AncientSageBow;
-import net.bandit.many_bows.item.SentinelsWrathBow;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -66,10 +64,15 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "hunter_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<AstralArrow>> ASTRAL_ARROW = ENTITY_TYPES.register("astral_arrow",
+            () -> EntityType.Builder.<AstralArrow>of(AstralArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "astral_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<HunterXPArrow>> HUNTER_XP_ARROW = ENTITY_TYPES.register("hunter_xp_arrow",
             () -> EntityType.Builder.<HunterXPArrow>of(HunterXPArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
-                    .build(new ResourceLocation(MOD_ID, "hunter_arrow").toString()));
+                    .build(new ResourceLocation(MOD_ID, "hunter_xp_arrow").toString()));
 
     public static final RegistrySupplier<EntityType<AncientSageArrow>> ANCIENT_SAGE_ARROW = ENTITY_TYPES.register("ancient_sage_arrow",
             () -> EntityType.Builder.<AncientSageArrow>of(AncientSageArrow::new, MobCategory.MISC)
@@ -81,12 +84,20 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "sentinel_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<VitalityArrow>> VITALITY_ARROW = ENTITY_TYPES.register("vitality_arrow",
+            () -> EntityType.Builder.<VitalityArrow>of(VitalityArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "vitality_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<ShulkerBlastProjectile>> SHULKER_BLAST_PROJECTILE = ENTITY_TYPES.register("shulker_blast_projectile",
             () -> EntityType.Builder.<ShulkerBlastProjectile>of(ShulkerBlastProjectile::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "shulker_blast_projectile").toString()));
 
-
+    public static final RegistrySupplier<EntityType<SpectralArrow>> SPECTRAL_ARROW = ENTITY_TYPES.register("spectral_arrow",
+            () -> EntityType.Builder.<SpectralArrow>of(SpectralArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "spectral_arrow").toString()));
 
 
     public static void register() {

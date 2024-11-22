@@ -37,7 +37,7 @@ public class TidalBow extends BowItem {
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 TidalArrow tidalArrow = new TidalArrow(level, player);
 
-                // Apply enchantments
+                // Apply enchantment
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
                     tidalArrow.setBaseDamage(tidalArrow.getBaseDamage() + (double) powerLevel * 0.5 + 0.5);

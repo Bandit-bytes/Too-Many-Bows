@@ -55,7 +55,7 @@ public class SolarBow extends BowItem {
         if (!level.isClientSide()) {
             Arrow arrow = new Arrow(level, player);
 
-            // Apply enchantments
+            // Apply enchantment
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             if (powerLevel > 0) {
                 arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
