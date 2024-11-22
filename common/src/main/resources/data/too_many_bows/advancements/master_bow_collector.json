@@ -141,6 +141,30 @@
       "conditions": {
         "items": [{ "items": ["too_many_bows:verdant_viper"] }]
       }
+    },
+    "emerald_sage_bow": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:emerald_sage_bow"] }]
+      }
+    },
+    "vitality_weaver": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:vitality_weaver"] }]
+      }
+    },
+    "astral_bound": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:astral_bound"] }]
+      }
+    },
+    "spectral_whisper": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:spectral_whisper"] }]
+      }
     }
   },
   "requirements": [
@@ -164,7 +188,11 @@
     ["arc_heavens"],
     ["cyroheart_bow"],
     ["burnt_relic"],
-    ["verdant_viper"]
+    ["verdant_viper"],
+    ["emerald_sage_bow"],
+    ["vitality_weaver"],
+    ["astral_bound"],
+    ["spectral_whisper"]
   ],
   "rewards": {
     "experience": 1000,

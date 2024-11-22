@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class SpectralArrow extends AbstractArrow {
     private int remainingObstacles;
+    private int lifespan = 140;
 
     public SpectralArrow(EntityType<? extends SpectralArrow> entityType, Level level) {
         super(entityType, level);
@@ -37,15 +38,13 @@ public class SpectralArrow extends AbstractArrow {
     @Override
     public void tick() {
         super.tick();
-        if (this.getDeltaMovement().lengthSqr() < 0.01) {
+        if (--lifespan <= 0) {
             this.discard();
             return;
         }
 
         Vec3 currentPosition = this.position();
         Vec3 nextPosition = currentPosition.add(this.getDeltaMovement());
-
-
         EntityHitResult entityHitResult = this.findHitEntity(currentPosition, nextPosition);
         if (entityHitResult != null) {
             this.onHitEntity(entityHitResult);
@@ -71,14 +70,13 @@ public class SpectralArrow extends AbstractArrow {
             if (remainingObstacles > 0) {
                 remainingObstacles--;
 
-
                 Vec3 movement = this.getDeltaMovement();
                 Vec3 hitPos = result.getLocation();
                 this.setPos(hitPos.x + movement.x * 0.5, hitPos.y + movement.y * 0.5, hitPos.z + movement.z * 0.5);
 
                 this.setDeltaMovement(movement);
             } else {
-                this.discard();
+                this.setDeltaMovement(Vec3.ZERO);
             }
         }
     }
