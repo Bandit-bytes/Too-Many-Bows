@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.DragonsBreathArrow;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -86,5 +87,9 @@ public class DragonsBreathBow extends BowItem {
         tooltip.add(Component.translatable("item.many_bows.dragons_breath_bow.tooltip").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD));
         tooltip.add(Component.translatable("item.many_bows.dragons_breath_bow.tooltip.ability")
                 .withStyle(style -> style.withColor(TextColor.fromRgb(0x8B0000))));
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 }

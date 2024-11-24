@@ -1,5 +1,6 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
@@ -119,6 +120,10 @@ public class ArcaneBow extends BowItem {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SHROOMLIGHT_STEP, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 
     @Override

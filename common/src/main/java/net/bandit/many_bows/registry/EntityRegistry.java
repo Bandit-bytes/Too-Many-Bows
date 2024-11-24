@@ -99,6 +99,16 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "spectral_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<AuroraArrowEntity>> AURORA_ARROW = ENTITY_TYPES.register("aurora_arrow",
+            () -> EntityType.Builder.<AuroraArrowEntity>of(AuroraArrowEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "aurora_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<RiftEntity>> RIFT_ENTITY = ENTITY_TYPES.register("rift_entity",
+            () -> EntityType.Builder.<RiftEntity>of(RiftEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "aurora_arrow").toString()));
+
 
     public static void register() {
         ENTITY_TYPES.register();

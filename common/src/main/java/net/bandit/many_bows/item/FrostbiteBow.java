@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.FrostbiteArrow;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -138,5 +139,9 @@ public class FrostbiteBow extends BowItem {
             double offsetZ = entity.getRandom().nextGaussian() * 0.6D;
             level.addParticle(ParticleTypes.SNOWFLAKE, entity.getX() + offsetX, entity.getY() + entity.getBbHeight() / 2.0 + offsetY, entity.getZ() + offsetZ, 0.0D, 0.1D, 0.0D);
         }
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 }

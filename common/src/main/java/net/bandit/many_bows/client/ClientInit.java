@@ -37,6 +37,7 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.VITALITY_WEAVER.get());
         registerBowProperties(ItemRegistry.ASTRAL_BOUND.get());
         registerBowProperties(ItemRegistry.SPECTRAL_WHISPER.get());
+        registerBowProperties(ItemRegistry.AURORAS_GRACE.get());
 
         registerEntityRenderers();
     }
@@ -70,6 +71,7 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.VITALITY_ARROW.get(), VitalityArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.ASTRAL_ARROW.get(), AstralArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SPECTRAL_ARROW.get(), SpectralArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.AURORA_ARROW.get(), AuroraArrowRenderer::new);
 
     }
 }

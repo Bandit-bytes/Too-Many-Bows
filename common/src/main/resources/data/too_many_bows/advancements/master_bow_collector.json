@@ -165,6 +165,12 @@
       "conditions": {
         "items": [{ "items": ["too_many_bows:spectral_whisper"] }]
       }
+    },
+    "auroras_grace": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:auroras_grace"] }]
+      }
     }
   },
   "requirements": [
@@ -192,7 +198,8 @@
     ["emerald_sage_bow"],
     ["vitality_weaver"],
     ["astral_bound"],
-    ["spectral_whisper"]
+    ["spectral_whisper"],
+    ["auroras_grace"]
   ],
   "rewards": {
     "experience": 1000,

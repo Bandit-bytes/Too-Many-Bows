@@ -5,6 +5,7 @@ import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.forge.loot.BowLootInjectorPlatformImpl;
 import net.bandit.many_bows.registry.EntityRegistry;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
@@ -59,5 +60,7 @@ public class ManyBowsModForge {
         event.registerEntityRenderer(EntityRegistry.VITALITY_ARROW.get(), VitalityArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.ASTRAL_ARROW.get(), AstralArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SPECTRAL_ARROW.get(), SpectralArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.AURORA_ARROW.get(), AuroraArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.RIFT_ENTITY.get(), NoopRenderer::new);
     }
 }

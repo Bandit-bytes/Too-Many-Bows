@@ -23,6 +23,11 @@
           "type": "item",
           "name": "too_many_bows:emerald_sage_bow",
           "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:repair_crystal",
+          "weight": 1
         }
       ]
     }

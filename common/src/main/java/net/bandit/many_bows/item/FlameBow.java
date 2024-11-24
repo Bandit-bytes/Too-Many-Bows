@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.FlameArrow;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -82,5 +83,9 @@ public class FlameBow extends BowItem {
         tooltip.add(Component.translatable("item.too_many_bows.flame_bow.tooltip").withStyle(ChatFormatting.RED));
         tooltip.add(Component.translatable("item.too_many_bows.flame_bow.tooltip.ability").withStyle(ChatFormatting.GOLD));
         tooltip.add(Component.translatable("item.too_many_bows.flame_bow.tooltip.legend").withStyle(ChatFormatting.DARK_RED, ChatFormatting.ITALIC));
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 }

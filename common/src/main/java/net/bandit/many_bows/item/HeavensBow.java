@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.LightningArrow;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -78,5 +79,9 @@ public class HeavensBow extends BowItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.too_many_bows.arc_heavens.tooltip").withStyle(ChatFormatting.GOLD));
         tooltip.add(Component.translatable("item.too_many_bows.arc_heavens.tooltip.ability").withStyle(ChatFormatting.DARK_GREEN));
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 }

@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.WindProjectile;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -88,5 +89,9 @@ public class WindBow extends BowItem {
         tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.ability").withStyle(ChatFormatting.LIGHT_PURPLE));
         tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.effect").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.legend").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 }

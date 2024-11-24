@@ -166,5 +166,21 @@
 
   "entity.too_many_bows.spectral_arrow": "Spectral Arrow",
   "enchantment.too_many_bows.spectral": "Spectral",
-  "enchantment.too_many_bows.spectral.desc": "Allows arrows to pass through additional obstacles."
+  "enchantment.too_many_bows.spectral.desc": "Allows arrows to pass through additional obstacles.",
+
+  "item.too_many_bows.auroras_grace": "Aurora's Grace",
+  "item.many_bows.aurora_bow.tooltip": "A bow infused with celestial energy.",
+  "item.many_bows.aurora_bow.tooltip.ability": "Harness the power of the rift.",
+  "item.many_bows.aurora_bow.tooltip.extended": "This bow requires both arrows and Rift Shards to fire.",
+  "item.many_bows.aurora_bow.item_use": "You need Rift Shards to use this bow!",
+  "item.too_many_bows.rift_shard": "Rift Shard",
+  "item.too_many_bows.repair_crystal": "Repair Crystal",
+
+  "advancement.too_many_bows.repair.title": "Repair Crystal",
+  "advancement.too_many_bows.repair.description": "Use this crystal to repair your bows on an anvil...",
+
+  "item.many_bows.repair_crystal.tooltip": "A crystal of pure energy.",
+  "item.many_bows.repair_crystal.tooltip.use": "Use in an anvil to repair bows.",
+  "item.many_bows.rift_shard.tooltip": "A shard of pure energy.",
+  "item.many_bows.rift_shard.tooltip.use": "Use to infuse the Aurora's Grace bow arrows powerful enough to be fired."
 }

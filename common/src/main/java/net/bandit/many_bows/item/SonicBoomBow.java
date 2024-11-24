@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.SonicBoomProjectile;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -84,5 +85,9 @@ public class SonicBoomBow extends BowItem {
         tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip").withStyle(ChatFormatting.GOLD));
         tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip.ability").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip.legend").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+    }
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
     }
 }
