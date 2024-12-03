@@ -51,7 +51,7 @@ public class TidalArrow extends AbstractArrow {
 
     @Override
     protected float getWaterInertia() {
-        return 1.0F; // Reduce water drag to allow underwater travel
+        return 1.0F;
     }
 
     @Override

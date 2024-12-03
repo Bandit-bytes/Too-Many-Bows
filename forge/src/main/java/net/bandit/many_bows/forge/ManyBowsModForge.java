@@ -30,7 +30,6 @@ public class ManyBowsModForge {
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(BowLootInjectorPlatformImpl.class);
     }
 
-
     private void onClientSetup(final FMLClientSetupEvent event) {
         // This is where the client-specific code should be registered
         ManyBowsMod.initClient();

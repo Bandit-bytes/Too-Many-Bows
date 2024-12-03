@@ -30,16 +30,21 @@ public class BowLootInjectorPlatformImpl {
 
     private static boolean isMediumLootTable(ResourceLocation id) {
         return id.equals(BuiltInLootTables.JUNGLE_TEMPLE)
-                || id.equals(BuiltInLootTables.PILLAGER_OUTPOST);
+                || id.equals(BuiltInLootTables.PILLAGER_OUTPOST)
+                || id.equals(BuiltInLootTables.ABANDONED_MINESHAFT)
+                || id.equals(BuiltInLootTables.SIMPLE_DUNGEON);
     }
 
     private static boolean isHardLootTable(ResourceLocation id) {
         return id.equals(BuiltInLootTables.STRONGHOLD_CORRIDOR)
-                || id.equals(BuiltInLootTables.NETHER_BRIDGE);
+                || id.equals(BuiltInLootTables.NETHER_BRIDGE)
+                || id.equals(BuiltInLootTables.BASTION_TREASURE);
     }
 
     private static boolean isEndGameLootTable(ResourceLocation id) {
         return id.equals(BuiltInLootTables.END_CITY_TREASURE)
+                || id.equals(BuiltInLootTables.NETHER_BRIDGE)
+                || id.equals(BuiltInLootTables.ABANDONED_MINESHAFT)
                 || id.equals(BuiltInLootTables.BASTION_TREASURE);
     }
 

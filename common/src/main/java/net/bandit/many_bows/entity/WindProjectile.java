@@ -36,6 +36,11 @@ public class WindProjectile extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
+            if (target == this.getOwner()) {
+                return;
+            }
+
+            // Apply damage and levitation effect
             target.hurt(damageSources().magic(), (float) this.getBaseDamage());
             if (!target.hasEffect(MobEffects.LEVITATION)) {
                 target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, LEVITATION_DURATION, 1));
@@ -44,6 +49,7 @@ public class WindProjectile extends AbstractArrow {
 
         this.discard();
     }
+
 
     @Override
     public void tick() {

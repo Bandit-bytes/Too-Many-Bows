@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class IcicleJavelinRenderer extends EntityRenderer<IcicleJavelin> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("too_many_bows", "textures/entity/frostbite_arrow.png");
@@ -23,7 +22,6 @@ public class IcicleJavelinRenderer extends EntityRenderer<IcicleJavelin> {
     public void render(IcicleJavelin entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         Vec3 entityPos = entity.position();
 
-        // Use level's random instead
         for (int i = 0; i < 5; i++) {
             double offsetX = Mth.nextDouble(entity.level().random, -0.2, 0.2);
             double offsetY = Mth.nextDouble(entity.level().random, -0.2, 0.2);
