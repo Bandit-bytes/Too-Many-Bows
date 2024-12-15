@@ -29,21 +29,19 @@ public class AuroraArrowEntity extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        // Spawn a rift when hitting an entity
         if (!this.level().isClientSide) {
             spawnRift(BlockPos.containing(result.getLocation()));
         }
-        this.discard(); // Remove the arrow after hitting an entity
+        this.discard();
     }
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
-        // Spawn a rift when hitting a block
         if (!this.level().isClientSide) {
             spawnRift(result.getBlockPos());
         }
-        this.discard(); // Remove the arrow after hitting a block
+        this.discard();
     }
 
     private void spawnRift(BlockPos position) {

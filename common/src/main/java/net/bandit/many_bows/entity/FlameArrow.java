@@ -83,12 +83,12 @@ public class FlameArrow extends AbstractArrow {
     }
 
     private void createFireExplosion(Vec3 position, @Nullable LivingEntity entityHit) {
-        int radius = 5; // Explosion radius
+        int radius = 5;
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
 
         for (LivingEntity entity : entities) {
             if (entity != this.getOwner() && entity != entityHit) {
-                entity.setSecondsOnFire(5); // Ignite all nearby entities
+                entity.setSecondsOnFire(5);
             }
         }
 

@@ -15,6 +15,7 @@ public final class ManyBowsMod {
         EntityRegistry.register();
         EffectRegistry.register();
         EnchantmentRegistry.register();
+
     }
 
     public static void initClient() {

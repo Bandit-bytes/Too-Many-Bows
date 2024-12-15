@@ -5,37 +5,37 @@
       "rolls": 1,
       "entries": [
         {
-          "type": "item",
+          "type": "minecraft:item",
           "name": "too_many_bows:sentinels_wrath",
           "weight": 1
         },
         {
-          "type": "item",
+          "type": "minecraft:item",
           "name": "too_many_bows:skull",
           "weight": 1
         },
         {
-          "type": "item",
+          "type": "minecraft:item",
           "name": "too_many_bows:solar_bow",
           "weight": 1
         },
         {
-          "type": "item",
-          "name": "too_many_bows:arc_of_heavens",
+          "type": "minecraft:item",
+          "name": "too_many_bows:arc_heavens",
           "weight": 1
         },
         {
-          "type": "item",
-          "name": "too_many_bows:scatter_shot",
+          "type": "minecraft:item",
+          "name": "too_many_bows:scatter_bow",
           "weight": 1
         },
         {
-          "type": "item",
+          "type": "minecraft:item",
           "name": "too_many_bows:vitality_weaver",
           "weight": 1
         },
         {
-          "type": "item",
+          "type": "minecraft:item",
           "name": "too_many_bows:spectral_whisper",
           "weight": 1
         }

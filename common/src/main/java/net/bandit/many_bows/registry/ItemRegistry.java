@@ -6,6 +6,7 @@ import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.item.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.Rarity;
@@ -92,6 +93,10 @@ public class ItemRegistry {
             () -> new SpectralWhisperBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> AURORAS_GRACE = ITEMS.register("auroras_grace",
             () -> new AuroraBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+
+    //Crossbows
+    public static final RegistrySupplier<Item> ARCFORGE = ITEMS.register("arcforge",
+            () -> new CrossbowItem(new Properties().durability(700).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
 
 
     public static void register() {

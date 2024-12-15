@@ -43,8 +43,6 @@ public class AncientSageArrow extends AbstractArrow {
             target.hurt(AncientSageDamageSource.create(this.level(), this, this.getOwner()), armorReducedDamage);
             createHitParticles();
         }
-
-        // Safely discard the arrow
         this.discard();
     }
 
@@ -52,8 +50,6 @@ public class AncientSageArrow extends AbstractArrow {
     @Override
     public void tick() {
         super.tick();
-
-        // Only create trail particles for a limited number of ticks
         if (particleTicksRemaining > 0) {
             createTrailParticles();
             particleTicksRemaining--;

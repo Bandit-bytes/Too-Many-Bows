@@ -182,5 +182,6 @@
   "item.many_bows.repair_crystal.tooltip": "A crystal of pure energy.",
   "item.many_bows.repair_crystal.tooltip.use": "Use in an anvil to repair bows.",
   "item.many_bows.rift_shard.tooltip": "A shard of pure energy.",
-  "item.many_bows.rift_shard.tooltip.use": "Use to infuse the Aurora's Grace bow arrows powerful enough to be fired."
+  "item.many_bows.rift_shard.tooltip.use": "Use to infuse the Aurora's Grace bow arrows powerful enough to be fired.",
+  "item.too_many_bows.arcforge": "ArcForge"
 }

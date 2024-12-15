@@ -6,7 +6,9 @@ import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 
 
 public class ClientInit {
@@ -39,6 +41,9 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.SPECTRAL_WHISPER.get());
         registerBowProperties(ItemRegistry.AURORAS_GRACE.get());
 
+        //crowsbows
+        registerCrossbowProperties(ItemRegistry.ARCFORGE.get());
+
         registerEntityRenderers();
     }
 
@@ -52,6 +57,25 @@ public class ClientInit {
             return entity != null && entity.isUsingItem() && entity.getUseItem() == itemStack ? 1.0F : 0.0F;
         });
     }
+    private static void registerCrossbowProperties(Item item) {
+        ItemPropertiesRegistry.register(item, new ResourceLocation("charged"), (stack, level, entity, seed) -> {
+            return CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
+        });
+
+        ItemPropertiesRegistry.register(item, new ResourceLocation("firework"), (stack, level, entity, seed) -> {
+            return CrossbowItem.containsChargedProjectile(stack, Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+        });
+
+        ItemPropertiesRegistry.register(item, new ResourceLocation("pull"), (stack, level, entity, seed) -> {
+            if (entity == null || CrossbowItem.isCharged(stack)) return 0.0F;
+            return (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / CrossbowItem.getChargeDuration(stack);
+        });
+
+        ItemPropertiesRegistry.register(item, new ResourceLocation("pulling"), (stack, level, entity, seed) -> {
+            return entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
+        });
+    }
+
     public static void registerEntityRenderers() {
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);

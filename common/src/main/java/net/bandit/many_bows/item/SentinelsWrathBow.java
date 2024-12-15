@@ -34,31 +34,20 @@ public class SentinelsWrathBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Ensure the bow is properly charged
             if (power >= 0.1F) {
                 boolean creative = player.getAbilities().instabuild;
                 boolean hasInfinity = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
                 ItemStack arrowStack = findArrowInInventory(player);
-
-                // Check if the player has arrows or is in creative mode or has Infinity enchantment
                 if (!arrowStack.isEmpty() || creative || hasInfinity) {
                     SentinelArrow sentinelArrow = new SentinelArrow(level, player);
                     sentinelArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-
-                    // Apply enchantment to the arrow
                     applyEnchantments(stack, sentinelArrow);
-
-                    // Extra damage against raid mobs
                     if (sentinelArrow.getOwner() instanceof LivingEntity owner && isRaidMob(owner)) {
                         sentinelArrow.setBaseDamage(sentinelArrow.getBaseDamage() * DAMAGE_MULTIPLIER);
                     }
-
-                    // Only consume an arrow if the player is not in creative mode and doesn't have Infinity enchantment
                     if (!creative && !hasInfinity) {
                         arrowStack.shrink(1);
                     }
-
-                    // Spawn the arrow and play the sound
                     level.addFreshEntity(sentinelArrow);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
 
@@ -106,12 +95,8 @@ public class SentinelsWrathBow extends BowItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        // Default tooltip that always shows
         tooltip.add(Component.translatable("item.too_many_bows.sentinels_wrath.tooltip").withStyle(ChatFormatting.GOLD));
-
-        // Check if the player is holding the Shift key
         if (Screen.hasShiftDown()) {
-            // List of mobs the bow is strong against
             tooltip.add(Component.translatable("item.too_many_bows.sentinels_wrath.shift_title").withStyle(ChatFormatting.YELLOW));
             tooltip.add(Component.translatable("item.too_many_bows.sentinels_wrath.mob1").withStyle(ChatFormatting.GREEN));
             tooltip.add(Component.translatable("item.too_many_bows.sentinels_wrath.mob2").withStyle(ChatFormatting.GREEN));

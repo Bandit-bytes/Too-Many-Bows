@@ -29,9 +29,8 @@ public class AstralArrow extends AbstractArrow {
         super(EntityRegistry.ASTRAL_ARROW.get(), shooter, level);
         this.setBaseDamage(7.0);
 
-        // Determine max ricochets based on the enchantment level
         int enchantmentLevel = EnchantmentHelper.getItemEnchantmentLevel(EnchantmentRegistry.RICOCHET.get(), bow);
-        this.maxRicochets = 3 + enchantmentLevel; //  +1 per enchantment level
+        this.maxRicochets = 3 + enchantmentLevel;
     }
 
     @Override
@@ -74,8 +73,6 @@ public class AstralArrow extends AbstractArrow {
     @Override
     public void tick() {
         super.tick();
-
-        // Discard the arrow if it slows down too much
         Vec3 movement = this.getDeltaMovement();
         if (movement.lengthSqr() < 0.01) {
             this.discard();

@@ -59,10 +59,7 @@ public class CursedFlameArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
-            // Apply the Cursed Flame effect
             hitEntity.addEffect(new MobEffectInstance(EffectRegistry.CURSED_FLAME.get(), 200, 0));
-
-            // Create soul fire particles
             createCursedSoulFireParticles(hitEntity.position());
         }
     }
