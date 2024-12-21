@@ -5,6 +5,7 @@ import dev.architectury.registry.item.ItemPropertiesRegistry;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
+import net.minecraft.client.renderer.entity.SkeletonRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
@@ -40,6 +41,12 @@ public class ClientInit {
         registerBowProperties(ItemRegistry.ASTRAL_BOUND.get());
         registerBowProperties(ItemRegistry.SPECTRAL_WHISPER.get());
         registerBowProperties(ItemRegistry.AURORAS_GRACE.get());
+        registerBowProperties(ItemRegistry.TWIN_SHADOWS.get());
+        registerBowProperties(ItemRegistry.VERDANT_VIGOR.get());
+        registerBowProperties(ItemRegistry.CRIMSON_NEXUS.get());
+        registerBowProperties(ItemRegistry.RADIANCE.get());
+        registerBowProperties(ItemRegistry.DUSK_REAPER.get());
+        registerBowProperties(ItemRegistry.ETHEREAL_HUNTER.get());
 
         //crowsbows
         registerCrossbowProperties(ItemRegistry.ARCFORGE.get());
@@ -96,6 +103,8 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.ASTRAL_ARROW.get(), AstralArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SPECTRAL_ARROW.get(), SpectralArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.AURORA_ARROW.get(), AuroraArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.RADIANT_ARROW.get(), RadianceArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.DUSK_REAPER_ARROW.get(), DuskArrowRenderer::new);
 
     }
 }

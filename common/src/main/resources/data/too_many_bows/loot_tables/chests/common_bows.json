@@ -40,6 +40,11 @@
         },
         {
           "type": "item",
+          "name": "too_many_bows:arcforge",
+          "weight": 1
+        },
+        {
+          "type": "item",
           "name": "too_many_bows:repair_crystal",
           "weight": 1
         }

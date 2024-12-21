@@ -109,6 +109,18 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "aurora_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<RadiantArrow>> RADIANT_ARROW = ENTITY_TYPES.register("radiant_arrow",
+            () -> EntityType.Builder.<RadiantArrow>of(RadiantArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "radiant_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<DuskReaperArrow>> DUSK_REAPER_ARROW = ENTITY_TYPES.register("dusk_reaper_arrow",
+            () -> EntityType.Builder.<DuskReaperArrow>of(DuskReaperArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build(new ResourceLocation(MOD_ID, "dusk_reaper_arrow").toString()));
+
 
     public static void register() {
         ENTITY_TYPES.register();

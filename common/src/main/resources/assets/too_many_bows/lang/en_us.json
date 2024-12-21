@@ -174,6 +174,7 @@
   "item.many_bows.aurora_bow.tooltip.extended": "This bow requires both arrows and Rift Shards to fire.",
   "item.many_bows.aurora_bow.item_use": "You need Rift Shards to use this bow!",
   "item.too_many_bows.rift_shard": "Rift Shard",
+  "item.too_many_bows.soul_fragment": "Soul Fragment",
   "item.too_many_bows.repair_crystal": "Repair Crystal",
 
   "advancement.too_many_bows.repair.title": "Repair Crystal",
@@ -183,5 +184,45 @@
   "item.many_bows.repair_crystal.tooltip.use": "Use in an anvil to repair bows.",
   "item.many_bows.rift_shard.tooltip": "A shard of pure energy.",
   "item.many_bows.rift_shard.tooltip.use": "Use to infuse the Aurora's Grace bow arrows powerful enough to be fired.",
-  "item.too_many_bows.arcforge": "ArcForge"
+  "item.too_many_bows.arcforge": "ArcForge",
+  "item.too_many_bows.dusk_reaper": "Dusk Reaper",
+  "item.too_many_bows.ethereal_hunter": "Ethereal Hunter",
+  "item.too_many_bows.twin_shadows": "Twin Shadows",
+  "item.too_many_bows.verdant_vigor": "Verdant Vigor",
+  "item.too_many_bows.crimson_nexus": "Crimson Nexus",
+  "item.too_many_bows.radiance": "Radiance",
+
+  "item.many_bows.verdant_vigor.tooltip": "A bow imbued with the essence of nature.",
+  "item.many_bows.verdant_vigor.tooltip.ability": "Holding this bow grants health and heals nearby allies.",
+  "item.many_bows.verdant_vigor.tooltip.legend": "Legends speak of its power to breathe life into barren lands.",
+
+  "item.many_bows.twin_shadows.tooltip": "A bow imbued with the essence of light and shadow.",
+  "item.many_bows.twin_shadows.tooltip.ability": "Fires twin arrows: one of light and one of darkness.",
+  "item.many_bows.twin_shadows.tooltip.legend": "“Balance is the key to harmony.”",
+
+  "item.many_bows.crimson_nexus.tooltip": "A bow pulsing with crimson energy.",
+  "item.many_bows.crimson_nexus.tooltip.ability": "Fires energy arrows that consume health and lifedrain nearby foes.",
+  "item.many_bows.crimson_nexus.tooltip.legend": "Master its power, but beware its toll.",
+  "item.many_bows.crimson_nexus.tooltip.info": "Consumes health to fire powerful arrows.",
+  "item.many_bows.crimson_nexus.tooltip.health_cost": "Health Cost: §c%s HP§r per shot.",
+
+
+  "item.many_bows.radiance.tooltip": "A bow blessed by celestial light.",
+  "item.many_bows.radiance.tooltip.ability": "Radiant energy damages undead, heals allies, and blinds foes.",
+  "item.many_bows.radiance.tooltip.legend": "“The light shall guide and protect.”",
+  "item.many_bows.radiance.tooltip.info": "Consumes experience points to fire radiant arrows.",
+  "item.many_bows.radiance.tooltip.xp": "Experience Cost: §c%d XP§r per shot.",
+
+  "item.many_bows.dusk_reaper.tooltip.info": "Marks enemies.",
+  "item.many_bows.dusk_reaper.tooltip.mark": "Marked enemies take increased damage and leave a damaging trail.",
+  "item.many_bows.dusk_reaper.tooltip.spectral": "Fully charged shots create a spectral zone that damages and slows enemies.",
+  "item.many_bows.dusk_reaper.tooltip.effect": "Marked enemies explode on death, dealing AoE damage.",
+  "item.many_bows.dusk_reaper.tooltip.debuff": "Applies Weakness, Slowness, and constant damage to marked targets.",
+  "item.many_bows.dusk_reaper.tooltip.glow": "Marked enemies are visible through walls.",
+  "item.many_bows.soulfragment.tooltip.info":"Used to fire the Dusk Reaper bow",
+  "item.many_bows.dusk_reaper.tooltip.soul_fragments": "Consumes Soul Fragments to fire.",
+  "item.many_bows.ethereal_hunter.tooltip.info": "A mystical bow that fires radiant arrows fueled by your hunger.",
+  "item.many_bows.ethereal_hunter.tooltip.hunger": "Consumes %s hunger points per shot.",
+  "item.many_bows.ethereal_hunter.tooltip.legend": "Harnesses your energy to unleash powerful attacks.",
+  "item.many_bows.ethereal_hunter.no_hunger": "You are too hungry to fire the bow!"
 }

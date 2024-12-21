@@ -171,10 +171,58 @@
       "conditions": {
         "items": [{ "items": ["too_many_bows:auroras_grace"] }]
       }
+    },
+    "twin_shadows": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:twin_shadows"] }]
+      }
+    },
+    "verdant_vigor": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:verdant_vigor"] }]
+      }
+    },
+    "ethereal_hunter": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:ethereal_hunter"] }]
+      }
+    },
+    "dusk_reaper": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:dusk_reaper"] }]
+      }
+    },
+    "radiance": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:radiance"] }]
+      }
+    },
+    "arcforge": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:arcforge"] }]
+      }
+    },
+    "crimson_nexus": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:crimson_nexus"] }]
+      }
     }
   },
   "requirements": [
     ["arcane_bow"],
+    ["crimson_nexus"],
+    ["radiance"],
+    ["dusk_reaper"],
+    ["ethereal_hunter"],
+    ["verdant_vigor"],
+    ["twin_shadows"],
     ["dark_bow"],
     ["ancient_sage_bow"],
     ["shulker_blast"],
@@ -199,6 +247,7 @@
     ["vitality_weaver"],
     ["astral_bound"],
     ["spectral_whisper"],
+    ["arcforge"],
     ["auroras_grace"]
   ],
   "rewards": {
