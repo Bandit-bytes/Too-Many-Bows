@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 
 public class DuskArrowRenderer extends ArrowRenderer<DuskReaperArrow> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("too_many_bows", "textures/entity/hunter_arrow.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation("too_many_bows", "textures/entity/dusk_reaper_arrow.png");
 
     public DuskArrowRenderer(EntityRendererProvider.Context context) {
         super(context);

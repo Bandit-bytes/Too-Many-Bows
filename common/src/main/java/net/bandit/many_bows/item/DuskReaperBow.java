@@ -8,9 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BowItem;
@@ -19,7 +16,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +23,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class DuskReaperBow extends BowItem {
-
 
     public DuskReaperBow(Properties properties) {
         super(properties);
@@ -39,23 +34,29 @@ public class DuskReaperBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
+            // Check if power is sufficient and consume soul fragments
             if (power >= 0.1F && consumeSoulFragments(player)) {
                 // Play custom sound
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.5F, 0.5F);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.3F, 0.5F);
 
-                // Explicitly create and fire the custom arrow
+                // Create and fire the custom arrow
                 DuskReaperArrow arrow = new DuskReaperArrow(level, player);
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+                arrow.setOwner(player); // Set the owner to the player
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F); // Ensure arrow direction and speed
                 arrow.setCritArrow(charge >= 20);
 
                 // Apply enchantments
                 applyEnchantments(stack, arrow);
 
+                // Add the arrow to the world
                 level.addFreshEntity(arrow);
 
                 // Damage the bow
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 player.awardStat(Stats.ITEM_USED.get(this));
+            } else {
+                // Notify player if no soul fragments are available
+                player.displayClientMessage(Component.translatable("item.many_bows.dusk_reaper.no_soul_fragments").withStyle(ChatFormatting.RED), true);
             }
         }
     }
@@ -69,7 +70,6 @@ public class DuskReaperBow extends BowItem {
         }
         return false;
     }
-
 
     private void applyEnchantments(ItemStack stack, DuskReaperArrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
@@ -121,5 +121,4 @@ public class DuskReaperBow extends BowItem {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.YELLOW));
         }
     }
-
 }

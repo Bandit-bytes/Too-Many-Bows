@@ -117,8 +117,6 @@ public class EntityRegistry {
     public static final RegistrySupplier<EntityType<DuskReaperArrow>> DUSK_REAPER_ARROW = ENTITY_TYPES.register("dusk_reaper_arrow",
             () -> EntityType.Builder.<DuskReaperArrow>of(DuskReaperArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
-                    .clientTrackingRange(4)
-                    .updateInterval(20)
                     .build(new ResourceLocation(MOD_ID, "dusk_reaper_arrow").toString()));
 
 

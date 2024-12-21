@@ -224,5 +224,7 @@
   "item.many_bows.ethereal_hunter.tooltip.info": "A mystical bow that fires radiant arrows fueled by your hunger.",
   "item.many_bows.ethereal_hunter.tooltip.hunger": "Consumes %s hunger points per shot.",
   "item.many_bows.ethereal_hunter.tooltip.legend": "Harnesses your energy to unleash powerful attacks.",
-  "item.many_bows.ethereal_hunter.no_hunger": "You are too hungry to fire the bow!"
+  "item.many_bows.ethereal_hunter.no_hunger": "You are too hungry to fire the bow!",
+  "item.many_bows.dusk_reaper.no_soul_fragments": "You need Soul Fragments to fire this bow!",
+  "item.many_bows.aurora_bow.no_rift_shard": "You need a Rift shard to fire this bow!"
 }
