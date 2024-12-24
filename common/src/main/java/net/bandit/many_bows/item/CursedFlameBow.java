@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.entity.CursedFlameArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -85,10 +86,15 @@ public class CursedFlameBow extends BowItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
         tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip").withStyle(ChatFormatting.DARK_PURPLE));
         tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip.ability").withStyle(ChatFormatting.GREEN));
         tooltip.add(Component.translatable("item.too_many_bows.cursed_flame_bow.tooltip.legend").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
     }
+    else {
+        tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
+    }
+}
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());

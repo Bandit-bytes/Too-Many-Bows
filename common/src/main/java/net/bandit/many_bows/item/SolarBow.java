@@ -2,6 +2,7 @@ package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.sounds.SoundEvents;
@@ -104,12 +105,15 @@ public class SolarBow extends BowItem {
             }
         }
     }
-
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
         tooltip.add(Component.translatable("item.many_bows.solar_bow.tooltip").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
         tooltip.add(Component.translatable("item.many_bows.solar_bow.tooltip.ability")
                 .withStyle(style -> style.withColor(TextColor.fromRgb(0xFF4500))));
+    }else {
+            tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
+        }
     }
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {

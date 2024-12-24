@@ -18,7 +18,7 @@ public class ItemRegistry {
 
     //item
     public static final RegistrySupplier<Item> CURSED_STONE = ITEMS.register("cursed_stone",
-            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+            () -> new CursedStone(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> SOUL_FRAGMENT = ITEMS.register("soul_fragment",
             () -> new SoulFragment(new Item.Properties().stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> RIFT_SHARD = ITEMS.register("rift_shard",

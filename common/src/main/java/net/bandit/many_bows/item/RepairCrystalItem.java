@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,10 +15,13 @@ public class RepairCrystalItem extends Item {
     public RepairCrystalItem(Properties properties) {
         super(properties);
     }
-
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
         tooltip.add(Component.translatable("item.many_bows.repair_crystal.tooltip").withStyle(ChatFormatting.GREEN));
         tooltip.add(Component.translatable("item.many_bows.repair_crystal.tooltip.use").withStyle(ChatFormatting.GRAY));
+    }else {
+        tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
     }
+}
 }

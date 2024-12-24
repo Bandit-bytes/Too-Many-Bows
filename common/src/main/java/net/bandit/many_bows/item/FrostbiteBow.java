@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.entity.FrostbiteArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -111,10 +112,14 @@ public class FrostbiteBow extends BowItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip.ability").withStyle(ChatFormatting.DARK_AQUA));
         tooltip.add(Component.translatable("item.many_bows.frostbite_bow.tooltip.frostwalker").withStyle(ChatFormatting.BLUE));
+    } else {
+        tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
     }
+}
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
