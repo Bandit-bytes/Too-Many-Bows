@@ -19,9 +19,7 @@
   "item.too_many_bows.arc_heavens": "Arc Of The Heavens",
   "item.too_many_bows.solar_bow": "Solar Flare",
   "item.too_many_bows.dragons_breath": "Dragons Breath",
-  "item.too_many_bows.skull": "Necro Skull",
-  "item.too_many_bows.ancient_sage": "Ancient Sage",
-  "item.too_many_bows.frozenite": "Frozenite",
+  "item.too_many_bows.cursed_stone": "Cursed Stone",
   "item.too_many_bows.shulker_blast": "Shulker's Blast",
 
   "too_many_bows_tab": "Too Many Bows",
@@ -125,8 +123,8 @@
   "advancement.too_many_bows.master_bow_collector.title": "Bow Collector Extraordinaire",
   "advancement.too_many_bows.master_bow_collector.description": "Collect every unique bow in the Too Many Bows mod.",
 
-  "advancement.too_many_bows.necro_skull.title": "The Necro Skull",
-  "advancement.too_many_bows.necro_skull.description": "Obtain the legendary Necro Skull.",
+  "advancement.too_many_bows.necro_skull.title": "The Cursed Stone",
+  "advancement.too_many_bows.necro_skull.description": "Obtain the legendary Cursed Stone.",
   "advancement.too_many_bows.necro_flame_bow.title": "Necro Flame Bow",
   "advancement.too_many_bows.necro_flame_bow.description": "Wield the power of the Necro Flame Bow.",
 
@@ -175,9 +173,9 @@
   "item.many_bows.aurora_bow.item_use": "You need Rift Shards to use this bow!",
   "item.too_many_bows.rift_shard": "Rift Shard",
   "item.too_many_bows.soul_fragment": "Soul Fragment",
-  "item.too_many_bows.repair_crystal": "Repair Crystal",
+  "item.too_many_bows.power_crystal": "Power Crystal",
 
-  "advancement.too_many_bows.repair.title": "Repair Crystal",
+  "advancement.too_many_bows.repair.title": "Power Crystal",
   "advancement.too_many_bows.repair.description": "Use this crystal to repair your bows on an anvil...",
 
   "item.many_bows.repair_crystal.tooltip": "A crystal of pure energy.",

@@ -17,17 +17,13 @@ public class ItemRegistry {
 
 
     //item
-    public static final RegistrySupplier<Item> SKULL = ITEMS.register("skull",
-            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
-    public static final RegistrySupplier<Item> ANCIENT_SAGE = ITEMS.register("ancient_sage",
-            () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
-    public static final RegistrySupplier<Item> FROZENITE = ITEMS.register("frozenite",
+    public static final RegistrySupplier<Item> CURSED_STONE = ITEMS.register("cursed_stone",
             () -> new Item(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> SOUL_FRAGMENT = ITEMS.register("soul_fragment",
             () -> new SoulFragment(new Item.Properties().stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> RIFT_SHARD = ITEMS.register("rift_shard",
             () -> new RiftShardItem(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
-    public static final RegistrySupplier<Item> REPAIR_CRYSTAL = ITEMS.register("repair_crystal",
+    public static final RegistrySupplier<Item> POWER_CRYSTAL = ITEMS.register("power_crystal",
             () -> new RepairCrystalItem(new Properties().rarity(Rarity.EPIC).stacksTo(16).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 
     //BOWS

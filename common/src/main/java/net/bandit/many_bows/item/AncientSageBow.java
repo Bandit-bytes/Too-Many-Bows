@@ -79,7 +79,7 @@ public class AncientSageBow extends BowItem {
 
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
+        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
 
     @Override

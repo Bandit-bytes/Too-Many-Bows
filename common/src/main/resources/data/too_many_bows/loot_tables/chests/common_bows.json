@@ -45,7 +45,7 @@
         },
         {
           "type": "item",
-          "name": "too_many_bows:repair_crystal",
+          "name": "too_many_bows:power_crystal",
           "weight": 1
         }
       ]

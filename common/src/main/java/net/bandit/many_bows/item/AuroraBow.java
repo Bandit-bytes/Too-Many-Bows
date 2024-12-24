@@ -4,7 +4,6 @@ import net.bandit.many_bows.entity.AuroraArrowEntity;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -140,7 +139,7 @@ public class AuroraBow extends BowItem {
     }
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
+        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
 
     @Override

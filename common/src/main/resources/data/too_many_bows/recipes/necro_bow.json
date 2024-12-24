@@ -1,13 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "SWS",
-    "SBS",
-    "SWS"
+    "SW ",
+    " B ",
+    " WS"
   ],
   "key": {
     "S": {
-      "item": "too_many_bows:skull"
+      "item": "too_many_bows:cursed_stone"
     },
     "W": {
       "item": "minecraft:wither_skeleton_skull"

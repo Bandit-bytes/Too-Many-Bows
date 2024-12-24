@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "ASA",
-    "ABA",
-    "ASA"
+    " SA",
+    " B ",
+    "AS "
   ],
   "key": {
     "A": {
-      "item": "too_many_bows:ancient_sage"
+      "item": "too_many_bows:power_crystal"
     },
     "B": {
       "item": "minecraft:bow"
     },
     "S": {
-      "item": "minecraft:string"
+      "item": "minecraft:emerald"
     }
   },
   "result": {

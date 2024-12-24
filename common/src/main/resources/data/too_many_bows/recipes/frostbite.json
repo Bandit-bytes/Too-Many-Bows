@@ -1,20 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "D D",
-    " I ",
-    "D D"
+    "LL ",
+    " B ",
+    " LL"
   ],
   "key": {
-    "D": {
-      "item": "minecraft:diamond"
+    "L": {
+      "item": "minecraft:packed_ice"
     },
-    "I": {
-      "item": "minecraft:ice"
+    "B": {
+      "item": "minecraft:bow"
     }
   },
   "result": {
-    "item": "too_many_bows:frozenite",
-    "count": 1
+    "item": "too_many_bows:frostbite"
   }
 }

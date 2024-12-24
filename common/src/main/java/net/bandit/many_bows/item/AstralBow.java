@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.AstralArrow;
-import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -116,6 +115,6 @@ public class AstralBow extends BowItem {
     }
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
+        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
 }

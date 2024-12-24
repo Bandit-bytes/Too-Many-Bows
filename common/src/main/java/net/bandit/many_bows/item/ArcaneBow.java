@@ -3,7 +3,6 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -123,7 +122,7 @@ public class ArcaneBow extends BowItem {
     }
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemRegistry.REPAIR_CRYSTAL.get());
+        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
 
     @Override

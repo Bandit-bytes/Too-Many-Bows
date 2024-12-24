@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "too_many_bows:frozenite",
+  "parent": "too_many_bows:root",
   "criteria": {
     "get_frostbite": {
       "trigger": "minecraft:inventory_changed",

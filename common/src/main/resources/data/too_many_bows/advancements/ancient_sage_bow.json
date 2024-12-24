@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "too_many_bows:ancient_sage",
+  "parent": "too_many_bows:root",
   "criteria": {
     "get_sage_bow": {
       "trigger": "minecraft:inventory_changed",

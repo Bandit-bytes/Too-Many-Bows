@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "too_many_bows:skull"
+      "item": "too_many_bows:cursed_stone"
     },
     "title": {
       "translate": "advancement.too_many_bows.necro_skull.title"
@@ -21,7 +21,7 @@
       "conditions": {
         "items": [
           {
-            "items": ["too_many_bows:skull"]
+            "items": ["too_many_bows:cursed_stone"]
           }
         ]
       }
