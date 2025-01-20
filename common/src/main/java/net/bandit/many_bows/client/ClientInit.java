@@ -11,46 +11,54 @@ import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
+import java.util.List;
 
 public class ClientInit {
 
     public static void registerClientProperties() {
-        registerBowProperties(ItemRegistry.ARCANE_BOW.get());
-        registerBowProperties(ItemRegistry.SOLAR_BOW.get());
-        registerBowProperties(ItemRegistry.FROSTBITE.get());
-        registerBowProperties(ItemRegistry.ARC_HEAVENS.get());
-        registerBowProperties(ItemRegistry.DARK_BOW.get());
-        registerBowProperties(ItemRegistry.DRAGONS_BREATH.get());
-        registerBowProperties(ItemRegistry.VERDANT_VIPER.get());
-        registerBowProperties(ItemRegistry.FLAME_BOW.get());
-        registerBowProperties(ItemRegistry.TIDAL_BOW.get());
-        registerBowProperties(ItemRegistry.NECRO_FLAME_BOW.get());
-        registerBowProperties(ItemRegistry.SCATTER_BOW.get());
-        registerBowProperties(ItemRegistry.ANCIENT_SAGE_BOW.get());
-        registerBowProperties(ItemRegistry.WIND_BOW.get());
-        registerBowProperties(ItemRegistry.DEMONS_GRASP.get());
-        registerBowProperties(ItemRegistry.AETHERS_CALL.get());
-        registerBowProperties(ItemRegistry.CYROHEART_BOW.get());
-        registerBowProperties(ItemRegistry.BURNT_RELIC.get());
-        registerBowProperties(ItemRegistry.IRONCLAD_BOW.get());
-        registerBowProperties(ItemRegistry.HUNTER_BOW.get());
-        registerBowProperties(ItemRegistry.SENTINELS_WRAITH.get());
-        registerBowProperties(ItemRegistry.EMERALD_SAGE_BOW.get());
-        registerBowProperties(ItemRegistry.SHULKER_BLAST.get());
-        registerBowProperties(ItemRegistry.VITALITY_WEAVER.get());
-        registerBowProperties(ItemRegistry.ASTRAL_BOUND.get());
-        registerBowProperties(ItemRegistry.SPECTRAL_WHISPER.get());
-        registerBowProperties(ItemRegistry.AURORAS_GRACE.get());
-        registerBowProperties(ItemRegistry.TWIN_SHADOWS.get());
-        registerBowProperties(ItemRegistry.VERDANT_VIGOR.get());
-        registerBowProperties(ItemRegistry.CRIMSON_NEXUS.get());
-        registerBowProperties(ItemRegistry.RADIANCE.get());
-        registerBowProperties(ItemRegistry.DUSK_REAPER.get());
-        registerBowProperties(ItemRegistry.ETHEREAL_HUNTER.get());
+        // Bows
+        List<Item> bows = List.of(
+                ItemRegistry.ARCANE_BOW.get(),
+                ItemRegistry.SOLAR_BOW.get(),
+                ItemRegistry.FROSTBITE.get(),
+                ItemRegistry.ARC_HEAVENS.get(),
+                ItemRegistry.DARK_BOW.get(),
+                ItemRegistry.DRAGONS_BREATH.get(),
+                ItemRegistry.VERDANT_VIPER.get(),
+                ItemRegistry.FLAME_BOW.get(),
+                ItemRegistry.TIDAL_BOW.get(),
+                ItemRegistry.NECRO_FLAME_BOW.get(),
+                ItemRegistry.SCATTER_BOW.get(),
+                ItemRegistry.ANCIENT_SAGE_BOW.get(),
+                ItemRegistry.WIND_BOW.get(),
+                ItemRegistry.DEMONS_GRASP.get(),
+                ItemRegistry.AETHERS_CALL.get(),
+                ItemRegistry.CYROHEART_BOW.get(),
+                ItemRegistry.BURNT_RELIC.get(),
+                ItemRegistry.IRONCLAD_BOW.get(),
+                ItemRegistry.HUNTER_BOW.get(),
+                ItemRegistry.SENTINELS_WRAITH.get(),
+                ItemRegistry.EMERALD_SAGE_BOW.get(),
+                ItemRegistry.SHULKER_BLAST.get(),
+                ItemRegistry.VITALITY_WEAVER.get(),
+                ItemRegistry.ASTRAL_BOUND.get(),
+                ItemRegistry.SPECTRAL_WHISPER.get(),
+                ItemRegistry.AURORAS_GRACE.get(),
+                ItemRegistry.TWIN_SHADOWS.get(),
+                ItemRegistry.VERDANT_VIGOR.get(),
+                ItemRegistry.CRIMSON_NEXUS.get(),
+                ItemRegistry.RADIANCE.get(),
+                ItemRegistry.DUSK_REAPER.get(),
+                ItemRegistry.ETHEREAL_HUNTER.get()
+        );
 
-        //crowsbows
-        registerCrossbowProperties(ItemRegistry.ARCFORGE.get());
+        // Register properties for each bow
+        bows.forEach(ClientInit::registerBowProperties);
 
+        // Crossbows
+//        registerCrossbowProperties(ItemRegistry.ARCFORGE.get());
+
+        // Entity renderers
         registerEntityRenderers();
     }
 
@@ -64,6 +72,7 @@ public class ClientInit {
             return entity != null && entity.isUsingItem() && entity.getUseItem() == itemStack ? 1.0F : 0.0F;
         });
     }
+
     private static void registerCrossbowProperties(Item item) {
         ItemPropertiesRegistry.register(item, new ResourceLocation("charged"), (stack, level, entity, seed) -> {
             return CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
@@ -106,6 +115,5 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.RADIANT_ARROW.get(), RadianceArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DUSK_REAPER_ARROW.get(), DuskArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.RIFT_ENTITY.get(), NoopRenderer::new);
-
     }
 }

@@ -10,10 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -34,14 +31,14 @@ public class AncientSageBow extends BowItem {
             float power = getPowerForTime(charge);
 
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
-                AncientSageArrow arrow = new AncientSageArrow(level, player);
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
+                ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+                AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
 
-                arrow.setBaseDamage(8.0);
-                arrow.setArmorPenetration(0.33f);
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
+                arrow.setBaseDamage(8.0); // Adjust as needed
 
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
@@ -55,13 +52,18 @@ public class AncientSageBow extends BowItem {
                     arrow.setSecondsOnFire(100);
                 }
 
-                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
+                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
                 level.addFreshEntity(arrow);
+
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
 
                 if (!hasInfinity) {
                     arrowStack.shrink(1);
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
+
                 stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -70,9 +72,9 @@ public class AncientSageBow extends BowItem {
     }
 
     private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
-                return stack;
+        for (ItemStack itemStack : player.getInventory().items) {
+            if (itemStack.getItem() instanceof ArrowItem) {
+                return itemStack;
             }
         }
         return ItemStack.EMPTY;

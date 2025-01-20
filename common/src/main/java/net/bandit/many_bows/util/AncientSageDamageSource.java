@@ -9,14 +9,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 public class AncientSageDamageSource {
-
-    // Arrow damage source (existing)
     public static DamageSource create(Level level, Entity arrow, Entity owner) {
         Holder<DamageType> damageType = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.ARROW);
         return new DamageSource(damageType, owner);
     }
-
-    // Radiant damage source (new)
     public static DamageSource createRadiantDamage(Level level, Entity source) {
         Holder<DamageType> damageType = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.MAGIC);
         return new DamageSource(damageType, source);

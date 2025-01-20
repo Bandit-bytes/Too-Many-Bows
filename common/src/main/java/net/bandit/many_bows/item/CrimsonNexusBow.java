@@ -10,9 +10,11 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -44,24 +46,15 @@ public class CrimsonNexusBow extends BowItem {
                 float healthCost = player.getHealth() <= 4.0F ? 0 : 2.0F; // Prevent killing the player
                 player.hurt(player.damageSources().magic(), healthCost);
 
-                // Fire energy arrow
-                Arrow arrow = new Arrow(level, player);
+                // Dynamically find arrow type
+                ItemStack arrowStack = player.getProjectile(stack);
+                ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+                AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
+
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
                 // Apply enchantments
-                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-                if (powerLevel > 0) {
-                    arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
-                }
-
-                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-                if (punchLevel > 0) {
-                    arrow.setKnockback(punchLevel);
-                }
-
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-                    arrow.setSecondsOnFire(100);
-                }
+                applyEnchantments(stack, arrow);
 
                 // Special effects for full health
                 if (player.getHealth() == player.getMaxHealth()) {
@@ -69,13 +62,41 @@ public class CrimsonNexusBow extends BowItem {
                     arrow.setSecondsOnFire(200);
                 }
 
+                // Add arrow entity to the world
                 level.addFreshEntity(arrow);
 
                 // Damage the bow after firing
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+
+                // Update stats
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
+    }
+
+    private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
+        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+        if (powerLevel > 0) {
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
+        }
+
+        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+        if (punchLevel > 0) {
+            arrow.setKnockback(punchLevel);
+        }
+
+        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+            arrow.setSecondsOnFire(100);
+        }
+    }
+
+    private ItemStack findArrowInInventory(Player player) {
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() instanceof ArrowItem) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -110,10 +131,10 @@ public class CrimsonNexusBow extends BowItem {
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
+
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        // Allow the bow to function without requiring arrows
-        return stack -> true;
+        return stack -> stack.getItem() instanceof ArrowItem;
     }
 
     @Override
@@ -128,5 +149,4 @@ public class CrimsonNexusBow extends BowItem {
             tooltip.add(Component.translatable("item.too_many_bows.shulker_blast_bow.hold_shift"));
         }
     }
-
 }

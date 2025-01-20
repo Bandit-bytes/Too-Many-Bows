@@ -10,10 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -35,7 +32,7 @@ public class CursedFlameBow extends BowItem {
 
             if (power >= 0.1F) {
                 boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-                ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
+                ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
                 if (hasInfinity || !arrowStack.isEmpty()) {
                     CursedFlameArrow cursedFlameArrow = new CursedFlameArrow(level, player);
@@ -77,7 +74,7 @@ public class CursedFlameBow extends BowItem {
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
+            if (stack.getItem() instanceof ArrowItem) {
                 return stack;
             }
         }

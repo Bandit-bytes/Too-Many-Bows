@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,55 +32,82 @@ public class AuroraBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(stack) - timeCharged;
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GLOW_ITEM_FRAME_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F);
+            float power = getPowerForTime(charge);
 
-            boolean hasInfinity = player.getAbilities().instabuild;
-            int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-            int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-            int hasFlame = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack);
+            if (power >= 0.1F) {
+                boolean hasInfinity = player.getAbilities().instabuild ||
+                        EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+                ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
-            // Check if both an arrow and a Rift Shard are available
-            if (charge >= 20 && (hasInfinity || (consumeArrow(player, 1) && consumeRiftShard(player, 1)))) {
-                fireRiftArrow(level, player, hasInfinity, powerLevel, punchLevel, hasFlame);
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-            } else if (!hasInfinity) {
-                player.displayClientMessage(Component.translatable("item.many_bows.aurora_bow.item_use").withStyle(ChatFormatting.RED), true);
-            }
-        }
-    }
-    @Override
-    public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int timeLeft) {
-        if (entity instanceof Player player) {
-            int charge = this.getUseDuration(stack) - timeLeft;
-
-            if (charge > 0 && charge % 10 == 0) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.RESPAWN_ANCHOR_CHARGE,
-                        SoundSource.PLAYERS, 0.8F, 1.0F + charge * 0.02F);
-            }
-        }
-    }
-
-
-    private boolean consumeArrow(Player player, int count) {
-        if (player.getAbilities().instabuild) {
-            return true; // Creative mode bypass
-        }
-
-        int arrowsRemoved = 0;
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
-                int removeAmount = Math.min(stack.getCount(), count - arrowsRemoved);
-                stack.shrink(removeAmount);
-                arrowsRemoved += removeAmount;
-                if (arrowsRemoved >= count) {
-                    return true;
+                if (!arrowStack.isEmpty() || hasInfinity) {
+                    if (consumeRiftShard(player, 1)) {
+                        fireRiftArrow(level, player, arrowStack, hasInfinity, stack, power);
+                        stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                    } else {
+                        player.displayClientMessage(Component.translatable("item.many_bows.aurora_bow.no_rift_shard")
+                                .withStyle(ChatFormatting.RED), true);
+                    }
+                } else {
+                    player.displayClientMessage(Component.translatable("item.many_bows.aurora_bow.no_arrows")
+                            .withStyle(ChatFormatting.RED), true);
                 }
             }
         }
-        return false;
+    }
+
+    private void fireRiftArrow(Level level, Player player, ItemStack arrowStack, boolean hasInfinity, ItemStack bowStack, float power) {
+        // Create and configure AuroraArrowEntity
+        AuroraArrowEntity riftArrow = new AuroraArrowEntity(level, player);
+        riftArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+
+        // Apply enchantments to the arrow
+        applyEnchantments(bowStack, riftArrow);
+
+        // Handle Infinity enchantment and arrow consumption
+        if (hasInfinity) {
+            riftArrow.pickup = AuroraArrowEntity.Pickup.CREATIVE_ONLY;
+        } else {
+            arrowStack.shrink(1);
+            if (arrowStack.isEmpty()) {
+                player.getInventory().removeItem(arrowStack);
+            }
+        }
+
+        // Add arrow entity to the world
+        level.addFreshEntity(riftArrow);
+
+        // Play sound and update stats
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F,
+                1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+        player.awardStat(Stats.ITEM_USED.get(this));
+    }
+
+    private void applyEnchantments(ItemStack stack, AuroraArrowEntity arrow) {
+        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+        if (powerLevel > 0) {
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.0);
+        }
+
+        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+        if (punchLevel > 0) {
+            arrow.setKnockback(punchLevel);
+        }
+
+        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+            arrow.setSecondsOnFire(100);
+        }
+    }
+
+    private ItemStack findArrowInInventory(Player player) {
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() instanceof ArrowItem) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private boolean consumeRiftShard(Player player, int count) {
@@ -101,31 +129,9 @@ public class AuroraBow extends BowItem {
         return false;
     }
 
-    private void fireRiftArrow(Level level, Player player, boolean hasInfinity, int powerLevel, int punchLevel, int hasFlame) {
-        AuroraArrowEntity riftArrow = new AuroraArrowEntity(level, player);
-        riftArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 1.0F);
-
-        // Apply Power enchantment
-        if (powerLevel > 0) {
-            riftArrow.setBaseDamage(riftArrow.getBaseDamage() + (double) powerLevel * 0.5 + 2.0);
-        } else {
-            riftArrow.setBaseDamage(riftArrow.getBaseDamage() + 2.0);
-        }
-
-        // Apply Punch enchantment (knockback)
-        if (punchLevel > 0) {
-            riftArrow.setKnockback(punchLevel);
-        }
-
-        riftArrow.pickup = AuroraArrowEntity.Pickup.DISALLOWED;
-
-        level.addFreshEntity(riftArrow);
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-        player.awardStat(Stats.ITEM_USED.get(this));
-    }
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true; // No arrows required
+        return stack -> stack.getItem() instanceof ArrowItem;
     }
 
     @Override
@@ -137,6 +143,7 @@ public class AuroraBow extends BowItem {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         }
     }
+
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
@@ -144,6 +151,11 @@ public class AuroraBow extends BowItem {
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
-        return false;
+        return true;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return 20;
     }
 }

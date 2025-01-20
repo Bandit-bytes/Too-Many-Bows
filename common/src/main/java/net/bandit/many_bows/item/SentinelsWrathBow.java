@@ -10,10 +10,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -37,7 +34,7 @@ public class SentinelsWrathBow extends BowItem {
             if (power >= 0.1F) {
                 boolean creative = player.getAbilities().instabuild;
                 boolean hasInfinity = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-                ItemStack arrowStack = findArrowInInventory(player);
+                ItemStack arrowStack = player.getProjectile(stack);
                 if (!arrowStack.isEmpty() || creative || hasInfinity) {
                     SentinelArrow sentinelArrow = new SentinelArrow(level, player);
                     sentinelArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
@@ -78,7 +75,7 @@ public class SentinelsWrathBow extends BowItem {
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
+            if (stack.getItem() instanceof ArrowItem) {
                 return stack;
             }
         }

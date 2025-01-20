@@ -11,10 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -36,7 +33,7 @@ public class DragonsBreathBow extends BowItem {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.4F, 0.3F);
 
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 DragonsBreathArrow arrow = new DragonsBreathArrow(level, player);
@@ -76,7 +73,7 @@ public class DragonsBreathBow extends BowItem {
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
+            if (stack.getItem() instanceof ArrowItem) {
                 return stack;
             }
         }

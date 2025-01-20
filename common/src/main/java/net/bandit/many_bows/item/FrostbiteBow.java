@@ -11,10 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -42,7 +39,7 @@ public class FrostbiteBow extends BowItem {
             float power = getPowerForTime(charge);
 
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
             if (charge >= MIN_CHARGE_REQUIRED && power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 FrostbiteArrow arrow = new FrostbiteArrow(level, player);
@@ -123,7 +120,7 @@ public class FrostbiteBow extends BowItem {
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
+            if (stack.getItem() instanceof ArrowItem) {
                 return stack;
             }
         }

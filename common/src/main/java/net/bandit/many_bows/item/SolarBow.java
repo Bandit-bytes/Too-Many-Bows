@@ -11,10 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -36,7 +33,7 @@ public class SolarBow extends BowItem {
 
             // Check for Infinity enchantment or Creative mode
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : findArrowInInventory(player);
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
             // Fire arrow if charge is adequate and arrows are consumed or Infinity is enabled
             if (charge >= 20 && (hasInfinity || !arrowStack.isEmpty())) {
@@ -87,7 +84,7 @@ public class SolarBow extends BowItem {
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
+            if (stack.getItem() instanceof ArrowItem) {
                 return stack;
             }
         }

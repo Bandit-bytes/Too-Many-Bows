@@ -1,6 +1,0 @@
-{
-  "parent": "too_many_bows:item/dragons_breath",
-  "textures": {
-    "layer0": "too_many_bows:item/dragons_breath_pulling_1"
-  }
-}

@@ -10,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -30,32 +31,34 @@ public class DuskReaperBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide) {
+        if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Check if power is sufficient and consume soul fragments
             if (power >= 0.1F && consumeSoulFragments(player)) {
-                // Play custom sound
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.3F, 0.5F);
 
-                // Create and fire the custom arrow
-                DuskReaperArrow arrow = new DuskReaperArrow(level, player);
-                arrow.setOwner(player); // Set the owner to the player
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F); // Ensure arrow direction and speed
-                arrow.setCritArrow(charge >= 20);
+                // Find compatible arrows in inventory
+                ItemStack arrowStack = player.getProjectile(stack);
 
-                // Apply enchantments
+                ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : null);
+                DuskReaperArrow arrow = (arrowItem != null)
+                        ? (DuskReaperArrow) arrowItem.createArrow(level, arrowStack, player)
+                        : new DuskReaperArrow(level, player);
+
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+                arrow.setCritArrow(charge >= 20);
                 applyEnchantments(stack, arrow);
 
-                // Add the arrow to the world
                 level.addFreshEntity(arrow);
 
-                // Damage the bow
+                if (!player.getAbilities().instabuild) {
+                    arrowStack.shrink(1);
+                }
+
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 player.awardStat(Stats.ITEM_USED.get(this));
             } else {
-                // Notify player if no soul fragments are available
                 player.displayClientMessage(Component.translatable("item.many_bows.dusk_reaper.no_soul_fragments").withStyle(ChatFormatting.RED), true);
             }
         }
@@ -69,6 +72,15 @@ public class DuskReaperBow extends BowItem {
             }
         }
         return false;
+    }
+
+    private ItemStack findArrowInInventory(Player player) {
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() instanceof ArrowItem) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private void applyEnchantments(ItemStack stack, DuskReaperArrow arrow) {
@@ -104,7 +116,7 @@ public class DuskReaperBow extends BowItem {
 
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true; // No arrows required
+        return stack -> true; // Allow any type of projectile, though soul fragments are prioritized.
     }
 
     @Override

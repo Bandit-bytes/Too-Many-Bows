@@ -9,10 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -34,7 +31,7 @@ public class HunterBow extends BowItem {
 
             // Ensure the bow is properly charged before firing
             if (power >= 0.1F) {
-                ItemStack arrowStack = findArrowInInventory(player);
+                ItemStack arrowStack = player.getProjectile(stack);
 
                 // Creative mode: allow shooting without consuming arrows
                 boolean isCreative = player.getAbilities().instabuild;
@@ -84,13 +81,12 @@ public class HunterBow extends BowItem {
 
     private ItemStack findArrowInInventory(Player player) {
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
+            if (stack.getItem() instanceof ArrowItem) {
                 return stack;
             }
         }
         return ItemStack.EMPTY;
     }
-
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {

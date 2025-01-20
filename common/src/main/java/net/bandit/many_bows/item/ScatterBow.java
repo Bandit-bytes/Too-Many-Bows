@@ -10,10 +10,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -79,28 +76,33 @@ public class ScatterBow extends BowItem {
             }
         }
     }
-
     private boolean consumeArrow(Player player, int count) {
         if (player.getAbilities().instabuild) {
-            return true;
+            return true; // Creative mode bypass
         }
 
         int arrowsRemoved = 0;
+
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW && arrowsRemoved < count) {
-                int removeAmount = Math.min(stack.getCount(), count - arrowsRemoved);
-                stack.shrink(removeAmount);
+            ItemStack projectile = player.getProjectile(stack);
+            if (!projectile.isEmpty() && arrowsRemoved < count) {
+                int removeAmount = Math.min(projectile.getCount(), count - arrowsRemoved);
+                projectile.shrink(removeAmount);
                 arrowsRemoved += removeAmount;
             }
+            if (arrowsRemoved >= count) {
+                return true;
+            }
         }
-        return arrowsRemoved >= count;
+        return false;
     }
 
     private int countArrows(Player player) {
         int arrowCount = 0;
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
-                arrowCount += stack.getCount();
+            ItemStack projectile = player.getProjectile(stack);
+            if (!projectile.isEmpty()) {
+                arrowCount += projectile.getCount();
             }
         }
         return arrowCount;

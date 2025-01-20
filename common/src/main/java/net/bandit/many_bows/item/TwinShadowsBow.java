@@ -12,10 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -29,26 +26,19 @@ public class TwinShadowsBow extends BowItem {
     public TwinShadowsBow(Properties properties) {
         super(properties);
     }
-
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
         if (entity instanceof Player player) {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Check if the bow is fully charged
             if (power >= 1.0F) {
                 boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
 
-                // Consume arrows or use Infinity enchantment
                 if (hasInfinity || consumeArrows(player, 2)) {
-                    // Spawn twin arrows with unique effects
                     spawnTwinArrows(level, player, stack, hasInfinity);
 
-                    // Play shooting sound
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-
-                    // Damage the bow
                     stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                     player.awardStat(Stats.ITEM_USED.get(this));
                 }
@@ -104,26 +94,26 @@ public class TwinShadowsBow extends BowItem {
             arrow.setSecondsOnFire(100);
         }
     }
-
     private boolean consumeArrows(Player player, int count) {
         if (player.getAbilities().instabuild) {
             return true;
         }
 
         int arrowsRemoved = 0;
+
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
-                int removeAmount = Math.min(stack.getCount(), count - arrowsRemoved);
-                stack.shrink(removeAmount);
+            ItemStack projectile = player.getProjectile(stack);
+            if (!projectile.isEmpty() && arrowsRemoved < count) {
+                int removeAmount = Math.min(projectile.getCount(), count - arrowsRemoved);
+                projectile.shrink(removeAmount);
                 arrowsRemoved += removeAmount;
-                if (arrowsRemoved >= count) {
-                    return true;
-                }
+            }
+            if (arrowsRemoved >= count) {
+                return true;
             }
         }
         return false;
     }
-
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;

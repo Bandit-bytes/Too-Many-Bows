@@ -9,10 +9,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -25,7 +22,6 @@ public class AstralBow extends BowItem {
     public AstralBow(Properties properties) {
         super(properties);
     }
-
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity shooter, int timeCharged) {
         if (shooter instanceof Player player && !level.isClientSide()) {
@@ -35,7 +31,7 @@ public class AstralBow extends BowItem {
             if (power >= 0.1F) {
                 boolean infiniteArrows = player.getAbilities().instabuild ||
                         EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-                ItemStack arrowStack = findArrowInInventory(player);
+                ItemStack arrowStack = player.getProjectile(stack);
 
                 if (!arrowStack.isEmpty() || infiniteArrows) {
                     AstralArrow astralArrow = new AstralArrow(level, player, stack);
@@ -43,6 +39,7 @@ public class AstralBow extends BowItem {
 
                     applyEnchantments(stack, astralArrow);
 
+                    // Handle Infinity logic and arrow consumption
                     if (!infiniteArrows) {
                         arrowStack.shrink(1);
                         if (arrowStack.isEmpty()) {
@@ -52,20 +49,20 @@ public class AstralBow extends BowItem {
 
                     level.addFreshEntity(astralArrow);
 
+                    // Play shooting sound and damage the bow
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F,
                             1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
 
-
                     stack.hurtAndBreak(1, player, (entity) -> entity.broadcastBreakEvent(player.getUsedItemHand()));
                 } else {
+                    // Play failure sound if no arrows are found
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
             }
         }
     }
-
 
     private void applyEnchantments(ItemStack stack, AstralArrow astralArrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
@@ -83,10 +80,10 @@ public class AstralBow extends BowItem {
         }
     }
 
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == Items.ARROW) {
-                return stack;
+    private ItemStack findAnyArrowInInventory(Player player) {
+        for (ItemStack itemStack : player.getInventory().items) {
+            if (itemStack.getItem() instanceof ArrowItem) {
+                return itemStack;
             }
         }
         return ItemStack.EMPTY;
