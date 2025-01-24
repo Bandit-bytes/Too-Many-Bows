@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.AncientSageArrow;
-import net.bandit.many_bows.entity. AncientSageArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -27,12 +26,13 @@ public class AncientSageBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide()) {
+        if (entity instanceof Player player && !level.isClientSide) {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
             ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
+
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 AncientSageArrow arrow = new AncientSageArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
@@ -48,28 +48,22 @@ public class AncientSageBow extends BowItem {
                 if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
                     arrow.setSecondsOnFire(100);
                 }
-                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
                 level.addFreshEntity(arrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
 
                 if (!hasInfinity && !arrowStack.isEmpty()) {
-                    arrowStack.shrink(0);
+                    arrowStack.shrink(1);
                     if (arrowStack.isEmpty()) {
                         player.getInventory().removeItem(arrowStack);
                     }
                 }
+
                 stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
         }
-    }
-    /**
-     * Provides a default arrow for the Infinity enchantment.
-     * Used by BowInfinityFix and other systems for custom projectile handling.
-     */
-    public ItemStack getDefaultCreativeAmmo(Player player, ItemStack bowStack) {
-        return new ItemStack(Items.ARROW); // Provides a default arrow for Infinity
     }
 
     @Override

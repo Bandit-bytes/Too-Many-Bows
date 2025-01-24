@@ -74,14 +74,6 @@ public class DragonsBreathBow extends BowItem {
         }
     }
 
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
