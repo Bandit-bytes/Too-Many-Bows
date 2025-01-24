@@ -61,8 +61,11 @@ public class DragonsBreathBow extends BowItem {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.8F, 1.2F);
 
                 // Consume arrow if not in Creative mode or with Infinity
-                if (!hasInfinity) {
+                if (!hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else {

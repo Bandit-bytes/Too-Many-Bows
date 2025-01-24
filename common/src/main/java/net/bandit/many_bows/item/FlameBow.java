@@ -57,9 +57,13 @@ public class FlameBow extends BowItem {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
                 // Consume arrow if Infinity is not active
-                if (!hasInfinity) {
+                if (!hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
+
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);

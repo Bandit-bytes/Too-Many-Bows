@@ -40,7 +40,7 @@ public class AstralBow extends BowItem {
                     applyEnchantments(stack, astralArrow);
 
                     // Handle Infinity logic and arrow consumption
-                    if (!infiniteArrows) {
+                    if (!infiniteArrows && !arrowStack.isEmpty()) {
                         arrowStack.shrink(1);
                         if (arrowStack.isEmpty()) {
                             player.getInventory().removeItem(arrowStack);

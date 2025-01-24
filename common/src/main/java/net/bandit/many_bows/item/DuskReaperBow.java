@@ -28,7 +28,6 @@ public class DuskReaperBow extends BowItem {
     public DuskReaperBow(Properties properties) {
         super(properties);
     }
-
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
         if (entity instanceof Player player && !level.isClientSide()) {
@@ -38,22 +37,25 @@ public class DuskReaperBow extends BowItem {
             if (power >= 0.1F && consumeSoulFragments(player)) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.3F, 0.5F);
 
-                // Find compatible arrows in inventory
                 ItemStack arrowStack = player.getProjectile(stack);
+                DuskReaperArrow arrow;
 
-                ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : null);
-                DuskReaperArrow arrow = (arrowItem != null)
-                        ? (DuskReaperArrow) arrowItem.createArrow(level, arrowStack, player)
-                        : new DuskReaperArrow(level, player);
-
+                if (!arrowStack.isEmpty() && arrowStack.getItem() instanceof ArrowItem arrowItem) {
+                    arrow = new DuskReaperArrow(level, player);
+                    arrow.setBaseDamage(2.0);
+                } else {
+                    arrow = new DuskReaperArrow(level, player);
+                }
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 arrow.setCritArrow(charge >= 20);
                 applyEnchantments(stack, arrow);
-
                 level.addFreshEntity(arrow);
 
                 if (!player.getAbilities().instabuild) {
                     arrowStack.shrink(1);
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
 
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));

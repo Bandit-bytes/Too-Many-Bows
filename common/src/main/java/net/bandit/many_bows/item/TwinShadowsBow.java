@@ -3,15 +3,12 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -28,58 +25,67 @@ public class TwinShadowsBow extends BowItem {
     }
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            if (power >= 1.0F) {
-                boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
-                if (hasInfinity || consumeArrows(player, 2)) {
-                    spawnTwinArrows(level, player, stack, hasInfinity);
+            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
+                // Call the method
+                fireTwinArrows(level, player, hasInfinity, stack);
 
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                    stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                    player.awardStat(Stats.ITEM_USED.get(this));
+                // Damage the bow
+                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+            } else {
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
+            }
+        }
+
+}
+    private void fireTwinArrows(Level level, Player player, boolean hasInfinity, ItemStack bowStack) {
+        Vec3 arrowDirection = player.getLookAngle();
+
+        // Retrieve the arrow stack once
+        ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(bowStack);
+
+        if (!arrowStack.isEmpty() || hasInfinity) {
+            // Fire the first (Light) arrow
+            ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+            AbstractArrow lightArrow = arrowItem.createArrow(level, arrowStack, player);
+            lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 4.0F, 1.0F);
+            lightArrow.setBaseDamage(6.0);
+            lightArrow.addTag("light");
+            lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
+            applyEnchantments(lightArrow, bowStack);
+            lightArrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+            level.addFreshEntity(lightArrow);
+
+            // Fire the second (Dark) arrow
+            AbstractArrow darkArrow = arrowItem.createArrow(level, arrowStack, player);
+            darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, 4.0F, 1.0F); // Slight yaw offset
+            darkArrow.setBaseDamage(8.0);
+            darkArrow.addTag("dark");
+            darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
+            applyEnchantments(darkArrow, bowStack);
+            darkArrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+            level.addFreshEntity(darkArrow);
+
+            // Play shooting sound
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+            if (!hasInfinity && !arrowStack.isEmpty()) {
+                arrowStack.shrink(1);
+                if (arrowStack.isEmpty()) {
+                    player.getInventory().removeItem(arrowStack);
                 }
             }
+
         }
     }
 
-    private void spawnTwinArrows(Level level, Player player, ItemStack stack, boolean hasInfinity) {
-        Vec3 arrowDirection = player.getLookAngle();
-
-        // Light Arrow
-        Arrow lightArrow = createArrow(level, player, stack, arrowDirection, ChatFormatting.WHITE);
-        lightArrow.setBaseDamage(6.0); // Base damage for the light arrow
-        lightArrow.addTag("light");
-        level.addFreshEntity(lightArrow);
-
-        // Dark Arrow
-        Arrow darkArrow = createArrow(level, player, stack, arrowDirection.add(0.1, 0, -0.1), ChatFormatting.DARK_GRAY);
-        darkArrow.setBaseDamage(8.0); // Higher damage for the dark arrow
-        darkArrow.addTag("dark");
-        level.addFreshEntity(darkArrow);
-
-        // Apply enchantments to both arrows
-        applyEnchantments(lightArrow, stack);
-        applyEnchantments(darkArrow, stack);
-
-        // Add particle effects
-        level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, player.getX(), player.getY() + 1.5, player.getZ(), 0, 0.05, 0);
-    }
-
-    private Arrow createArrow(Level level, Player player, ItemStack stack, Vec3 direction, ChatFormatting color) {
-        Arrow arrow = new Arrow(level, player);
-        arrow.shoot(direction.x, direction.y, direction.z, 3.0F, 1.0F);
-        arrow.setSecondsOnFire(0); // Prevent default fire unless enchanted
-        arrow.setGlowingTag(true); // Make the arrow visually distinct
-        arrow.setCustomName(Component.literal(color + "Shadow Arrow"));
-        arrow.pickup = player.getAbilities().instabuild ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
-        return arrow;
-    }
-
-    private void applyEnchantments(Arrow arrow, ItemStack stack) {
+    private void applyEnchantments(AbstractArrow arrow, ItemStack stack) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
             arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 1.5);
@@ -93,26 +99,6 @@ public class TwinShadowsBow extends BowItem {
         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
             arrow.setSecondsOnFire(100);
         }
-    }
-    private boolean consumeArrows(Player player, int count) {
-        if (player.getAbilities().instabuild) {
-            return true;
-        }
-
-        int arrowsRemoved = 0;
-
-        for (ItemStack stack : player.getInventory().items) {
-            ItemStack projectile = player.getProjectile(stack);
-            if (!projectile.isEmpty() && arrowsRemoved < count) {
-                int removeAmount = Math.min(projectile.getCount(), count - arrowsRemoved);
-                projectile.shrink(removeAmount);
-                arrowsRemoved += removeAmount;
-            }
-            if (arrowsRemoved >= count) {
-                return true;
-            }
-        }
-        return false;
     }
     @Override
     public boolean isEnchantable(ItemStack stack) {

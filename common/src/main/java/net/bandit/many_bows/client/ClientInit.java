@@ -51,14 +51,20 @@ public class ClientInit {
                 ItemRegistry.DUSK_REAPER.get(),
                 ItemRegistry.ETHEREAL_HUNTER.get()
         );
-
-        // Register properties for each bow
-        bows.forEach(ClientInit::registerBowProperties);
-
-        // Crossbows
-//        registerCrossbowProperties(ItemRegistry.ARCFORGE.get());
-
-        // Entity renderers
+        List<Item> bowsCopy = List.copyOf(bows);
+        bowsCopy.forEach(bow -> {
+            if (bow != null) {
+                try {
+                    registerBowProperties(bow);
+                } catch (Exception e) {
+                    System.err.println("Error registering properties for bow: " + bow);
+                    e.printStackTrace();
+                }
+            } else {
+                System.err.println("Null bow encountered during registration.");
+            }
+        });
+        // registerCrossbowProperties(ItemRegistry.ARCFORGE.get());
         registerEntityRenderers();
     }
 
@@ -72,25 +78,25 @@ public class ClientInit {
             return entity != null && entity.isUsingItem() && entity.getUseItem() == itemStack ? 1.0F : 0.0F;
         });
     }
-
-    private static void registerCrossbowProperties(Item item) {
-        ItemPropertiesRegistry.register(item, new ResourceLocation("charged"), (stack, level, entity, seed) -> {
-            return CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
-        });
-
-        ItemPropertiesRegistry.register(item, new ResourceLocation("firework"), (stack, level, entity, seed) -> {
-            return CrossbowItem.containsChargedProjectile(stack, Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
-        });
-
-        ItemPropertiesRegistry.register(item, new ResourceLocation("pull"), (stack, level, entity, seed) -> {
-            if (entity == null || CrossbowItem.isCharged(stack)) return 0.0F;
-            return (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / CrossbowItem.getChargeDuration(stack);
-        });
-
-        ItemPropertiesRegistry.register(item, new ResourceLocation("pulling"), (stack, level, entity, seed) -> {
-            return entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
-        });
-    }
+//
+//    private static void registerCrossbowProperties(Item item) {
+//        ItemPropertiesRegistry.register(item, new ResourceLocation("charged"), (stack, level, entity, seed) -> {
+//            return CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
+//        });
+//
+//        ItemPropertiesRegistry.register(item, new ResourceLocation("firework"), (stack, level, entity, seed) -> {
+//            return CrossbowItem.containsChargedProjectile(stack, Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
+//        });
+//
+//        ItemPropertiesRegistry.register(item, new ResourceLocation("pull"), (stack, level, entity, seed) -> {
+//            if (entity == null || CrossbowItem.isCharged(stack)) return 0.0F;
+//            return (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / CrossbowItem.getChargeDuration(stack);
+//        });
+//
+//        ItemPropertiesRegistry.register(item, new ResourceLocation("pulling"), (stack, level, entity, seed) -> {
+//            return entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
+//        });
+//    }
 
     public static void registerEntityRenderers() {
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);

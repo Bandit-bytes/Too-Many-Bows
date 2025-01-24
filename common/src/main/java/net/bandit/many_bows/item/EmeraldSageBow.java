@@ -51,8 +51,11 @@ public class EmeraldSageBow extends BowItem {
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
 
                     // Consume arrow if not infinite
-                    if (!infiniteArrows) {
+                    if (!infiniteArrows && !arrowStack.isEmpty()) {
                         arrowStack.shrink(1);
+                        if (arrowStack.isEmpty()) {
+                            player.getInventory().removeItem(arrowStack);
+                        }
                     }
 
                     // Damage the bow

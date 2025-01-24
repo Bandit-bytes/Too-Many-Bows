@@ -41,7 +41,7 @@ public class SpectralWhisperBow extends BowItem {
 
                     applyEnchantments(stack, spectralArrow);
 
-                    if (!infiniteArrows) {
+                    if (!infiniteArrows && !arrowStack.isEmpty()) {
                         arrowStack.shrink(1);
                         if (arrowStack.isEmpty()) {
                             player.getInventory().removeItem(arrowStack);

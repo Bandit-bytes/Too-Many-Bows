@@ -202,12 +202,6 @@
         "items": [{ "items": ["too_many_bows:radiance"] }]
       }
     },
-    "arcforge": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [{ "items": ["too_many_bows:arcforge"] }]
-      }
-    },
     "crimson_nexus": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
@@ -247,7 +241,6 @@
     ["vitality_weaver"],
     ["astral_bound"],
     ["spectral_whisper"],
-    ["arcforge"],
     ["auroras_grace"]
   ],
   "rewards": {

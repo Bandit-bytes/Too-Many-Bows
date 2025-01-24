@@ -40,10 +40,13 @@ public class SolarBow extends BowItem {
                 fireFlamingArrow(level, player, hasInfinity, stack);
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
 
-                // Consume arrow if not in Creative mode or with Infinity
-                if (!hasInfinity) {
+                if (!hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
+
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }

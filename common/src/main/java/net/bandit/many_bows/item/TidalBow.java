@@ -60,9 +60,13 @@ public class TidalBow extends BowItem {
                 level.addFreshEntity(tidalArrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_SPLASH_HIGH_SPEED, SoundSource.PLAYERS, 0.3F, 1.0F);
 
-                if (!hasInfinity) {
+                if (!hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
+
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             } else if (power >= 0.1F) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);

@@ -68,9 +68,11 @@ public class IcicleJavelinBow extends BowItem {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F);
 
                 // Consume the arrow and damage the bow if not in Creative mode or without Infinity
-                if (!hasInfinity) {
+                if (!hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
-                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                    if (arrowStack.isEmpty()) {
+                        player.getInventory().removeItem(arrowStack);
+                    }
                 }
             }
         }

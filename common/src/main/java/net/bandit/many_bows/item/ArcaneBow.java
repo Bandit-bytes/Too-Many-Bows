@@ -44,14 +44,6 @@ public class ArcaneBow extends BowItem {
         }
     }
 
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack itemStack : player.getInventory().items) {
-            if (itemStack.getItem() instanceof ArrowItem) {
-                return itemStack;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
 
     private void fireExtraArrows(Level level, Player player, boolean hasInfinity, ItemStack arrowStack, ItemStack bowStack) {
         float basePitch = player.getXRot();

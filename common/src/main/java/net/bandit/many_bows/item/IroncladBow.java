@@ -64,13 +64,17 @@ public class IroncladBow extends BowItem {
                         arrow.setSecondsOnFire(100);
                     }
 
-                    arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+                    arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
                     level.addFreshEntity(arrow);
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SKELETON_AMBIENT, SoundSource.PLAYERS, 1.0F, 1.2F);
 
-                    if (!hasInfinity) {
+                    if (!hasInfinity && !arrowStack.isEmpty()) {
                         arrowStack.shrink(1);
+                        if (arrowStack.isEmpty()) {
+                            player.getInventory().removeItem(arrowStack);
+                        }
                     }
+
                     stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 }
             }
@@ -89,15 +93,6 @@ public class IroncladBow extends BowItem {
                 target.setDeltaMovement(target.getDeltaMovement().add(direction));
             }
         }
-    }
-
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
     }
     @Override
     public ItemStack getDefaultInstance() {
