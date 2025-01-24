@@ -43,40 +43,41 @@ public class ArcaneBow extends BowItem {
             }
         }
     }
-
-
     private void fireExtraArrows(Level level, Player player, boolean hasInfinity, ItemStack arrowStack, ItemStack bowStack) {
         float basePitch = player.getXRot();
         float baseYaw = player.getYRot();
+        boolean consumeArrow = !hasInfinity && !arrowStack.isEmpty();
+        if (consumeArrow) {
+            arrowStack.shrink(1);
+            if (arrowStack.isEmpty()) {
+                player.getInventory().removeItem(arrowStack);
+            }
+        }
+
+        boolean hasPickedUpArrow = false;
 
         for (int i = -1; i <= 1; i++) {
-            // Dynamically create the correct arrow type
             ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
             AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
 
             arrow.shootFromRotation(player, basePitch, baseYaw + i * 5.0F, 0.0F, 4.0F, 1.0F);
-
-            // Apply Power enchantment
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, bowStack);
             if (powerLevel > 0) {
                 arrow.setBaseDamage(arrow.getBaseDamage() + (double) powerLevel * 0.5 + 4.0);
             } else {
                 arrow.setBaseDamage(arrow.getBaseDamage() + 4.0);
             }
-
-            // Apply Punch enchantment (knockback)
             int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, bowStack);
             if (punchLevel > 0) {
                 arrow.setKnockback(punchLevel);
             }
-
-            // Apply Flame enchantment
             if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, bowStack) > 0) {
                 arrow.setSecondsOnFire(100);
             }
-
-            // Prevent pickup if Infinity is enabled
-            if (hasInfinity) {
+            if (!hasPickedUpArrow) {
+                arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+                hasPickedUpArrow = true;
+            } else {
                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
             }
 
@@ -85,13 +86,6 @@ public class ArcaneBow extends BowItem {
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
         player.awardStat(Stats.ITEM_USED.get(this));
-
-        if (!hasInfinity) {
-            arrowStack.shrink(1);
-            if (arrowStack.isEmpty()) {
-                player.getInventory().removeItem(arrowStack);
-            }
-        }
     }
 
     @Override

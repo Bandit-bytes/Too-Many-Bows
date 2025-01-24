@@ -119,6 +119,11 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "dusk_reaper_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<WebstringArrow>> WEBSTRING_ARROW = ENTITY_TYPES.register("webstring_arrow",
+            () -> EntityType.Builder.<WebstringArrow>of(WebstringArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "webstring_arrow").toString()));
+
 
     public static void register() {
         ENTITY_TYPES.register();

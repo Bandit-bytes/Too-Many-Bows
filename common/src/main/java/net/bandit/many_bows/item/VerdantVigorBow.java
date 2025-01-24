@@ -31,7 +31,6 @@ public class VerdantVigorBow extends BowItem {
     public VerdantVigorBow(Properties properties) {
         super(properties);
     }
-
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (entity instanceof Player player && !level.isClientSide) {
@@ -39,9 +38,6 @@ public class VerdantVigorBow extends BowItem {
                 MobEffectInstance currentEffect = player.getEffect(MobEffects.HEALTH_BOOST);
                 if (currentEffect == null || currentEffect.getAmplifier() != HEALTH_BOOST_LEVEL) {
                     player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, Integer.MAX_VALUE, HEALTH_BOOST_LEVEL, true, false));
-                }
-                if (player.getHealth() < player.getMaxHealth()) {
-                    player.heal(1.0F);
                 }
                 if (level.getGameTime() % 40 == 0) {
                     AABB area = new AABB(player.getX() - 5, player.getY() - 5, player.getZ() - 5,
@@ -69,6 +65,7 @@ public class VerdantVigorBow extends BowItem {
 
             boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
             ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
+
             if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
                 VitalityArrow arrow = new VitalityArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
@@ -85,6 +82,11 @@ public class VerdantVigorBow extends BowItem {
                     arrow.setSecondsOnFire(100);
                 }
                 arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+
+                arrow.setOnHitCallback(target -> {
+                    target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 1));
+                });
+
                 level.addFreshEntity(arrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
 
@@ -101,23 +103,6 @@ public class VerdantVigorBow extends BowItem {
             }
         }
     }
-
-    private boolean consumeArrows(Player player, int count) {
-        if (player.getAbilities().instabuild) {
-            return true;
-        }
-
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                if (stack.getCount() >= count) {
-                    stack.shrink(count);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;

@@ -15,7 +15,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
+import java.util.function.Consumer;
+
 public class VitalityArrow extends AbstractArrow {
+
+    private Consumer<LivingEntity> onHitCallback;
 
     public VitalityArrow(EntityType<? extends VitalityArrow> entityType, Level level) {
         super(entityType, level);
@@ -23,6 +27,13 @@ public class VitalityArrow extends AbstractArrow {
 
     public VitalityArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.VITALITY_ARROW.get(), shooter, level);
+    }
+
+    /**
+     * Sets a callback to be executed when the arrow hits a living entity.
+     */
+    public void setOnHitCallback(Consumer<LivingEntity> callback) {
+        this.onHitCallback = callback;
     }
 
     @Override
@@ -38,13 +49,18 @@ public class VitalityArrow extends AbstractArrow {
                 boolean didDamage = target.hurt(damageSource, damageDealt);
 
                 if (didDamage && damageDealt > 0) {
+                    if (onHitCallback != null) {
+                        onHitCallback.accept(target);
+                    }
+
                     float healAmount = Math.min(damageDealt * 0.5F, target.getHealth());
                     shooter.heal(healAmount);
                     level().playSound(null, target.getX(), target.getY(), target.getZ(),
-                            SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.0F, 1.0F);
+                            SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
             }
         }
+
         this.discard();
     }
 

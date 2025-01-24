@@ -21,6 +21,7 @@
   "item.too_many_bows.dragons_breath": "Dragons Breath",
   "item.too_many_bows.cursed_stone": "Cursed Stone",
   "item.too_many_bows.shulker_blast": "Shulker's Blast",
+  "item.too_many_bows.webstring": "Webstring",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
@@ -225,5 +226,9 @@
   "item.many_bows.ethereal_hunter.tooltip.legend": "Harnesses your energy to unleash powerful attacks.",
   "item.many_bows.ethereal_hunter.no_hunger": "You are too hungry to fire the bow!",
   "item.many_bows.dusk_reaper.no_soul_fragments": "You need Soul Fragments to fire this bow!",
-  "item.many_bows.aurora_bow.no_rift_shard": "You need a Rift shard to fire this bow!"
+  "item.many_bows.aurora_bow.no_rift_shard": "You need a Rift shard to fire this bow!",
+
+  "item.too_many_bows.webstring_volley": "Webstring Volley",
+  "item.too_many_bows.webstring_volley.tooltip": "Unleash a volley of arrows in a wide spread.",
+  "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets."
 }

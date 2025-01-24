@@ -7,9 +7,7 @@ import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 
 import java.util.List;
 
@@ -49,7 +47,8 @@ public class ClientInit {
                 ItemRegistry.CRIMSON_NEXUS.get(),
                 ItemRegistry.RADIANCE.get(),
                 ItemRegistry.DUSK_REAPER.get(),
-                ItemRegistry.ETHEREAL_HUNTER.get()
+                ItemRegistry.ETHEREAL_HUNTER.get(),
+                ItemRegistry.WEBSTRING.get()
         );
         List<Item> bowsCopy = List.copyOf(bows);
         bowsCopy.forEach(bow -> {
@@ -121,5 +120,6 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.RADIANT_ARROW.get(), RadianceArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DUSK_REAPER_ARROW.get(), DuskArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.RIFT_ENTITY.get(), NoopRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
     }
 }
