@@ -1,0 +1,6 @@
+{
+  "parent": "too_many_bows:item/frostbite",
+  "textures": {
+    "layer0": "too_many_bows:item/frostbite_pulling_0"
+  }
+}

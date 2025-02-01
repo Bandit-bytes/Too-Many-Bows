@@ -1,0 +1,79 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "too_many_bows:item/arcforge"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [ -90, 0, -60 ],
+      "translation": [ 2, 0.1, -3 ],
+      "scale": [ 1.0, 1.0, 1 ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [ -90, 0, 30 ],
+      "translation": [ 2, 0.1, -3 ],
+      "scale": [ 1.0, 1.0, 1]
+    },
+    "firstperson_righthand": {
+      "rotation": [ -90, 0, -55 ],
+      "translation": [ 1.13, 3.2, 1.13],
+      "scale": [ 1, 1, 1 ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [ -90, 0, 35 ],
+      "translation": [ 1.13, 3.2, 1.13],
+      "scale": [ 1, 1, 1 ]
+
+    },
+    "ground": {
+      "rotation": [0, 180, 0],
+      "translation": [0, 3.5, 0],
+      "scale": [0.9, 0.9, 0.5]
+    }
+  },
+  "fixed": {
+    "rotation": [ 0, 180, 0 ],
+    "translation": [ 0, 0, 0 ],
+    "scale": [ 1, 1, 1 ]
+  },
+  "head": {
+    "rotation": [ 0, 0, 270 ],
+    "translation": [ -1, 3.5, 0],
+    "scale":[ 1, 1, 0.5 ]
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "pulling": 1
+      },
+      "model": "too_many_bows:item/arcforge_pulling_0"
+    },
+    {
+      "predicate": {
+        "pulling": 1,
+        "pull": 0.58
+      },
+      "model": "too_many_bows:item/arcforge_pulling_1"
+    },
+    {
+      "predicate": {
+        "pulling": 1,
+        "pull": 1.0
+      },
+      "model": "too_many_bows:item/arcforge_pulling_2"
+    },
+    {
+      "predicate": {
+        "charged": 1
+      },
+      "model": "too_many_bows:item/arcforge_pulling_2"
+    },
+    {
+      "predicate": {
+        "charged": 1,
+        "firework": 1
+      },
+      "model": "too_many_bows:item/arcforge_firework"
+    }
+  ]
+}
