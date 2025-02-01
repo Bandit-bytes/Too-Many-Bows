@@ -92,12 +92,12 @@ public class AuroraBow extends BowItem {
     }
     private boolean consumeRiftShard(Player player, int count) {
         if (player.getAbilities().instabuild) {
-            return true; // Creative mode bypass
+            return true;
         }
 
         int shardsRemoved = 0;
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == ItemRegistry.RIFT_SHARD.get()) { // Replace with your Rift Shard registry call
+            if (stack.getItem() == ItemRegistry.RIFT_SHARD.get()) {
                 int removeAmount = Math.min(stack.getCount(), count - shardsRemoved);
                 stack.shrink(removeAmount);
                 shardsRemoved += removeAmount;

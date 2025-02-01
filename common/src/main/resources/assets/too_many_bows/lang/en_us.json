@@ -211,6 +211,7 @@
   "item.many_bows.radiance.tooltip.legend": "“The light shall guide and protect.”",
   "item.many_bows.radiance.tooltip.info": "Consumes experience points to fire radiant arrows.",
   "item.many_bows.radiance.tooltip.xp": "Experience Cost: §c%d XP§r per shot.",
+  "item.many_bows.radiance.no_experience": "Need Experience to fire this bow!",
 
   "item.many_bows.dusk_reaper.tooltip.info": "Marks enemies.",
   "item.many_bows.dusk_reaper.tooltip.mark": "Marked enemies take increased damage and leave a damaging trail.",
@@ -219,11 +220,16 @@
   "item.many_bows.dusk_reaper.tooltip.debuff": "Applies Weakness, Slowness, and constant damage to marked targets.",
   "item.many_bows.dusk_reaper.tooltip.glow": "Marked enemies are visible through walls.",
   "item.many_bows.soulfragment.tooltip.info":"Used to fire the Dusk Reaper bow",
+  "item.many_bows.soulfragment.tooltip.info_2": "Infinity Enchantment has no power over Souls..",
   "item.many_bows.dusk_reaper.tooltip.soul_fragments": "Consumes Soul Fragments to fire.",
   "item.many_bows.ethereal_hunter.tooltip.info": "A mystical bow that fires radiant arrows fueled by your hunger.",
   "item.many_bows.ethereal_hunter.tooltip.hunger": "Consumes %s hunger points per shot.",
   "item.many_bows.ethereal_hunter.tooltip.legend": "Harnesses your energy to unleash powerful attacks.",
   "item.many_bows.ethereal_hunter.no_hunger": "You are too hungry to fire the bow!",
   "item.many_bows.dusk_reaper.no_soul_fragments": "You need Soul Fragments to fire this bow!",
-  "item.many_bows.aurora_bow.no_rift_shard": "You need a Rift shard to fire this bow!"
+  "item.many_bows.aurora_bow.no_rift_shard": "You need a Rift shard to fire this bow!",
+  "item.too_many_bows.webstring": "Webstring",
+  "item.too_many_bows.webstring_volley": "Webstring Volley",
+  "item.too_many_bows.webstring_volley.tooltip": "Unleash a volley of arrows in a wide spread.",
+  "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets."
 }

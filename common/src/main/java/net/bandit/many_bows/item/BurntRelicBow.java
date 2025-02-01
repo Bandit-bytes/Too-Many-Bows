@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -74,8 +75,8 @@ public class BurntRelicBow extends BowItem {
     }
 
     @Override
-    public Predicate<ItemStack> getAllSupportedProjectiles() {
-        return ARROW_ONLY;
+    public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
+        return stack -> true;
     }
 
     @Override

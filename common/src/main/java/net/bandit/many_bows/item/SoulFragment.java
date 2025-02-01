@@ -19,6 +19,7 @@ public class SoulFragment extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (Screen.hasShiftDown()) {
             tooltipComponents.add(Component.translatable("item.many_bows.soulfragment.tooltip.info").withStyle(ChatFormatting.GREEN));
+            tooltipComponents.add(Component.translatable("item.many_bows.soulfragment.tooltip.info_2").withStyle(ChatFormatting.GRAY));
         } else {
             tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift"));
         }

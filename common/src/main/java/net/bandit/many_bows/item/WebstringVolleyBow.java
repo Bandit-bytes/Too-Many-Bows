@@ -1,0 +1,150 @@
+package net.bandit.many_bows.item;
+
+import net.bandit.many_bows.entity.WebstringArrow;
+import net.bandit.many_bows.registry.EntityRegistry;
+import net.bandit.many_bows.registry.ItemRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+
+import java.util.List;
+import java.util.function.Predicate;
+
+public class WebstringVolleyBow extends BowItem {
+    private static final int ARROW_COUNT = 5;
+    private static final float SPREAD_ANGLE = 15.0F;
+
+    public WebstringVolleyBow(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
+        if (entity instanceof Player player) {
+            ItemStack arrowStack = player.getProjectile(bowStack);
+
+            if (!arrowStack.isEmpty() || player.getAbilities().instabuild) {
+                int charge = this.getUseDuration(bowStack, entity) - chargeTime;
+                float power = getPowerForTime(charge);
+
+                if (power >= 0.1F) {
+                    if (level instanceof ServerLevel serverLevel) {
+                        fireVolleyArrows(serverLevel, player, bowStack, arrowStack, power);
+                    }
+
+                    // Play sound and apply durability loss
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    player.awardStat(Stats.ITEM_USED.get(this));
+
+                    if (!player.getAbilities().instabuild) {
+                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                    }
+                }
+            }
+        }
+    }
+
+    private void fireVolleyArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, ItemStack projectileStack, float power) {
+        float basePitch = player.getXRot();
+        float baseYaw = player.getYRot();
+        float angleStep = SPREAD_ANGLE / (ARROW_COUNT - 1);
+
+        for (int i = 0; i < ARROW_COUNT; i++) { // Fires 5 arrows
+            float spreadOffset = (i - (ARROW_COUNT - 1) / 2.0F) * angleStep;
+
+            WebstringArrow arrow = EntityRegistry.WEBSTRING_ARROW.get().create(serverLevel);
+            if (arrow != null) {
+                arrow.setOwner(player);
+                arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
+                arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
+                arrow.pickup = AbstractArrow.Pickup.ALLOWED;
+
+                serverLevel.addFreshEntity(arrow);
+            }
+        }
+
+        // Consume only 1 arrow
+        if (!player.getAbilities().instabuild) {
+            projectileStack.shrink(1);
+        }
+    }
+
+
+    public static float getPowerForTime(int pCharge) {
+        float f = (float) pCharge / 16.0F;
+        f = (f * f + f * 2.0F) / 3.0F;
+        return Math.min(f, 1.0F);
+    }
+
+    @Override
+    public Predicate<ItemStack> getAllSupportedProjectiles() {
+        return ARROW_ONLY;
+    }
+
+    @Override
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+        return 72000;
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public int getEnchantmentValue() {
+        return 1;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack bowStack = player.getItemInHand(hand);
+        boolean hasArrows = !player.getProjectile(bowStack).isEmpty();
+        if (!player.hasInfiniteMaterials() && !hasArrows) {
+            return InteractionResultHolder.fail(bowStack);
+        } else {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(bowStack);
+        }
+    }
+
+    @Override
+    public int getDefaultProjectileRange() {
+        return 64;
+    }
+
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        if (Screen.hasShiftDown()) {
+            tooltipComponents.add(Component.translatable("item.too_many_bows.webstring_volley.details").withStyle(ChatFormatting.YELLOW));
+        } else {
+            tooltipComponents.add(Component.translatable("item.too_many_bows.webstring_volley").withStyle(ChatFormatting.GOLD));
+            tooltipComponents.add(Component.translatable("item.too_many_bows.webstring_volley.tooltip").withStyle(ChatFormatting.GREEN));
+            tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.GRAY));
+        }
+    }
+}
