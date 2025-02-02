@@ -14,10 +14,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -31,15 +29,15 @@ public class ArcaneBow extends BowItem {
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
-            ItemStack arrowStack = player.getProjectile(bowStack);
+            List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
 
-            if (!arrowStack.isEmpty() || player.getAbilities().instabuild) {
+            if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
                 float power = getPowerForTime(charge);
 
                 if (power >= 0.1F) {
                     if (level instanceof ServerLevel serverLevel) {
-                        fireTripleArrows(serverLevel, player, bowStack, arrowStack, power);
+                        fireTripleArrows(serverLevel, player, bowStack, projectiles, power);
                     }
 
                     // Play sound and apply durability loss
@@ -55,58 +53,44 @@ public class ArcaneBow extends BowItem {
         }
     }
 
-    private void fireTripleArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, ItemStack projectileStack, float power) {
+    private void fireTripleArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power) {
         float basePitch = player.getXRot();
         float baseYaw = player.getYRot();
         float spreadAngle = 5.0F; // Small spread between arrows
 
-        for (int i = -1; i <= 1; i++) { // Fires 3 arrows (-1, 0, 1)
-            AbstractArrow arrow;
+        // Ensure we have at least one projectile
+        if (projectileStacks.isEmpty() && !player.getAbilities().instabuild) {
+            return;
+        }
 
-            // Middle arrow = Player's arrow choice
-            if (i == 0) {
-                if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
-                    arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
-                } else {
-                    arrow = ((ArrowItem) Items.ARROW).createArrow(serverLevel, projectileStack, player, bowStack);
-                }
-            } else {
-                // Side arrows are always normal arrows
-                arrow = ((ArrowItem) Items.ARROW).createArrow(serverLevel, new ItemStack(Items.ARROW), player, bowStack);
-            }
+        // Get the first available projectile
+        ItemStack projectileStack = projectileStacks.get(0);
+        boolean arrowConsumed = false;
+
+        for (int i = -1; i <= 1; i++) { // Fires 3 arrows (-1, 0, 1)
+            AbstractArrow arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
 
             // Adjust the shooting spread
             float spreadOffset = i * spreadAngle;
             arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
 
-            // Handle pickup behavior
-            if (player.getAbilities().instabuild || i != 0) {
-                arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY; // Only main arrow is recoverable
-            } else {
-                arrow.pickup = AbstractArrow.Pickup.ALLOWED;
-            }
+            // **Only the first arrow should be pickupable**
+            arrow.pickup = (i == 0) ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
 
             serverLevel.addFreshEntity(arrow);
         }
 
-        // Consume only 1 arrow
+        // **Consume only 1 arrow from inventory**
         if (!player.getAbilities().instabuild) {
             projectileStack.shrink(1);
         }
     }
 
-    protected void shootProjectile(LivingEntity shooter, Projectile projectile, int index, float velocity, float inaccuracy, float angle, @Nullable LivingEntity target) {
-        projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
-    }
 
     public static float getPowerForTime(int pCharge) {
-        float f = (float)pCharge / 16.0F;
+        float f = (float) pCharge / 16.0F;
         f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-
-        return f;
+        return Math.min(f, 1.0F);
     }
 
     @Override
@@ -123,10 +107,12 @@ public class ArcaneBow extends BowItem {
     public UseAnim getUseAnimation(ItemStack stack) {
         return UseAnim.BOW;
     }
+
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;
     }
+
     @Override
     public int getEnchantmentValue() {
         return 1;
@@ -136,17 +122,19 @@ public class ArcaneBow extends BowItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack bowStack = player.getItemInHand(hand);
         boolean hasArrows = !player.getProjectile(bowStack).isEmpty();
-        if (!player.hasInfiniteMaterials() && !hasArrows) {
+        if (!hasArrows) {
             return InteractionResultHolder.fail(bowStack);
         } else {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(bowStack);
         }
     }
+
     @Override
     public int getDefaultProjectileRange() {
         return 64;
     }
+
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
@@ -162,5 +150,4 @@ public class ArcaneBow extends BowItem {
             tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
     }
-
 }

@@ -4,6 +4,7 @@ import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -14,10 +15,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -30,59 +29,63 @@ public class TwinShadowsBow extends BowItem {
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide()) {
-            int charge = this.getUseDuration(stack, entity) - timeCharged;
-            float power = getPowerForTime(charge);
+    public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
+        if (entity instanceof Player player) {
+            List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
 
-            // Retrieve arrow stack
-            ItemStack arrowStack = player.getProjectile(stack);
+            if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
+                int charge = this.getUseDuration(bowStack, entity) - chargeTime;
+                float power = getPowerForTime(charge);
 
-            if (power >= 0.1F && !arrowStack.isEmpty()) {
-                fireTwinArrows(level, player, stack, arrowStack);
+                if (power >= 0.1F) {
+                    if (level instanceof ServerLevel serverLevel) {
+                        fireTwinArrows(serverLevel, player, bowStack, projectiles, power);
+                    }
 
-                // Damage the bow
-                stack.hurtAndBreak(1, player,(EquipmentSlot.MAINHAND));
-            } else {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    // Play shooting sound & apply durability loss
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    player.awardStat(Stats.ITEM_USED.get(this));
+
+                    if (!player.getAbilities().instabuild) {
+                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                    }
+                }
             }
         }
     }
 
-    private void fireTwinArrows(Level level, Player player, ItemStack bowStack, ItemStack arrowStack) {
-        Vec3 arrowDirection = player.getLookAngle();
+    private void fireTwinArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power) {
+        if (projectileStacks.isEmpty()) return;
 
-        ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+        ItemStack projectileStack = projectileStacks.get(0); // Get the first available projectile
+        ArrowItem arrowItem = (ArrowItem) (projectileStack.getItem() instanceof ArrowItem ? projectileStack.getItem() : Items.ARROW);
 
         // Fire the first (Light) arrow
-        AbstractArrow lightArrow = arrowItem.createArrow(level, bowStack, player, arrowStack);
-        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.5F, 1.0F);
+        AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
+        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
         lightArrow.setBaseDamage(6.0);
         lightArrow.addTag("light");
         lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
         lightArrow.pickup = AbstractArrow.Pickup.ALLOWED;
-        level.addFreshEntity(lightArrow);
+        serverLevel.addFreshEntity(lightArrow);
 
         // Fire the second (Dark) arrow
-        AbstractArrow darkArrow = arrowItem.createArrow(level, bowStack, player, arrowStack);
-        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, 3.5F, 1.0F);
+        AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
+        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, power * 2.5F, 1.0F);
         darkArrow.setBaseDamage(8.0);
         darkArrow.addTag("dark");
         darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
         darkArrow.pickup = AbstractArrow.Pickup.ALLOWED;
-        level.addFreshEntity(darkArrow);
-
-        // Play shooting sound
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        serverLevel.addFreshEntity(darkArrow);
 
         // Consume only 1 arrow from inventory
         if (!player.getAbilities().instabuild) {
-            arrowStack.shrink(1);
+            projectileStack.shrink(1);
+            if (projectileStack.isEmpty()) {
+                projectileStacks.remove(0);
+            }
         }
-    }
-
-    protected void shootProjectile(LivingEntity shooter, Projectile projectile, int index, float velocity, float inaccuracy, float angle, @Nullable LivingEntity target) {
-        projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
     }
 
     public static float getPowerForTime(int pCharge) {

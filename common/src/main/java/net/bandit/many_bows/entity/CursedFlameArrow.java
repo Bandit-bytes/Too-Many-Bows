@@ -56,10 +56,15 @@ public class CursedFlameArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
-            hitEntity.addEffect(new MobEffectInstance(EffectRegistry.CURSED_FLAME, 200, 0));
-            createCursedSoulFireParticles(hitEntity.position());
+            if (EffectRegistry.CURSED_FLAME.isPresent()) {
+                hitEntity.addEffect(new MobEffectInstance(EffectRegistry.CURSED_FLAME, 200, 0));
+                createCursedSoulFireParticles(hitEntity.position());
+            } else {
+//                System.err.println("ERROR: Cursed Flame Effect is missing! Skipping application.");
+            }
         }
     }
+
 
     @Override
     protected void onHitBlock(BlockHitResult result) {

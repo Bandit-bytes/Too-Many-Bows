@@ -1,7 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.entity.AncientSageArrow;
 import net.bandit.many_bows.entity.WebstringArrow;
-import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -12,20 +12,19 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 public class WebstringVolleyBow extends BowItem {
-    private static final int ARROW_COUNT = 5;
-    private static final float SPREAD_ANGLE = 15.0F;
 
     public WebstringVolleyBow(Properties properties) {
         super(properties);
@@ -34,15 +33,15 @@ public class WebstringVolleyBow extends BowItem {
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
-            ItemStack arrowStack = player.getProjectile(bowStack);
+            List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
 
-            if (!arrowStack.isEmpty() || player.getAbilities().instabuild) {
+            if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
                 float power = getPowerForTime(charge);
 
                 if (power >= 0.1F) {
                     if (level instanceof ServerLevel serverLevel) {
-                        fireVolleyArrows(serverLevel, player, bowStack, arrowStack, power);
+                        fireTripleArrows(serverLevel, player, bowStack, projectiles, power);
                     }
 
                     // Play sound and apply durability loss
@@ -58,31 +57,40 @@ public class WebstringVolleyBow extends BowItem {
         }
     }
 
-    private void fireVolleyArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, ItemStack projectileStack, float power) {
+    private void fireTripleArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power) {
         float basePitch = player.getXRot();
         float baseYaw = player.getYRot();
-        float angleStep = SPREAD_ANGLE / (ARROW_COUNT - 1);
+        float spreadAngle = 5.0F;
 
-        for (int i = 0; i < ARROW_COUNT; i++) { // Fires 5 arrows
-            float spreadOffset = (i - (ARROW_COUNT - 1) / 2.0F) * angleStep;
-
-            WebstringArrow arrow = EntityRegistry.WEBSTRING_ARROW.get().create(serverLevel);
-            if (arrow != null) {
-                arrow.setOwner(player);
-                arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
-                arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
-                arrow.pickup = AbstractArrow.Pickup.ALLOWED;
-
-                serverLevel.addFreshEntity(arrow);
-            }
+        if (projectileStacks.isEmpty() && !player.getAbilities().instabuild) {
+            return;
         }
 
-        // Consume only 1 arrow
+        ItemStack projectileStack = projectileStacks.get(0);
+        boolean arrowConsumed = false;
+
+        for (int i = -2; i <= 2; i++) {
+            WebstringArrow arrow = new WebstringArrow(serverLevel, player, bowStack, projectileStack);
+
+            // Adjust the shooting spread
+            float spreadOffset = i * spreadAngle;
+            arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
+
+            // **Only the first arrow should be pickupable**
+            arrow.pickup = (i == 0) ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
+
+            serverLevel.addFreshEntity(arrow);
+        }
+
+        // **Consume only 1 arrow from inventory**
         if (!player.getAbilities().instabuild) {
             projectileStack.shrink(1);
         }
     }
 
+    protected void shootProjectile(LivingEntity shooter, Projectile projectile, int index, float velocity, float inaccuracy, float angle, @Nullable LivingEntity target) {
+        projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
+    }
 
     public static float getPowerForTime(int pCharge) {
         float f = (float) pCharge / 16.0F;

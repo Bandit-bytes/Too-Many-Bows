@@ -29,9 +29,9 @@ public class ScatterBow extends BowItem {
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
-            ItemStack arrowStack = player.getProjectile(bowStack);
+            List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
 
-            if (!arrowStack.isEmpty() || player.getAbilities().instabuild) {
+            if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
                 float power = getPowerForTime(charge);
 
@@ -74,13 +74,14 @@ public class ScatterBow extends BowItem {
      * Get the number of arrows in the player's inventory.
      */
     private int getArrowCount(Player player) {
-        int count = 0;
+        int arrowCount = 0;
         for (ItemStack stack : player.getInventory().items) {
-            if (!stack.isEmpty() && stack.getItem() instanceof ArrowItem) {
-                count += stack.getCount();
+            ItemStack projectile = player.getProjectile(stack);
+            if (!projectile.isEmpty()) {
+                arrowCount += projectile.getCount();
             }
         }
-        return count;
+        return arrowCount;
     }
 
     /**
