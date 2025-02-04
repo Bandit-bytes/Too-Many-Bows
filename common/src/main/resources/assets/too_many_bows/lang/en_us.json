@@ -84,8 +84,8 @@
   "item.many_bows.icicle_javelin_bow.tooltip.freeze": "summon ice upon block hit.",
 
   "item.too_many_bows.ironclad_bow.tooltip": "Forged with iron, tempered in battle",
-  "item.too_many_bows.ironclad_bow.tooltip.ability": "Magnetic Pulse: Pulls enemies towards the point of impact",
-  "item.too_many_bows.ironclad_bow.tooltip.legend": "Arrows have magnetic force..",
+  "item.too_many_bows.ironclad_bow.tooltip.ability": "Magnetic Pulse: Pulls enemies towards the point of impact of arrow..",
+  "item.too_many_bows.ironclad_bow.tooltip.legend": "Including yourself (block radius 5)..",
 
   "item.too_many_bows.hunter_bow_bow": "The Hunter's trusty bow.",
   "item.too_many_bows.hunter_bow.tooltip": "§7Effective against passive mobs.",

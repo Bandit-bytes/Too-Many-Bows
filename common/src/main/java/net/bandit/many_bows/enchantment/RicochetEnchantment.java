@@ -18,7 +18,7 @@ public class RicochetEnchantment extends Enchantment {
 
     @Override
     public boolean isDiscoverable() {
-        return true;
+        return false;
     }
 
     @Override

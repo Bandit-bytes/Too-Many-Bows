@@ -101,15 +101,6 @@ public class AuroraBow extends BowItem {
         }
     }
 
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
     private boolean consumeRiftShard(Player player, int count) {
         if (player.getAbilities().instabuild) {
             return true; // Creative mode bypass
@@ -117,7 +108,7 @@ public class AuroraBow extends BowItem {
 
         int shardsRemoved = 0;
         for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() == ItemRegistry.RIFT_SHARD.get()) { // Replace with your Rift Shard registry call
+            if (stack.getItem() == ItemRegistry.RIFT_SHARD.get()) {
                 int removeAmount = Math.min(stack.getCount(), count - shardsRemoved);
                 stack.shrink(removeAmount);
                 shardsRemoved += removeAmount;
@@ -133,17 +124,6 @@ public class AuroraBow extends BowItem {
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
         return stack -> stack.getItem() instanceof ArrowItem;
     }
-
-    @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        if (Screen.hasShiftDown()) {
-            tooltip.add(Component.translatable("item.many_bows.aurora_bow.tooltip.extended").withStyle(ChatFormatting.GRAY));
-        } else {
-            tooltip.add(Component.translatable("item.many_bows.aurora_bow.tooltip").withStyle(ChatFormatting.AQUA));
-            tooltip.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-        }
-    }
-
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
@@ -157,5 +137,15 @@ public class AuroraBow extends BowItem {
     @Override
     public int getEnchantmentValue() {
         return 20;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
+            tooltip.add(Component.translatable("item.many_bows.aurora_bow.tooltip.extended").withStyle(ChatFormatting.GRAY));
+        } else {
+            tooltip.add(Component.translatable("item.many_bows.aurora_bow.tooltip").withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+        }
     }
 }

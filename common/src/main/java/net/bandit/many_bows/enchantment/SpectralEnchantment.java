@@ -10,6 +10,15 @@ public class SpectralEnchantment extends Enchantment {
     public SpectralEnchantment() {
         super(Rarity.UNCOMMON, EnchantmentCategory.BOW, new EquipmentSlot[]{EquipmentSlot.MAINHAND});
     }
+    @Override
+    public boolean isTradeable() {
+        return true;
+    }
+
+    @Override
+    public boolean isDiscoverable() {
+        return false;
+    }
 
     @Override
     public boolean canEnchant(ItemStack stack) {

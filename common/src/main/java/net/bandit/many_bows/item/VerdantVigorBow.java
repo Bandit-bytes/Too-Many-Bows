@@ -26,36 +26,54 @@ public class VerdantVigorBow extends BowItem {
 
     private static final int HEALTH_BOOST_LEVEL = 1;
     private static final int REGENERATION_DURATION = 40;
-    private static final int HEAL_INTERVAL = 20;
+    private static final int HEALTH_BOOST_DURATION = 100;
+    private static final int BUFFER_DURATION = 100;
+    private static final int HEALTH_BOOST_HEARTS = 4;
+
+    private int bufferTimer = 0;
 
     public VerdantVigorBow(Properties properties) {
         super(properties);
     }
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && !level.isClientSide) {
-            if (selected) {
-                MobEffectInstance currentEffect = player.getEffect(MobEffects.HEALTH_BOOST);
-                if (currentEffect == null || currentEffect.getAmplifier() != HEALTH_BOOST_LEVEL) {
-                    player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, Integer.MAX_VALUE, HEALTH_BOOST_LEVEL, true, false));
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+        if (entity instanceof Player player && !world.isClientSide) {
+            boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+
+            if (isHoldingBow) {
+                bufferTimer = BUFFER_DURATION;
+                MobEffectInstance healthBoost = player.getEffect(MobEffects.HEALTH_BOOST);
+                if (healthBoost == null || healthBoost.getAmplifier() != HEALTH_BOOST_LEVEL || healthBoost.getDuration() < 60) {
+                    player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, HEALTH_BOOST_DURATION, HEALTH_BOOST_LEVEL, true, false, false));
+                    if (player.getHealth() < player.getMaxHealth()) {
+                        player.setHealth(Math.min(player.getMaxHealth(), player.getHealth() + (HEALTH_BOOST_HEARTS * 2)));
+                    }
                 }
-                if (level.getGameTime() % 40 == 0) {
-                    AABB area = new AABB(player.getX() - 5, player.getY() - 5, player.getZ() - 5,
-                            player.getX() + 5, player.getY() + 5, player.getZ() + 5);
-                    level.getEntities(player, area, e -> e instanceof LivingEntity && e.isAlive() && e != player)
+                if (world.getGameTime() % 40 == 0) {
+                    AABB area = new AABB(
+                            player.getX() - 5, player.getY() - 5, player.getZ() - 5,
+                            player.getX() + 5, player.getY() + 5, player.getZ() + 5
+                    );
+
+                    world.getEntities(player, area, e -> e instanceof LivingEntity && e.isAlive() && e != player)
                             .forEach(entityNearby -> {
                                 if (entityNearby instanceof LivingEntity livingEntity) {
-                                    livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, REGENERATION_DURATION, 0));
+                                    livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, REGENERATION_DURATION, 0, true, false, false));
                                 }
                             });
                 }
             } else {
-                if (player.hasEffect(MobEffects.HEALTH_BOOST)) {
-                    player.removeEffect(MobEffects.HEALTH_BOOST);
+                if (bufferTimer > 0) {
+                    bufferTimer--;
+                } else {
+                    if (player.hasEffect(MobEffects.HEALTH_BOOST)) {
+                        player.removeEffect(MobEffects.HEALTH_BOOST);
+                    }
                 }
             }
         }
     }
+
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {

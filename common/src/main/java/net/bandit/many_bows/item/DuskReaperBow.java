@@ -34,7 +34,7 @@ public class DuskReaperBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            if (power >= 0.1F && consumeSoulFragments(player)) {
+            if (power >= 0.1F && consumeSoulFragments(player, 1)) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.3F, 0.5F);
 
                 ItemStack arrowStack = player.getProjectile(stack);
@@ -66,23 +66,23 @@ public class DuskReaperBow extends BowItem {
         }
     }
 
-    private boolean consumeSoulFragments(Player player) {
+    private boolean consumeSoulFragments(Player player, int count) {
+        if (player.getAbilities().instabuild) {
+            return true; // Creative mode bypass
+        }
+
+        int shardsRemoved = 0;
         for (ItemStack stack : player.getInventory().items) {
             if (stack.getItem() == ItemRegistry.SOUL_FRAGMENT.get()) {
-                stack.shrink(1);
-                return true;
+                int removeAmount = Math.min(stack.getCount(), count - shardsRemoved);
+                stack.shrink(removeAmount);
+                shardsRemoved += removeAmount;
+                if (shardsRemoved >= count) {
+                    return true;
+                }
             }
         }
         return false;
-    }
-
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
     }
 
     private void applyEnchantments(ItemStack stack, DuskReaperArrow arrow) {
@@ -102,25 +102,23 @@ public class DuskReaperBow extends BowItem {
     }
 
     @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
+    public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
+        return stack -> stack.getItem() instanceof ArrowItem;
     }
-
-    @Override
-    public int getEnchantmentValue() {
-        return 15;
-    }
-
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
 
     @Override
-    public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true; // Allow any type of projectile, though soul fragments are prioritized.
+    public boolean isEnchantable(ItemStack stack) {
+        return true;
     }
 
+    @Override
+    public int getEnchantmentValue() {
+        return 20;
+    }
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
