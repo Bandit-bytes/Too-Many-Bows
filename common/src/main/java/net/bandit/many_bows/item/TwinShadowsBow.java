@@ -76,7 +76,7 @@ public class TwinShadowsBow extends BowItem {
         darkArrow.setBaseDamage(8.0);
         darkArrow.addTag("dark");
         darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
-        darkArrow.pickup = AbstractArrow.Pickup.ALLOWED;
+        darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
         serverLevel.addFreshEntity(darkArrow);
 
         // Consume only 1 arrow from inventory

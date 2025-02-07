@@ -1,12 +1,11 @@
 package net.bandit.many_bows.entity;
 
-import net.bandit.many_bows.registry.EffectRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -56,15 +55,23 @@ public class CursedFlameArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
-            if (EffectRegistry.CURSED_FLAME.isPresent()) {
-                hitEntity.addEffect(new MobEffectInstance(EffectRegistry.CURSED_FLAME, 200, 0));
-                createCursedSoulFireParticles(hitEntity.position());
-            } else {
-//                System.err.println("ERROR: Cursed Flame Effect is missing! Skipping application.");
+            hitEntity.setRemainingFireTicks(200); // 10 seconds of fire
+
+            // Increase fire damage if needed (Soul Fire burns hotter)
+            hitEntity.hurt(hitEntity.damageSources().onFire(), 4.0F); // Adjust damage as needed
+
+            // Remove any regeneration effects to prevent healing
+            if (hitEntity.hasEffect(MobEffects.REGENERATION)) {
+                hitEntity.removeEffect(MobEffects.REGENERATION);
             }
+
+            if (hitEntity.hasEffect(MobEffects.HEAL)) {
+                hitEntity.removeEffect(MobEffects.HEAL);
+            }
+
+            createCursedSoulFireParticles(hitEntity.position());
         }
     }
-
 
     @Override
     protected void onHitBlock(BlockHitResult result) {

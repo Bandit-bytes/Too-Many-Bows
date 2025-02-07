@@ -11,16 +11,11 @@ public class CursedFlameEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
-        if (!entity.level().isClientSide) {
-            entity.hurt(entity.damageSources().magic(), 1.0F + amplifier);
-        }
-        return false;
+    public boolean applyEffectTick(LivingEntity livingEntity, int i) {
+        return super.applyEffectTick(livingEntity, i);
     }
-
     @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return true;
     }
-
 }

@@ -8,11 +8,12 @@ import net.minecraft.resources.ResourceLocation;
 
 
 public class SentinelArrowRenderer extends ArrowRenderer<SentinelArrow> {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("too_many_bows", "textures/entity/arrow.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("too_many_bows", "textures/entity/ironclad_arrow.png");
 
     public SentinelArrowRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
+
 
     @Override
     public ResourceLocation getTextureLocation(SentinelArrow entity) {
