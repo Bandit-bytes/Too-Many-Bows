@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:arcane_bow"
+    },
+    "title": {
+      "translate": "advancement.too_many_bows.root.title"
+    },
+    "description": {
+      "translate": "advancement.too_many_bows.root.description"
+    },
+    "background": "minecraft:textures/block/end_stone.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_any_bow": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "tag": "too_many_bows:bows"
+          }
+        ],
+        "sends_telemetry_event": true
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_any_bow"
+    ]
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:shulker_blast"
+    },
+    "title": {
+      "translate": "advancement.shulker_blast.title"
+    },
+    "description": {
+      "translate": "advancement.shulker_blast.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "too_many_bows:shulker_shell",
+  "criteria": {
+    "get_shulker_blast": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["too_many_bows:shulker_blast"]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    ["get_shulker_blast"]
+  ],
+  "rewards": {
+    "experience": 500
+  }
+}

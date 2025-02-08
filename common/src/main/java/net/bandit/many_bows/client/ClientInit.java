@@ -48,6 +48,7 @@ public class ClientInit {
                 ItemRegistry.RADIANCE.get(),
                 ItemRegistry.DUSK_REAPER.get(),
                 ItemRegistry.ETHEREAL_HUNTER.get(),
+                ItemRegistry.TORCHBEARER.get(),
                 ItemRegistry.WEBSTRING.get()
         );
 

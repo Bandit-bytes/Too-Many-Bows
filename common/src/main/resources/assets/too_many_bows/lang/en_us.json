@@ -231,5 +231,9 @@
   "item.too_many_bows.webstring": "Webstring",
   "item.too_many_bows.webstring_volley": "Webstring Volley",
   "item.too_many_bows.webstring_volley.tooltip": "Unleash a volley of arrows in a wide spread.",
-  "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets."
+  "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets.",
+  "item.too_many_bows.torchbearer_bow": "Torchbearer Bow",
+  "item.too_many_bows.torchbearer": "Torchbearer",
+  "item.too_many_bows.torchbearer_bow.shift": "Ignites enemies and lights your path.",
+  "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact."
 }

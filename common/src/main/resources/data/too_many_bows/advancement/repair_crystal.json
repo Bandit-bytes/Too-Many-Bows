@@ -1,0 +1,39 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:power_crystal"
+    },
+    "title": {
+      "translate": "advancement.too_many_bows.repair.title"
+    },
+    "description": {
+      "translate": "advancement.too_many_bows.repair.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "too_many_bows:root",
+  "criteria": {
+    "get_repair": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["too_many_bows:power_crystal"],
+            "count": {
+              "min": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    ["get_repair"]
+  ],
+  "rewards": {
+    "experience": 1000
+  }
+}

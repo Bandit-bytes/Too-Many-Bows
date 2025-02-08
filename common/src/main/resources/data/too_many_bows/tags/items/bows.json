@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     "too_many_bows:arcane_bow",
     "too_many_bows:dark_bow",
@@ -32,6 +33,7 @@
     "too_many_bows:dusk_reaper",
     "too_many_bows:radiance",
     "too_many_bows:crimson_nexus",
-    "too_many_bows:arcforge"
+    "too_many_bows:webstring",
+    "too_many_bows:torchbearer"
   ]
 }

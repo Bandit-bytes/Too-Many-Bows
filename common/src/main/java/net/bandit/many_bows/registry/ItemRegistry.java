@@ -80,6 +80,8 @@ public class ItemRegistry {
             () -> new RadianceBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
     public static final RegistrySupplier<Item> WEBSTRING = ITEMS.register("webstring",
             () -> new WebstringVolleyBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
+    public static final RegistrySupplier<Item> TORCHBEARER = ITEMS.register("torchbearer",
+            () -> new TorchbearerBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
 
 //    //bandit bows
     public static final RegistrySupplier<Item> FLAME_BOW = ITEMS.register("flame_bow",

@@ -69,6 +69,7 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.CYROHEART_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.POWER_CRYSTAL.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.EMERALD_SAGE_BOW.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.TORCHBEARER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.DEMONS_GRASP.get()));
     }
 
@@ -78,6 +79,7 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.ARCANE_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.CYROHEART_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.POWER_CRYSTAL.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.TORCHBEARER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.EMERALD_SAGE_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.DEMONS_GRASP.get()));
     }
@@ -90,6 +92,7 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.SOLAR_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.ARC_HEAVENS.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.SCATTER_BOW.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.TORCHBEARER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.VITALITY_WEAVER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.SPECTRAL_WHISPER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.WEBSTRING.get()));
