@@ -7,8 +7,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -31,14 +33,27 @@ public class HunterBow extends BowItem {
             if (power >= 0.1F) {
                 ItemStack arrowStack = player.getProjectile(stack);
                 boolean isCreative = player.getAbilities().instabuild;
-                boolean hasArrows = !arrowStack.isEmpty() || isCreative;
+                boolean hasInfinity = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+                boolean hasArrows = !arrowStack.isEmpty() || isCreative || hasInfinity;
 
                 if (hasArrows) {
+                    if (arrowStack.isEmpty() && hasInfinity) {
+                        arrowStack = new ItemStack(Items.ARROW);
+                    }
+
                     HunterArrow hunterArrow = new HunterArrow(level, player);
                     hunterArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                     applyEnchantments(stack, hunterArrow);
-                    if (!isCreative && !arrowStack.isEmpty()) {
+
+                    if (hasInfinity) {
+                        hunterArrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+                    }
+
+                    if (!isCreative && !hasInfinity) {
                         arrowStack.shrink(1);
+                        if (arrowStack.isEmpty()) {
+                            player.getInventory().removeItem(arrowStack);
+                        }
                     }
 
                     level.addFreshEntity(hunterArrow);
@@ -46,9 +61,9 @@ public class HunterBow extends BowItem {
 
                     stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 } else {
-                    // Play an error sound if no arrows are available
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
     }
@@ -68,15 +83,6 @@ public class HunterBow extends BowItem {
         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
             hunterArrow.setSecondsOnFire(100);
         }
-    }
-
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
     }
 
     @Override

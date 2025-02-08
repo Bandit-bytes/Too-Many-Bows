@@ -52,6 +52,7 @@ public class RadianceBow extends BowItem {
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 

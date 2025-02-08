@@ -71,6 +71,7 @@ public class CrimsonNexusBow extends BowItem {
                 // Update stats
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 

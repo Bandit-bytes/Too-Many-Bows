@@ -41,6 +41,7 @@ public class ArcaneBow extends BowItem {
                 fireExtraArrows(level, player, hasInfinity, arrowStack, stack);
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
             }
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
     private void fireExtraArrows(Level level, Player player, boolean hasInfinity, ItemStack arrowStack, ItemStack bowStack) {

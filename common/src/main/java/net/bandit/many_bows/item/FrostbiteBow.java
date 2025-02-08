@@ -9,6 +9,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -74,6 +75,7 @@ public class FrostbiteBow extends BowItem {
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
         hasPlayedPullSound = false;
     }
@@ -122,14 +124,6 @@ public class FrostbiteBow extends BowItem {
     }
 }
 
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
 
     private void createPullingSnowParticles(Level level, LivingEntity entity) {
         double offsetX = entity.getRandom().nextGaussian() * 0.2D;

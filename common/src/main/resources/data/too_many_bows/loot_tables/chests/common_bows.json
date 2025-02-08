@@ -18,9 +18,15 @@
           "type": "item",
           "name": "too_many_bows:burnt_relic",
           "weight": 1
-        }, {
+        },
+        {
           "type": "item",
           "name": "too_many_bows:arcane_bow",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "too_many_bows:torchbearer",
           "weight": 1
         },
         {

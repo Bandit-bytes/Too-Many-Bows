@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -61,7 +62,9 @@ public class EmeraldSageBow extends BowItem {
                     // Damage the bow
                     stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 }
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 

@@ -53,6 +53,7 @@ public class AuroraBow extends BowItem {
                     player.displayClientMessage(Component.translatable("item.many_bows.aurora_bow.no_arrows")
                             .withStyle(ChatFormatting.RED), true);
                 }
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
     }

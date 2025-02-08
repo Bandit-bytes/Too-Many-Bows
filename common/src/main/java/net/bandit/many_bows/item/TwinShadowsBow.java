@@ -41,8 +41,6 @@ public class TwinShadowsBow extends BowItem {
 
                 int charge = this.getUseDuration(itemStack) - i;
                 float power = getPowerForTime(charge);
-
-                // 🔹 Ensure FULL charge (20 ticks) AND max power before firing
                 if (charge < 20 || power < 1.0F) {
                     return; // Prevent early firing
                 }
@@ -50,27 +48,18 @@ public class TwinShadowsBow extends BowItem {
                 boolean isCreativeArrow = hasInfinity && arrowStack.is(Items.ARROW);
 
                 if (!level.isClientSide) {
-                    // Fire both Twin Arrows (Light + Dark)
                     fireTwinArrows(level, player, hasInfinity, itemStack, arrowStack);
-
-                    // Damage the bow
                     itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 }
-
-                // Play bow shooting sound
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS,
                         1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
 
-                // 🔹 Ensure 2 arrows are consumed correctly
-                if (!isCreativeArrow && !player.getAbilities().instabuild) {
-                    if (arrowStack.getCount() >= 2) {
-                        arrowStack.shrink(2);
-                    } else {
+                if (!isCreativeArrow && !hasInfinity && !player.getAbilities().instabuild) {
+                    arrowStack.shrink(2);
+                    if (arrowStack.isEmpty()) {
                         player.getInventory().removeItem(arrowStack);
                     }
                 }
-
-                // Update player stats
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
@@ -78,7 +67,7 @@ public class TwinShadowsBow extends BowItem {
 
     public static float getPowerForTime(int charge) {
         if (charge < 20) {
-            return 0.0F; // 🔹 Prevent early shots
+            return 0.0F;
         }
 
         float f = (float) charge / 20.0F;

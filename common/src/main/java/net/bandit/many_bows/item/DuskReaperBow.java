@@ -63,6 +63,7 @@ public class DuskReaperBow extends BowItem {
             } else {
                 player.displayClientMessage(Component.translatable("item.many_bows.dusk_reaper.no_soul_fragments").withStyle(ChatFormatting.RED), true);
             }
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 

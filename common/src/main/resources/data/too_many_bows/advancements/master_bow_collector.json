@@ -117,6 +117,11 @@
       "conditions": {
         "items": [{ "items": ["too_many_bows:necro_flame_bow"] }]
       }
+    }, "torchbearer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:torchbearer"] }]
+      }
     },
     "arc_heavens": {
       "trigger": "minecraft:inventory_changed",
@@ -241,7 +246,8 @@
     ["vitality_weaver"],
     ["astral_bound"],
     ["spectral_whisper"],
-    ["auroras_grace"]
+    ["auroras_grace"],
+    ["torchbearer"]
   ],
   "rewards": {
     "experience": 1000,
