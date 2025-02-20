@@ -6,7 +6,6 @@ import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.forge.loot.BowLootInjectorPlatformImpl;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
-import net.minecraft.client.renderer.entity.SkeletonRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
