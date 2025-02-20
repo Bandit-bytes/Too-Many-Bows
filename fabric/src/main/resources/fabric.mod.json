@@ -3,15 +3,15 @@
   "id": "too_many_bows",
   "version": "${version}",
   "name": "Too Many Bows",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "An Awesome bow mod that has a lot of unique bows and abilities! ",
   "authors": [
-    "Me!"
+    "Bandit-Bytes"
   ],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
   },
-  "license": "CC0-1.0",
+  "license": "ALL RIGHTS RESERVED",
   "icon": "assets/too_many_bows/icon.png",
   "environment": "*",
   "entrypoints": {

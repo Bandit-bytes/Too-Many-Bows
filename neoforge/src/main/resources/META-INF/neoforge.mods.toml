@@ -1,15 +1,15 @@
 modLoader = "javafml"
 loaderVersion = "[4,)"
 #issueTrackerURL = ""
-license = "Insert License Here"
+license = "All Right Reserved
 
 [[mods]]
 modId = "too_many_bows"
 version = "${version}"
 displayName = "Too Many Bows"
-authors = "Me!"
+authors = "Bandit-Bytes"
 description = '''
-This is an example description! Tell everyone what your mod is about!
+An Awesome bow mod that has a lot of unique bows and abilities!
 '''
 #logoFile = ""
 

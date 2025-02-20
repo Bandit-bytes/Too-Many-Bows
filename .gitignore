@@ -1,2 +1,10 @@
-/neoforge/run/
-/fabric/src/
+# Project exclude paths
+/.gradle/
+/common/.gradle/
+/common/build/
+/fabric/.gradle/
+/fabric/build/
+/neoforge/.gradle/
+/neoforge/build/
+/neoforge/run/**
+/fabric/run/**
