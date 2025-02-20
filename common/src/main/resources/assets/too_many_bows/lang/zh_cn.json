@@ -21,6 +21,8 @@
 "item.too_many_bows.dragons_breath": "龙之吐息",
 "item.too_many_bows.cursed_stone": "诅咒之石",
 "item.too_many_bows.shulker_blast": "潜影冲击",
+"item.too_many_bows.webstring": "网弦",
+"item.too_many_bows.torchbearer": "执炬",
 
 "too_many_bows_tab": "琳琅满弓",
 "category.many_bows": "琳琅满弓",
@@ -89,7 +91,7 @@
 "item.too_many_bows.hunter_bow_bow": "猎人最信任的弓。",
 "item.too_many_bows.hunter_bow.tooltip": "§7可有效对付被动生物。",
 "item.too_many_bows.hunter_bow.hold_shift": "§8[按住 §eShift§8] 查看更多信息",
-"item.too_many_bows.hunter_bow.shift_title": "§有效目标：",
+"item.too_many_bows.hunter_bow.shift_title": "§6有效目标：",
 "item.too_many_bows.hunter_bow.mob1": "§7牛",
 "item.too_many_bows.hunter_bow.mob2": "§7猪",
 "item.too_many_bows.hunter_bow.mob3": "§7绵羊",
@@ -101,7 +103,7 @@
 
 "item.too_many_bows.sentinels_wrath.tooltip": "§7有效对付袭击者。",
 "item.too_many_bows.sentinels_wrath.hold_shift": "§8[按住 §eShift§8] 查看更多信息",
-"item.too_many_bows.sentinels_wrath.shift_title": "§有效目标：",
+"item.too_many_bows.sentinels_wrath.shift_title": "§6有效目标：",
 "item.too_many_bows.sentinels_wrath.mob1": "§7掠夺者",
 "item.too_many_bows.sentinels_wrath.mob2": "§7卫道士",
 "item.too_many_bows.sentinels_wrath.mob3": "§7唤魔者",
@@ -114,7 +116,7 @@
 "item.too_many_bows.shulker_blast_bow.effect1": "§7追踪导弹",
 "item.too_many_bows.shulker_blast_bow.hold_shift": "§8[按住 §eShift§8] 查看更多信息",
 "item.too_many_bows.burnt_relic.tooltip":"古代遗留之弓",
-"item.too_many_bows.burnt_relic.tooltip1": "曾被古代神明使用，仍蕴藏着微弱的力量......",
+"item.too_many_bows.burnt_relic.tooltip1": "曾被古代神明使用，仍蕴藏着微弱的力量……",
 "item.too_many_bows.burnt_relic.tooltip2":"无限箭矢和增强伤害",
 
 
@@ -130,6 +132,8 @@
 
 "advancement.too_many_bows.ancient_sage.title": "古代贤者",
 "advancement.too_many_bows.ancient_sage.description": "发现古代贤者的力量。",
+
+  
 "advancement.too_many_bows.frostbite.title": "霜噬",
 "advancement.too_many_bows.frostbite.description": "施展霜噬弓的寒冰力量",
 "advancement.too_many_bows.sage_bow.title": "古代贤者之遗产",
@@ -181,6 +185,7 @@
 "item.many_bows.repair_crystal.tooltip.use": "在铁砧上使用可以修复弓。",
 "item.many_bows.rift_shard.tooltip": "纯粹能量的碎片。",
 "item.many_bows.rift_shard.tooltip.use": "用于为极光之耀弓注入足够的发射动力。",
+  
 "item.too_many_bows.dusk_reaper": "黄昏死神",
 "item.too_many_bows.ethereal_hunter": "超凡猎弓",
 "item.too_many_bows.twin_shadows": "双生对影",
@@ -208,7 +213,6 @@
 "item.many_bows.radiance.tooltip.legend": "“光明将指引和保护我们。”",
 "item.many_bows.radiance.tooltip.info": "消耗经验值发射光辉箭。",
 "item.many_bows.radiance.tooltip.xp": "经验消耗：§c%d XP§r 每击。",
-"item.many_bows.radiance.no_experience": "需要经验来发射这把弓！",
 
 "item.many_bows.dusk_reaper.tooltip.info": "标记敌人。",
 "item.many_bows.dusk_reaper.tooltip.mark": "被标记的敌人受到的伤害会增加，并留下伤害轨迹。",
@@ -224,9 +228,13 @@
 "item.many_bows.ethereal_hunter.no_hunger": "你太饿了，无法开弓！",
 "item.many_bows.dusk_reaper.no_soul_fragments": "你需要灵魂残片来发射这把弓！",
 "item.many_bows.aurora_bow.no_rift_shard": "你需要裂隙碎片来发射这把弓！",
+"item.many_bows.radiance.no_experience": "需要经验来发射这把弓！",
 
-"item.too_many_bows.webstring": "网弦",
 "item.too_many_bows.webstring_volley": "网弦群射",
 "item.too_many_bows.webstring_volley.tooltip": "大范围发射一排箭矢。",
-"item.too_many_bows.webstring_volley.details": "以散射模式射出 5 支箭，对目标施加缓慢。"
+"item.too_many_bows.webstring_volley.details": "以散射模式射出 5 支箭，对目标施加缓慢。",
+"item.too_many_bows.torchbearer_bow": "执炬弓",
+"item.too_many_bows.torchbearer_bow.tooltip": "手持此弓时会发出光亮。",
+"item.too_many_bows.torchbearer_bow.shift": "点燃敌人，照亮前路。",
+"item.too_many_bows.torchbearer_bow.effect": "射出的火焰箭在撞击时会放出火把。"
 }
