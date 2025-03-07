@@ -42,5 +42,6 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.DUSK_REAPER_ARROW.get(), DuskArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.IRONCLAD_ARROW.get(), IroncladArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
     }
 }

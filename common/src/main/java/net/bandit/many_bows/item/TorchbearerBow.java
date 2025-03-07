@@ -30,8 +30,6 @@ public class TorchbearerBow extends BowItem {
     public TorchbearerBow(Properties properties) {
         super(properties);
     }
-
-
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
@@ -156,9 +154,9 @@ public class TorchbearerBow extends BowItem {
         if (Screen.hasShiftDown()) {
             tooltipComponents.add(Component.translatable("item.too_many_bows.torchbearer_bow.shift").withStyle(ChatFormatting.YELLOW));
             tooltipComponents.add(Component.translatable("item.too_many_bows.torchbearer_bow.effect").withStyle(ChatFormatting.RED));
-            tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift"));
         } else {
             tooltipComponents.add(Component.translatable("item.too_many_bows.torchbearer_bow").withStyle(ChatFormatting.GOLD));
+            tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
     }
 }

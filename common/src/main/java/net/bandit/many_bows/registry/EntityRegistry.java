@@ -5,6 +5,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.entity.*;
 import net.bandit.many_bows.entity.AstralArrow;
+import net.bandit.many_bows.item.TorchbearerBow;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -129,6 +130,11 @@ public class EntityRegistry {
             () -> EntityType.Builder.<WebstringArrow>of(WebstringArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "webstring_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<TorchbearerArrow>> TORCHBEARER_ARROW = ENTITY_TYPES.register("torchbearer_arrow",
+            () -> EntityType.Builder.<TorchbearerArrow>of(TorchbearerArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "torchbearer_arrow").toString()));
 
 
     public static void register() {
