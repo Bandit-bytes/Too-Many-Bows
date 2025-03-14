@@ -73,10 +73,7 @@ public class ArcaneBow extends BowItem {
             // Adjust the shooting spread
             float spreadOffset = i * spreadAngle;
             arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
-
-            // **Only the first arrow should be pickupable**
             arrow.pickup = (i == 0) ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
-
             serverLevel.addFreshEntity(arrow);
         }
 

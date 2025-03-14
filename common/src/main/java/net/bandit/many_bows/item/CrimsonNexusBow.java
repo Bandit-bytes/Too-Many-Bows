@@ -95,7 +95,7 @@ public class CrimsonNexusBow extends BowItem {
     protected void shootProjectile(LivingEntity shooter, Projectile projectile, int index, float velocity, float inaccuracy, float angle, @Nullable LivingEntity target) {
         projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
     }
-
+//Fixed
     public static float getPowerForTime(int pCharge) {
         float f = (float)pCharge / 16.0F;
         f = (f * f + f * 2.0F) / 3.0F;
