@@ -14,7 +14,6 @@ public class SentinelArrowRenderer extends ArrowRenderer<SentinelArrow> {
         super(context);
     }
 
-
     @Override
     public ResourceLocation getTextureLocation(SentinelArrow entity) {
         return TEXTURE;

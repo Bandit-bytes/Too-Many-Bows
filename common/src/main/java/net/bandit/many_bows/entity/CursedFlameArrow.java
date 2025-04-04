@@ -103,6 +103,6 @@ public class CursedFlameArrow extends AbstractArrow {
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return null;
+        return new ItemStack(Items.ARROW);
     }
 }

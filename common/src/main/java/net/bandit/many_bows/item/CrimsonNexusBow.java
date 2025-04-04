@@ -16,11 +16,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -70,6 +67,8 @@ public class CrimsonNexusBow extends BowItem {
                         (ArrowItem) arrowStack.getItem() : (ArrowItem) Items.ARROW;
 
                 AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player, bowStack);
+                arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+
 
                 // Fire the arrow
                 arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);

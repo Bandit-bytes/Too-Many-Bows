@@ -12,6 +12,7 @@ import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
@@ -26,7 +27,7 @@ public class SentinelArrow extends AbstractArrow {
         super(EntityRegistry.SENTINEL_ARROW.get(), shooter, level, bowStack, arrowStack);
     }
 
-    @Override
+        @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
@@ -57,9 +58,10 @@ public class SentinelArrow extends AbstractArrow {
         }
     }
 
+
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return null;
+        return new ItemStack(Items.ARROW);
     }
 
     private boolean isRaidMob(LivingEntity entity) {
@@ -69,5 +71,9 @@ public class SentinelArrow extends AbstractArrow {
                 entity instanceof Ravager ||
                 entity instanceof Illusioner ||
                 entity instanceof Witch;
+    }
+    @Override
+    public ItemStack getPickupItem() {
+        return new ItemStack(Items.ARROW);
     }
 }

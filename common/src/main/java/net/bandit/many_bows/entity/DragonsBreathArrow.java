@@ -3,9 +3,6 @@ package net.bandit.many_bows.entity;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.AreaEffectCloud;
@@ -29,7 +26,7 @@ public class DragonsBreathArrow extends AbstractArrow {
     }
 
     public DragonsBreathArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.ASTRAL_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.DRAGONS_BREATH_ARROW.get(), shooter, level, bowStack, arrowStack);
         this.setBaseDamage(7.0);
     }
 

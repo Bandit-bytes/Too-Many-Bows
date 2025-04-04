@@ -65,8 +65,9 @@ public class WindProjectile extends AbstractArrow {
         return new ItemStack(Items.ARROW);
     }
 
+
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return null;
+        return new ItemStack(Items.ARROW);
     }
 }

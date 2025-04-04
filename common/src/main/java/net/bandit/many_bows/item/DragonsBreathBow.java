@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
 
-import net.bandit.many_bows.entity.AncientSageArrow;
 import net.bandit.many_bows.entity.DragonsBreathArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;

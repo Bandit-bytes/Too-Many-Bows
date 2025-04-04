@@ -113,7 +113,7 @@ public class VenomArrow extends AbstractArrow {
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return null;
+        return new ItemStack(Items.ARROW);
     }
 }
 

@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
 
-import net.bandit.many_bows.entity.AncientSageArrow;
 import net.bandit.many_bows.entity.SentinelArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -178,7 +177,6 @@ public class SentinelsWrathBow extends BowItem {
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
-
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (Screen.hasShiftDown()) {
