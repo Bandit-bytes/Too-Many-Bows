@@ -46,12 +46,12 @@ public class ItemRegistry {
             () -> new IroncladBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> HUNTER_BOW = ITEMS.register("hunter_bow",
             () -> new HunterBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
+    public static final RegistrySupplier<Item> SENTINELS_WRATH= ITEMS.register("sentinels_wrath",
+            () -> new SentinelBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
     public static final RegistrySupplier<Item> BURNT_RELIC = ITEMS.register("burnt_relic",
             () -> new BurntRelicBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
     public static final RegistrySupplier<Item> CYROHEART_BOW = ITEMS.register("cyroheart_bow",
             () -> new IcicleJavelinBow(new Properties().durability(850).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
-    public static final RegistrySupplier<Item> SENTINELS_WRAITH = ITEMS.register("sentinels_wrath",
-            () -> new SentinelsWrathBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
     public static final RegistrySupplier<Item> VITALITY_WEAVER = ITEMS.register("vitality_weaver",
             () -> new VitalityWeaverBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
     public static final RegistrySupplier<Item> ASTRAL_BOUND = ITEMS.register("astral_bound",

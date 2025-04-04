@@ -15,7 +15,6 @@ public final class ManyBowsMod {
         EntityRegistry.register();
         EffectRegistry.register();
         ModLootModifiers.registerLootModifiers();
-//        EnchantmentRegistry.register();
     }
     public static void initClient() {
         ClientInit.registerClientProperties();

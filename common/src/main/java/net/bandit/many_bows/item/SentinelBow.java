@@ -1,7 +1,7 @@
 package net.bandit.many_bows.item;
 
 
-import net.bandit.many_bows.entity.SentinelArrow;
+import net.bandit.many_bows.entity.SentinelWrathArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,9 +30,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class SentinelsWrathBow extends BowItem {
 
-    public SentinelsWrathBow(Properties properties) {
+public class SentinelBow extends BowItem {
+
+    public SentinelBow(Properties properties) {
         super(properties);
     }
 
@@ -55,7 +56,7 @@ public class SentinelsWrathBow extends BowItem {
                             if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
                                 arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                             } else {
-                                arrow = new SentinelArrow(serverLevel, player, bowStack, projectileStack);
+                                arrow = new SentinelWrathArrow(serverLevel, player, bowStack, projectileStack);
                             }
 
                             applyPowerEnchantment(arrow, bowStack, level);

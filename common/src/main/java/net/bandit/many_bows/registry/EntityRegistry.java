@@ -82,8 +82,8 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "ancient_sage_arrow").toString()));
 
-    public static final RegistrySupplier<EntityType<SentinelArrow>> SENTINEL_ARROW = ENTITY_TYPES.register("sentinel_arrow",
-            () -> EntityType.Builder.<SentinelArrow>of(SentinelArrow::new, MobCategory.MISC)
+    public static final RegistrySupplier<EntityType<SentinelWrathArrow>> SENTINEL_ARROW = ENTITY_TYPES.register("sentinel_arrow",
+            () -> EntityType.Builder.<SentinelWrathArrow>of(SentinelWrathArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "sentinel_arrow").toString()));
 

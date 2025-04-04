@@ -35,7 +35,7 @@ public class ClientInit {
                 ItemRegistry.BURNT_RELIC.get(),
                 ItemRegistry.IRONCLAD_BOW.get(),
                 ItemRegistry.HUNTER_BOW.get(),
-                ItemRegistry.SENTINELS_WRAITH.get(),
+                ItemRegistry.SENTINELS_WRATH.get(),
                 ItemRegistry.EMERALD_SAGE_BOW.get(),
                 ItemRegistry.SHULKER_BLAST.get(),
                 ItemRegistry.VITALITY_WEAVER.get(),

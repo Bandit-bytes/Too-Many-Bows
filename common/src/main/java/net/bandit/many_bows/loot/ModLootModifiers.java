@@ -95,7 +95,7 @@ public class ModLootModifiers {
     private static LootPool.Builder createRareBowPool(float chance) {
         return LootPool.lootPool()
                 .setRolls(UniformGenerator.between(0.0F, 1.0F))
-                .add(LootItem.lootTableItem(ItemRegistry.SENTINELS_WRAITH.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.SENTINELS_WRATH.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.CURSED_STONE.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.SOLAR_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.ARC_HEAVENS.get()))
