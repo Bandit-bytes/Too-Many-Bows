@@ -7,6 +7,7 @@ import net.bandit.many_bows.config.BowLootConfig;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 
 public final class ManyBowsMod {
     public static final String MOD_ID = "too_many_bows";
@@ -47,5 +48,6 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
     }
 }

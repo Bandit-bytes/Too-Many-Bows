@@ -14,7 +14,7 @@ import net.minecraft.world.phys.EntityHitResult;
 public class AncientSageArrow extends AbstractArrow {
 
     private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.33f;
-    private static final int PARTICLE_LIFESPAN = 60; // Number of ticks to show particles
+    private static final int PARTICLE_LIFESPAN = 60;
     private float armorPenetration = DEFAULT_ARMOR_PENETRATION_FACTOR;
     private int particleTicksRemaining = PARTICLE_LIFESPAN;
 

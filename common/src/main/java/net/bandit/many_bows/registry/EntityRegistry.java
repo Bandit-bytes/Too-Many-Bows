@@ -141,6 +141,13 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "torchbearer_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<LightOrbEntity>> LIGHT_ORB = ENTITY_TYPES.register("light_orb",
+            () -> EntityType.Builder.<LightOrbEntity>of(LightOrbEntity::new, MobCategory.MISC)
+                    .sized(0.1F, 0.1F)
+                    .clientTrackingRange(32)
+                    .updateInterval(20)
+                    .build(ResourceLocation.fromNamespaceAndPath(MOD_ID, "light_orb").toString()));
+
 
     public static void register() {
         ENTITY_TYPES.register();

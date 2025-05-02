@@ -1,7 +1,8 @@
 package net.bandit.many_bows.item;
 
-import net.bandit.many_bows.entity.AncientSageArrow;
+import net.bandit.many_bows.entity.LightOrbEntity;
 import net.bandit.many_bows.entity.TorchbearerArrow;
+import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,6 +16,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -36,6 +38,23 @@ public class TorchbearerBow extends BowItem {
 
     public TorchbearerBow(Properties properties) {
         super(properties);
+    }
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if (level.isClientSide || !(entity instanceof Player player)) return;
+
+        boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+
+        if (isHoldingBow) {
+            boolean hasOrb = !level.getEntitiesOfClass(net.bandit.many_bows.entity.LightOrbEntity.class, player.getBoundingBox().inflate(3))
+                    .isEmpty();
+
+            if (!hasOrb) {
+                var orb = new LightOrbEntity(EntityRegistry.LIGHT_ORB.get(), level);
+                orb.moveTo(player.getX(), player.getY() + 1.5, player.getZ());
+                level.addFreshEntity(orb);
+            }
+        }
     }
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
