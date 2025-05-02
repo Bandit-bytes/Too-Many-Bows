@@ -235,5 +235,11 @@
   "item.too_many_bows.torchbearer_bow": "Torchbearer Bow",
   "item.too_many_bows.torchbearer": "Torchbearer",
   "item.too_many_bows.torchbearer_bow.shift": "Ignites enemies and lights your path.",
-  "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact."
+  "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact.",
+
+  "item.many_bows.demon_bow.tooltip.extended": "The Demons Bow",
+  "item.many_bows.demon_bow.tooltip": "No real power emits from this bow anymore....",
+
+  "item.many_bows.aether_bow.tooltip.extended": "The angels Bow",
+  "item.many_bows.aether_bow.tooltip": "No real power emits from this bow anymore...."
 }

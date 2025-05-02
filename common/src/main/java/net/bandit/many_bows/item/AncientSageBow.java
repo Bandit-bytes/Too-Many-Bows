@@ -1,7 +1,8 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.entity.AncientSageArrow;
-import net.bandit.many_bows.entity.IronCladArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -125,13 +126,9 @@ public class AncientSageBow extends BowItem {
     }
 
     public static float getPowerForTime(int pCharge) {
-        float f = (float)pCharge / 16.0F;
+        float f = (float) pCharge / 16.0F;
         f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-
-        return f;
+        return Math.min(f, 1.0F);
     }
 
     @Override

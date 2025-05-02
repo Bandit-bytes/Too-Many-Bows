@@ -12,13 +12,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -58,32 +55,24 @@ public class AuroraBow extends BowItem {
                                 } else {
                                     arrow = new AuroraArrowEntity(serverLevel, player, bowStack, projectileStack);
                                 }
-
-                                // Apply Enchantments
                                 applyPowerEnchantment(arrow, bowStack, level);
                                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                                 applyFlameEnchantment(arrow, bowStack, level);
 
-                                // Handle Infinity
                                 if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                     arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                                 } else {
                                     arrow.pickup = AbstractArrow.Pickup.ALLOWED;
                                 }
 
-                                // Fire the arrow
                                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                                 serverLevel.addFreshEntity(arrow);
-
-                                // Consume the arrow only once per shot
                                 if (!hasInfinityEnchantment(bowStack, level) && !player.getAbilities().instabuild && !arrowConsumed) {
                                     projectileStack.shrink(1);
                                     arrowConsumed = true;
                                 }
                             }
                         }
-
-                        // Play sound and apply durability loss
                         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                                 SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
                         player.awardStat(Stats.ITEM_USED.get(this));
@@ -186,5 +175,14 @@ public class AuroraBow extends BowItem {
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
+    }
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        if (Screen.hasShiftDown()) {
+            tooltipComponents.add(Component.translatable("item.many_bows.aurora_bow.tooltip.extended").withStyle(ChatFormatting.GRAY));
+        } else {
+            tooltipComponents.add(Component.translatable("item.many_bows.aurora_bow.tooltip").withStyle(ChatFormatting.AQUA));
+            tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+        }
     }
 }

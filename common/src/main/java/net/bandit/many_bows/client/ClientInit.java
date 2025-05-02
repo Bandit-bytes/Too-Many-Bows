@@ -62,13 +62,16 @@ public class ClientInit {
     private static void registerBowProperties(Item item) {
         ItemPropertiesRegistry.register(item, ResourceLocation.parse(ResourceLocation.fromNamespaceAndPath("minecraft","pull").toString()), (itemStack, level, entity, seed) -> {
             if (entity == null) return 0.0F;
-            return entity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / 20.0F;
+
+            float pullTicks = net.bandit.many_bows.config.ManyBowsConfigHolder.CONFIG.globalBowPullSpeed; // <- grab from config
+            return entity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration(entity) - entity.getUseItemRemainingTicks()) / pullTicks;
         });
 
         ItemPropertiesRegistry.register(item, ResourceLocation.parse(ResourceLocation.fromNamespaceAndPath("minecraft","pulling").toString()), (itemStack, level, entity, seed) -> {
             return entity != null && entity.isUsingItem() && entity.getUseItem() == itemStack ? 1.0F : 0.0F;
         });
     }
+
 
     public static void registerEntityRenderers() {
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
@@ -95,6 +98,7 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.RIFT_ENTITY.get(), NoopRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.IRONCLAD_ARROW.get(), IroncladArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
     }
 }

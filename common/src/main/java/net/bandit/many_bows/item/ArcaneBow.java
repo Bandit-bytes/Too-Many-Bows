@@ -83,7 +83,6 @@ public class ArcaneBow extends BowItem {
         }
     }
 
-
     public static float getPowerForTime(int pCharge) {
         float f = (float) pCharge / 16.0F;
         f = (f * f + f * 2.0F) / 3.0F;

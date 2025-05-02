@@ -92,6 +92,11 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "vitality_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<EtherealArrow>> ETHEREAL_ARROW = ENTITY_TYPES.register("ethereal_arrow",
+            () -> EntityType.Builder.<EtherealArrow>of(EtherealArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "ethereal_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<ShulkerBlastProjectile>> SHULKER_BLAST_PROJECTILE = ENTITY_TYPES.register("shulker_blast_projectile",
             () -> EntityType.Builder.<ShulkerBlastProjectile>of(ShulkerBlastProjectile::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)

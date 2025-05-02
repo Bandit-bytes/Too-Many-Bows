@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class RadiantArrow extends AbstractArrow {
@@ -27,11 +28,16 @@ public class RadiantArrow extends AbstractArrow {
     @Override
     protected void onHit(HitResult result) {
         super.onHit(result);
-        if (!hasExploded && result.getType() == HitResult.Type.BLOCK) {
-            hasExploded = true; // Mark as exploded
+
+        if (!hasExploded && (result.getType() == HitResult.Type.BLOCK || result.getType() == HitResult.Type.ENTITY)) {
+            hasExploded = true;
             createRadiantExplosion(this.level(), this);
             this.discard();
         }
+    }
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        super.onHitEntity(result);
     }
 
     private void createRadiantExplosion(Level level, RadiantArrow arrow) {

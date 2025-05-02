@@ -3,6 +3,8 @@ package net.bandit.many_bows;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.ClientInit;
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
 
@@ -15,6 +17,8 @@ public final class ManyBowsMod {
         EntityRegistry.register();
         EffectRegistry.register();
         ModLootModifiers.registerLootModifiers();
+        ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
+
     }
     public static void initClient() {
         ClientInit.registerClientProperties();
@@ -42,5 +46,6 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.IRONCLAD_ARROW.get(), IroncladArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
     }
 }

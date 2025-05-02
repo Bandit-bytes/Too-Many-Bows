@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 public class BowLootConfig {
 
@@ -24,6 +25,15 @@ public class BowLootConfig {
 
     public boolean endgameLootEnabled = true;
     public float endgameLootDropChance = 0.2F;
+
+    public float globalBowPullSpeed = 16.0F;
+
+    public int emeraldSageXpAmount = 10;
+    public List<String> emeraldSageXpBlacklist = List.of(
+            "minecraft:armor_stand",
+            "minecraft:wandering_trader"
+    );
+
 
     public static BowLootConfig loadConfig() {
         if (!CONFIG_FILE.exists()) {

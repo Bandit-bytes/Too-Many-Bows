@@ -39,9 +39,9 @@ public class ItemRegistry {
     public static final RegistrySupplier<Item> EMERALD_SAGE_BOW = ITEMS.register("emerald_sage_bow",
             () -> new EmeraldSageBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> DEMONS_GRASP = ITEMS.register("demons_grasp",
-            () -> new BowItem(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
+            () -> new DemonsGrasp(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> AETHERS_CALL = ITEMS.register("aethers_call",
-            () -> new BowItem(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
+            () -> new AethersCall(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> IRONCLAD_BOW = ITEMS.register("ironclad_bow",
             () -> new IroncladBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> HUNTER_BOW = ITEMS.register("hunter_bow",

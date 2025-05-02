@@ -21,10 +21,8 @@ public final class ManyBowsModNeoForge {
         // Run our common setup.
         ManyBowsMod.init();
         modEventBus.addListener(this::onClientSetup);
-//        EnvExecutor.runInEnv(Dist.CLIENT, () -> ManyBowsMod::initClient);
     }
     private void onClientSetup(final FMLClientSetupEvent event) {
-        // This is where the client-specific code should be registered
         ManyBowsMod.initClient();
     }
 
@@ -59,5 +57,6 @@ public final class ManyBowsModNeoForge {
         event.registerEntityRenderer(EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.IRONCLAD_ARROW.get(), IroncladArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
     }
 }

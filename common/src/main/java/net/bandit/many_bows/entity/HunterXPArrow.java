@@ -1,5 +1,7 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -25,10 +27,17 @@ public class HunterXPArrow extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            spawnExperienceOrb(target, 10);
+            String id = target.getType().builtInRegistryHolder().key().location().toString();
+            BowLootConfig config = ManyBowsConfigHolder.CONFIG;
+
+            if (!config.emeraldSageXpBlacklist.contains(id)) {
+                spawnExperienceOrb(target, config.emeraldSageXpAmount);
+            }
         }
+
         this.discard();
     }
+
 
     private void spawnExperienceOrb(LivingEntity target, int xpAmount) {
         if (xpAmount > 0) {
