@@ -7,6 +7,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -76,9 +79,13 @@ public class ShulkerBlastProjectile extends AbstractArrow {
 
     private LivingEntity findNearestTarget() {
         AABB searchBox = this.getBoundingBox().inflate(HOMING_RANGE);
-        List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, searchBox, entity -> entity != this.getOwner() && entity.isAlive());
+        List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, searchBox,
+                entity -> entity != this.getOwner()
+                        && entity.isAlive()
+                        && !(entity instanceof ArmorStand)
+                        && !(entity instanceof TamableAnimal tamable && tamable.isTame())
+        );
         return entities.stream()
-                .filter(entity -> entity instanceof Mob) // Focus on mobs
                 .min((e1, e2) -> Double.compare(e1.distanceTo(this), e2.distanceTo(this)))
                 .orElse(null);
     }

@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "too_many_bows:item/arcane_bow_pulling_0",
+		"0": "too_many_bows:item/arcane_bow",
 		"1": "too_many_bows:item/arcane_bow_arrow_0",
-		"particle": "too_many_bows:item/arcane_bow_pulling_0"
+		"particle": "too_many_bows:item/arcane_bow"
 	},
 	"elements": [
 		{

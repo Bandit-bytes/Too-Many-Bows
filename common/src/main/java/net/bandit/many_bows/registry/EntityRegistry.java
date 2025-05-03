@@ -128,6 +128,13 @@ public class EntityRegistry {
             () -> EntityType.Builder.<IronCladArrow>of(IronCladArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build(new ResourceLocation(MOD_ID, "ironclad_arrow").toString()));
+    public static final RegistrySupplier<EntityType<LightOrbEntity>> LIGHT_ORB = ENTITY_TYPES.register("light_orb",
+            () -> EntityType.Builder.<LightOrbEntity>of(LightOrbEntity::new, MobCategory.MISC)
+                    .sized(0.1F, 0.1F)
+                    .clientTrackingRange(32)
+                    .updateInterval(20)
+                    .build(new ResourceLocation(MOD_ID, "light_orb").toString()));
+
 
 
     public static void register() {

@@ -66,6 +66,7 @@ public class IcicleJavelinBow extends BowItem {
                 // Add the projectile to the world
                 level.addFreshEntity(javelin);
                 createIceParticles(level, player);
+                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F);
 
                 // Consume the arrow and damage the bow if not in Creative mode or without Infinity

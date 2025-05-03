@@ -123,5 +123,6 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.RIFT_ENTITY.get(), NoopRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.IRONCLAD_ARROW.get(), IroncladArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
     }
 }

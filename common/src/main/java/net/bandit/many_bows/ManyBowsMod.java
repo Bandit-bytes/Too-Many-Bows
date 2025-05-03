@@ -4,6 +4,7 @@ import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.ClientInit;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.registry.*;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 
 public final class ManyBowsMod {
     public static final String MOD_ID = "too_many_bows";
@@ -40,5 +41,6 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.AURORA_ARROW.get(), AuroraArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.RADIANT_ARROW.get(), RadianceArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DUSK_REAPER_ARROW.get(), DuskArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
     }
 }

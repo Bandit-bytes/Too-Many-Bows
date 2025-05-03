@@ -1,12 +1,12 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.entity.LightOrbEntity;
 import net.bandit.many_bows.entity.TorchbearerArrow;
+import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -17,7 +17,6 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -28,20 +27,19 @@ public class TorchbearerBow extends BowItem {
         super(properties);
     }
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && !world.isClientSide) {
-            boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if (level.isClientSide || !(entity instanceof Player player)) return;
 
-            if (isHoldingBow) {
-                BlockPos playerPos = player.blockPosition();
-                if (world.isEmptyBlock(playerPos)) {
-                    world.setBlockAndUpdate(playerPos, Blocks.LIGHT.defaultBlockState());
-                }
-            } else {
-                BlockPos playerPos = player.blockPosition();
-                if (world.getBlockState(playerPos).is(Blocks.LIGHT)) {
-                    world.setBlockAndUpdate(playerPos, Blocks.AIR.defaultBlockState());
-                }
+        boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+
+        if (isHoldingBow) {
+            boolean hasOrb = !level.getEntitiesOfClass(net.bandit.many_bows.entity.LightOrbEntity.class, player.getBoundingBox().inflate(3))
+                    .isEmpty();
+
+            if (!hasOrb) {
+                var orb = new LightOrbEntity(EntityRegistry.LIGHT_ORB.get(), level);
+                orb.moveTo(player.getX(), player.getY() + 1.5, player.getZ());
+                level.addFreshEntity(orb);
             }
         }
     }
