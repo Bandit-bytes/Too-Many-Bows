@@ -42,13 +42,10 @@ public class AuroraArrowEntity extends AbstractArrow {
     }
 
     private void spawnRift(BlockPos position) {
-        RiftEntity rift = new RiftEntity(this.level(), position);
-        this.level().addFreshEntity(rift);
-    }
-
-    private void spawnRift(double x, double y, double z) {
-        RiftEntity rift = new RiftEntity(this.level(), x, y, z);
-        this.level().addFreshEntity(rift);
+        if (this.getOwner() instanceof LivingEntity owner) {
+            RiftEntity rift = new RiftEntity(this.level(), owner, position);
+            this.level().addFreshEntity(rift);
+        }
     }
 
     @Override

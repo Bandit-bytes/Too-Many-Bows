@@ -20,28 +20,25 @@ import net.minecraft.world.phys.AABB;
 import java.util.List;
 
 public class RiftEntity extends Entity {
-    private int lifeTime = 60; // Lifetime in ticks (3 seconds)
-    private static final double PULL_RADIUS = 5.0; // Radius for pulling entities
-    private static final double EXPLOSION_RADIUS = 4.0; // Radius of the explosion
-    private static final double PULL_STRENGTH = 0.1; // Strength of the pull effect
+    private int lifeTime = 60;
+    private static final double PULL_RADIUS = 5.0;
+    private static final double EXPLOSION_RADIUS = 4.0;
+    private static final double PULL_STRENGTH = 0.1;
+
+    private LivingEntity owner;
 
     public RiftEntity(EntityType<?> type, Level world) {
         super(type, world);
-        this.noPhysics = true; // Makes the entity non-collidable
+        this.noPhysics = true;
     }
-
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-
-    }
-
     public RiftEntity(Level world, double x, double y, double z) {
         this(EntityRegistry.RIFT_ENTITY.get(), world);
         this.setPos(x, y, z);
     }
 
-    public RiftEntity(Level world, BlockPos pos) {
-        this(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5); // Center the rift in the block
+    public RiftEntity(Level world, LivingEntity owner, BlockPos pos) {
+        this(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+        this.owner = owner;
     }
 
 @Override
@@ -50,9 +47,9 @@ public void tick() {
 
     if (this.lifeTime-- <= 0) {
         if (!this.level().isClientSide) {
-            this.explode(); // Trigger the explosion
+            this.explode();
         }
-        this.discard(); // Remove the entity
+        this.discard();
     } else {
         if (!this.level().isClientSide) {
             // Pull entities in
@@ -73,8 +70,7 @@ public void tick() {
         }
 
         if (this.level().isClientSide) {
-            // Core Pulsating Effect
-            double corePulse = Math.sin(this.lifeTime * 0.1) * 0.5 + 1.5; // Dynamic core radius
+            double corePulse = Math.sin(this.lifeTime * 0.1) * 0.5 + 1.5;
             for (int i = 0; i < 30; i++) {
                 this.level().addParticle(ParticleTypes.REVERSE_PORTAL,
                         this.getX() + this.random.nextGaussian() * corePulse,
@@ -83,9 +79,8 @@ public void tick() {
                         0.0, 0.0, 0.0);
             }
 
-            // Enchanting Letters Being Pulled In
             for (int i = 0; i < 20; i++) {
-                double spawnRadius = 8.0; // Letters spawn far away
+                double spawnRadius = 8.0;
                 double angle = this.random.nextDouble() * Math.PI * 2.0;
                 double offsetX = Math.cos(angle) * spawnRadius;
                 double offsetZ = Math.sin(angle) * spawnRadius;
@@ -102,10 +97,9 @@ public void tick() {
                         velocityX, velocityY, velocityZ);
             }
 
-            // Swirling Rings
             for (int layer = 0; layer < 3; layer++) {
                 double height = this.getY() + layer * 0.3;
-                double radius = 2.5 + layer * 0.3; // Adjust ring radius
+                double radius = 2.5 + layer * 0.3;
                 for (int i = 0; i < 40; i++) {
                     double angle = (this.lifeTime * 0.1 + i) % (2 * Math.PI);
                     double offsetX = Math.cos(angle) * radius;
@@ -115,11 +109,9 @@ public void tick() {
                             this.getX() + offsetX,
                             height,
                             this.getZ() + offsetZ,
-                            0.0, 0.0, 0.0); // Static swirling particles
+                            0.0, 0.0, 0.0);
                 }
             }
-
-            // Occasional Time Explosion
             if (this.lifeTime % 20 == 0) {
                 this.level().addParticle(ParticleTypes.EXPLOSION_EMITTER,
                         this.getX(),
@@ -132,8 +124,22 @@ public void tick() {
 }
 
     private void explode() {
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
-        this.level().explode(null, this.getX(), this.getY(), this.getZ(), (float) EXPLOSION_RADIUS, Level.ExplosionInteraction.NONE);
+        level().playSound(null, getX(), getY(), getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+        // Damage entities directly, with owner credited
+        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class,
+                new AABB(getX() - EXPLOSION_RADIUS, getY() - EXPLOSION_RADIUS, getZ() - EXPLOSION_RADIUS,
+                        getX() + EXPLOSION_RADIUS, getY() + EXPLOSION_RADIUS, getZ() + EXPLOSION_RADIUS),
+                e -> e.isAlive() && !(e instanceof Player && ((Player)e).getAbilities().instabuild));
+
+        for (LivingEntity target : entities) {
+            float damage = 8.0f;
+            var source = level().damageSources().mobAttack(owner);
+            target.hurt(source, damage);
+        }
+    }
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
     }
 
