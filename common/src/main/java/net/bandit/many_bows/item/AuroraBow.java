@@ -74,7 +74,7 @@ public class AuroraBow extends BowItem {
                             }
                         }
                         level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                                SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+                                SoundEvents.MACE_SMASH_AIR, SoundSource.PLAYERS, 1.0F, 1.0F);
                         player.awardStat(Stats.ITEM_USED.get(this));
 
                         if (!player.getAbilities().instabuild) {

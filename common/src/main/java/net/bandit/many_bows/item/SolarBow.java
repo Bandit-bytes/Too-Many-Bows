@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
-import net.bandit.many_bows.entity.AncientSageArrow;
-import net.bandit.many_bows.entity.FlameArrow;
+import net.bandit.many_bows.entity.SolarArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,7 +19,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -57,7 +55,7 @@ public class SolarBow extends BowItem {
                             if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
                                 arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                             } else {
-                                arrow = new FlameArrow(serverLevel, player, bowStack, projectileStack);
+                                arrow = new SolarArrow(serverLevel, player, bowStack, projectileStack);
                             }
 
                             applyPowerEnchantment(arrow, bowStack, level);

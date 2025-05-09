@@ -39,6 +39,10 @@ public class EntityRegistry {
             () -> EntityType.Builder.<FlameArrow>of(FlameArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build("flame_arrow"));
+    public static final RegistrySupplier<EntityType<SolarArrow>> SOLAR_ARROW = ENTITY_TYPES.register("solar_arrow",
+            () -> EntityType.Builder.<SolarArrow>of(SolarArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build("solar_arrow"));
     public static final RegistrySupplier<EntityType<TidalArrow>> TIDAL_ARROW = ENTITY_TYPES.register("tidal_arrow",
             () -> EntityType.Builder.<TidalArrow>of(TidalArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)

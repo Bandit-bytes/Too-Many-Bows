@@ -29,8 +29,8 @@
   "item.many_bows.arcane_bow.tooltip.ability": "Ability: Fires three arrows in a spread pattern, dealing extra arcane damage.",
   "item.many_bows.arcane_bow.tooltip.legend": "Ancient secrets lie within its enchanted limbs...",
 
-  "item.many_bows.solar_bow.tooltip": "§eA powerful bow charged by the sun",
-  "item.many_bows.solar_bow.tooltip.ability": "§cShoots flaming solar arrows on full charge.",
+  "item.many_bows.solar_bow.tooltip": "§eCharged by the Sun, fire at enemy feet for death..",
+  "item.many_bows.solar_bow.tooltip.ability": "§cSummons Fire Tornados on ground blocks near entities.",
 
   "item.many_bows.frostbite_bow.tooltip": "A bow forged from the chilling essence of ice.",
   "item.many_bows.frostbite_bow.tooltip.ability": "Shoots frost arrows that slow and freeze enemies on full charge.",

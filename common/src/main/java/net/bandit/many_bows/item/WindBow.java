@@ -88,7 +88,7 @@ public class WindBow extends BowItem {
                         }
                     }
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.PLAYER_BREATH, SoundSource.PLAYERS, 1.0F, 1.2F);
+                            SoundEvents.BREEZE_WIND_CHARGE_BURST, SoundSource.PLAYERS, 1.0F, 1.0F);
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {

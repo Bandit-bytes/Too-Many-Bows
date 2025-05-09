@@ -75,7 +75,7 @@ public class TidalBow extends BowItem {
                         }
                     }
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.PLAYER_SPLASH_HIGH_SPEED, SoundSource.PLAYERS, 0.3F, 1.1F);
+                            SoundEvents.BUCKET_EMPTY_AXOLOTL, SoundSource.PLAYERS, 0.3F, 1.1F);
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {
