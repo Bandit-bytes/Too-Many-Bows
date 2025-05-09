@@ -29,8 +29,8 @@
   "item.many_bows.arcane_bow.tooltip.ability": "技能：以扩散的方式发射三支箭,造成额外的奥术伤害。",
   "item.many_bows.arcane_bow.tooltip.legend": "古老的秘密隐藏在其附魔弓臂之中……",
 
-  "item.many_bows.solar_bow.tooltip": "§e一把强大的弓，充盈着太阳的力量",
-  "item.many_bows.solar_bow.tooltip.ability": "§c完全蓄力时可射出燃烧的太阳箭矢。",
+  "item.many_bows.solar_bow.tooltip": "§e充盈着太阳的力量，向敌人脚下发射致命的火焰……",
+  "item.many_bows.solar_bow.tooltip.ability": "§c在命中实体周围的地面方块上召唤火龙卷。",
 
   "item.many_bows.frostbite_bow.tooltip": "使用寒冰精华锻造而成的弓。",
   "item.many_bows.frostbite_bow.tooltip.ability": "射出使敌人减速的冰霜箭，完全蓄力时能冻结敌人。",
