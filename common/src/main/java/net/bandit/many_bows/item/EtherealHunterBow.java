@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -42,6 +44,7 @@ public class EtherealHunterBow extends BowItem {
 
                 // Explicitly create and fire the vanilla arrow
                 Arrow arrow = new Arrow(level, player);
+                arrow.setBaseDamage(9.0);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 arrow.setCritArrow(charge >= 20);
 
@@ -100,7 +103,17 @@ public class EtherealHunterBow extends BowItem {
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
+    @Override
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
+        if (player.getAbilities().instabuild || player.getProjectile(stack).isEmpty() || this.getAllSupportedProjectiles().test(player.getProjectile(stack))) {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(stack);
+        } else {
+            return InteractionResultHolder.fail(stack);
+        }
+    }
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
         return stack -> true; // No arrows required

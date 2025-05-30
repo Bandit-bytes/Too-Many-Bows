@@ -8,6 +8,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BowItem;
@@ -66,6 +68,17 @@ public class RadianceBow extends BowItem {
         // Notify player if insufficient experience
         player.displayClientMessage(Component.translatable("item.many_bows.radiance.no_experience").withStyle(ChatFormatting.RED), true);
         return false;
+    }
+    @Override
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (player.getAbilities().instabuild || player.getProjectile(stack).isEmpty() || this.getAllSupportedProjectiles().test(player.getProjectile(stack))) {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(stack);
+        } else {
+            return InteractionResultHolder.fail(stack);
+        }
     }
 
     private void applyEnchantments(ItemStack stack, RadiantArrow arrow) {

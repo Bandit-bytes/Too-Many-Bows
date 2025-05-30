@@ -26,6 +26,7 @@ public class IronCladArrow extends AbstractArrow {
 
     public IronCladArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.IRONCLAD_ARROW.get(), shooter, level);
+        this.setBaseDamage(6.0);
     }
 
     @Override

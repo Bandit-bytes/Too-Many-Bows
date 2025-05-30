@@ -44,25 +44,29 @@ public class VitalityArrow extends AbstractArrow {
             LivingEntity shooter = this.getOwner() instanceof LivingEntity ? (LivingEntity) this.getOwner() : null;
 
             if (shooter != null) {
-                DamageSource damageSource = this.level().damageSources().arrow(this, shooter);
-                float damageDealt = (float) this.getBaseDamage();
-                boolean didDamage = target.hurt(damageSource, damageDealt);
+                DamageSource source = level().damageSources().arrow(this, shooter);
+                boolean didDamage = target.hurt(source, (float) this.getBaseDamage());
 
-                if (didDamage && damageDealt > 0) {
+                if (didDamage) {
                     if (onHitCallback != null) {
                         onHitCallback.accept(target);
                     }
 
-                    float healAmount = Math.min(damageDealt * 0.5F, target.getHealth());
-                    shooter.heal(healAmount);
-                    level().playSound(null, target.getX(), target.getY(), target.getZ(),
-                            SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    float maxHeal = (float) (this.getBaseDamage() * 0.5f);
+                    float actualHeal = Math.min(maxHeal, shooter.getMaxHealth() - shooter.getHealth());
+
+                    if (actualHeal > 0f) {
+                        shooter.heal(actualHeal);
+                        level().playSound(null, target.getX(), target.getY(), target.getZ(),
+                                SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.4F);
+                    }
                 }
             }
         }
 
         this.discard();
     }
+
 
     @Override
     protected ItemStack getPickupItem() {

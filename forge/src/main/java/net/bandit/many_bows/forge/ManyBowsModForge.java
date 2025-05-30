@@ -3,7 +3,6 @@ package net.bandit.many_bows.forge;
 import dev.architectury.platform.forge.EventBuses;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.ManyBowsMod;
-import net.bandit.many_bows.forge.loot.BowLootInjectorPlatformImpl;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,8 +25,6 @@ public class ManyBowsModForge {
         modEventBus.addListener(this::onClientSetup);
         ManyBowsMod.init();
 
-        // Register loot table handling on the Forge event bus
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.register(BowLootInjectorPlatformImpl.class);
     }
 
     private void onClientSetup(final FMLClientSetupEvent event) {

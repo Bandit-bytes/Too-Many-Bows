@@ -60,10 +60,8 @@ public class IcicleJavelinBow extends BowItem {
                     javelin.setSecondsOnFire(100);
                 }
 
-                // Set the pickup status based on Infinity or Creative mode
                 javelin.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
 
-                // Add the projectile to the world
                 level.addFreshEntity(javelin);
                 createIceParticles(level, player);
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
@@ -94,7 +92,6 @@ public class IcicleJavelinBow extends BowItem {
         if (Screen.hasShiftDown()) {
         tooltip.add(Component.translatable("item.many_bows.icicle_javelin_bow.tooltip").withStyle(ChatFormatting.AQUA));
         tooltip.add(Component.translatable("item.many_bows.icicle_javelin_bow.tooltip.ability").withStyle(ChatFormatting.DARK_AQUA));
-        tooltip.add(Component.translatable("item.many_bows.icicle_javelin_bow.tooltip.freeze").withStyle(ChatFormatting.BLUE));
     }else {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
         }

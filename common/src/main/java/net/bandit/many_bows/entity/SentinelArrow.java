@@ -27,6 +27,7 @@ public class SentinelArrow extends AbstractArrow {
 
     public SentinelArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.SENTINEL_ARROW.get(), shooter, level);
+        this.setBaseDamage(4.0);
     }
 
     @Override
@@ -34,31 +35,29 @@ public class SentinelArrow extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
+            float finalDamage = (float) this.getBaseDamage();
+            Entity owner = this.getOwner();
+
             if (isRaidMob(target)) {
-                float baseDamage = (float) this.getBaseDamage();
-                float extraDamage = baseDamage * (DAMAGE_MULTIPLIER - 1);
+                finalDamage *= DAMAGE_MULTIPLIER;
 
-
-                Entity owner = this.getOwner();
-                DamageSource damageSource = owner instanceof LivingEntity
-                        ? this.level().damageSources().arrow(this, owner)
-                        : this.level().damageSources().arrow(this, null);
-
-                target.hurt(damageSource, extraDamage);
-
-
-                this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 0.7F, 1.0F);
-
-
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 0.7F, 1.0F);
                 for (int i = 0; i < 10; i++) {
                     double xOffset = (this.random.nextDouble() - 0.5) * 0.2;
                     double yOffset = (this.random.nextDouble() - 0.5) * 0.2;
                     double zOffset = (this.random.nextDouble() - 0.5) * 0.2;
-                    this.level().addParticle(ParticleTypes.CRIT, this.getX() + xOffset, this.getY() + yOffset, this.getZ() + zOffset, 0.0, 0.0, 0.0);
+                    level().addParticle(ParticleTypes.CRIT, this.getX() + xOffset, this.getY() + yOffset, this.getZ() + zOffset, 0, 0, 0);
                 }
             }
+
+            DamageSource damageSource = (owner instanceof LivingEntity living)
+                    ? level().damageSources().arrow(this, living)
+                    : level().damageSources().arrow(this, null);
+
+            target.hurt(damageSource, finalDamage);
         }
     }
+
 
     @Override
     protected ItemStack getPickupItem() {

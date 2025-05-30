@@ -1,13 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "III",
+    "IIN",
     "IBI",
-    "III"
+    " II"
   ],
   "key": {
     "I": {
       "item": "minecraft:iron_ingot"
+    },
+    "N": {
+      "item": "minecraft:netherite_ingot"
     },
     "B": {
       "item": "minecraft:bow"

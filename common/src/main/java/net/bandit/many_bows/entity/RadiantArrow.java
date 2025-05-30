@@ -21,6 +21,7 @@ public class RadiantArrow extends AbstractArrow {
 
     public RadiantArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.RADIANT_ARROW.get(), shooter, level);
+        this.setBaseDamage(9);
     }
 
     @Override

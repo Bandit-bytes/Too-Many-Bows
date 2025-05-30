@@ -3,6 +3,9 @@ package net.bandit.many_bows;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.ClientInit;
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
+import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 
@@ -15,6 +18,8 @@ public final class ManyBowsMod {
         EntityRegistry.register();
         EffectRegistry.register();
         EnchantmentRegistry.register();
+        ModLootModifiers.registerLootModifiers();
+        ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
 
     }
 

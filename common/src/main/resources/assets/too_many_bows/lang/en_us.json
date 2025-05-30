@@ -58,7 +58,7 @@
 
   "item.too_many_bows.tidal_bow.tooltip": "The power of the ocean flows through this bow.",
   "item.too_many_bows.tidal_bow.tooltip.ability": "You are able to shoot arrows underwater as normal arrows.",
-  "item.too_many_bows.tidal_bow.tooltip.legend": "A bow that harnesses the ancient power of the seas.",
+  "item.too_many_bows.tidal_bow.tooltip.legend": "A bow that harnesses the ancient power of the seas, you get a 2.5 damage multi underwater.",
 
   "item.too_many_bows.cursed_flame_bow.tooltip": "A bow imbued with cursed flames, known to halt regeneration and burn with inextinguishable fury.",
   "item.too_many_bows.cursed_flame_bow.tooltip.ability": "Ignites foes with cursed fire: blocks all regen, can't be extinguished by water, and deals a heart of damage per tick.",

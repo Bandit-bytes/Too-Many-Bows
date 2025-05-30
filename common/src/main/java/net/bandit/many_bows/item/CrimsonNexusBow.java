@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -39,41 +41,51 @@ public class CrimsonNexusBow extends BowItem {
             float power = getPowerForTime(charge);
 
             if (power >= 0.1F) {
-                // Play custom sound
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-                // Calculate health cost
-                float healthCost = player.getHealth() <= 4.0F ? 0 : 2.0F; // Prevent killing the player
+                float healthCost = player.getHealth() <= 4.0F ? 0 : 2.0F;
                 player.hurt(player.damageSources().magic(), healthCost);
-
-                // Dynamically find arrow type
                 ItemStack arrowStack = player.getProjectile(stack);
-                ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+                ArrowItem arrowItem;
+
+                if (arrowStack.isEmpty() || !(arrowStack.getItem() instanceof ArrowItem)) {
+                    arrowItem = (ArrowItem) Items.ARROW;
+                    arrowStack = new ItemStack(Items.ARROW);
+                } else {
+                    arrowItem = (ArrowItem) arrowStack.getItem();
+                }
+
                 AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
 
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-                // Apply enchantments
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 applyEnchantments(stack, arrow);
 
-                // Special effects for full health
                 if (player.getHealth() == player.getMaxHealth()) {
                     arrow.setCritArrow(true);
                     arrow.setSecondsOnFire(200);
                 }
 
-                // Add arrow entity to the world
                 level.addFreshEntity(arrow);
 
-                // Damage the bow after firing
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-
-                // Update stats
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
+    @Override
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+
+        if (player.getAbilities().instabuild || player.getProjectile(stack).isEmpty() || this.getAllSupportedProjectiles().test(player.getProjectile(stack))) {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(stack);
+        } else {
+            return InteractionResultHolder.fail(stack);
+        }
+    }
+
 
     private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
@@ -103,20 +115,26 @@ public class CrimsonNexusBow extends BowItem {
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (entity instanceof Player player && selected && !level.isClientSide) {
-            // Apply life drain aura
-            if (level.getGameTime() % 20 == 0) {
-                AABB area = new AABB(player.getX() - 10, player.getY() - 10, player.getZ() - 10,
-                        player.getX() + 10, player.getY() + 10, player.getZ() + 10);
-                level.getEntities(player, area, e -> e instanceof LivingEntity && e != player)
-                        .forEach(target -> {
-                            if (target instanceof LivingEntity livingEntity) {
-                                livingEntity.hurt(player.damageSources().magic(), 1.0F);
-                                player.heal(0.5F); // Heal player slightly
-                            }
-                        });
+            if (level.getGameTime() % 20 == 0 && player.getHealth() < player.getMaxHealth()) {
+                AABB area = new AABB(player.getX() - 8, player.getY() - 4, player.getZ() - 8,
+                        player.getX() + 8, player.getY() + 4, player.getZ() + 8);
+
+                List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, area,
+                        e -> e != player && e.isAlive() && !(e instanceof Player));
+
+                if (!nearby.isEmpty()) {
+                    LivingEntity target = nearby.get(level.random.nextInt(nearby.size()));
+                    target.hurt(player.damageSources().magic(), 2.0F);
+                    player.heal(1.0F);
+
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 0.3F, 1.5F);
+
+                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
+                }
             }
         }
     }
+
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
@@ -141,7 +159,6 @@ public class CrimsonNexusBow extends BowItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-            // Detailed information when holding Shift
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.info").withStyle(ChatFormatting.DARK_RED));
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.health_cost", "2.0").withStyle(ChatFormatting.RED));
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.legend").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));

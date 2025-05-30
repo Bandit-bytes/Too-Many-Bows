@@ -57,11 +57,17 @@ public class TidalArrow extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
+            float baseDamage = (float) this.getBaseDamage();
+            float finalDamage = this.isInWater() ? baseDamage * 2.5f : baseDamage;
+
+            hitEntity.hurt(this.damageSources().arrow(this, this.getOwner()), finalDamage);
             hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 2));
             createWaterBindingEffect(hitEntity);
         }
     }
+
 
     private void createWaterBindingEffect(LivingEntity entity) {
         if (entity.level() instanceof ServerLevel serverLevel) {
