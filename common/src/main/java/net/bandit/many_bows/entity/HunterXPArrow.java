@@ -30,7 +30,7 @@ public class HunterXPArrow extends AbstractArrow {
             String id = target.getType().builtInRegistryHolder().key().location().toString();
             BowLootConfig config = ManyBowsConfigHolder.CONFIG;
 
-            if (!config.emeraldSageXpBlacklist.contains(id)) {
+            if (!config.emeraldSageCrimsonNexusBlacklist.contains(id)) {
                 spawnExperienceOrb(target, config.emeraldSageXpAmount);
             }
         }

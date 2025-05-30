@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -28,6 +30,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static net.bandit.many_bows.config.ManyBowsConfigHolder.CONFIG;
+
 public class CrimsonNexusBow extends BowItem {
 
     public CrimsonNexusBow(Properties properties) {
@@ -41,7 +45,8 @@ public class CrimsonNexusBow extends BowItem {
             float power = getPowerForTime(charge);
 
             if (power >= 0.1F) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
                 float healthCost = player.getHealth() <= 4.0F ? 0 : 2.0F;
                 player.hurt(player.damageSources().magic(), healthCost);
@@ -56,7 +61,7 @@ public class CrimsonNexusBow extends BowItem {
                 }
 
                 AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
-
+                arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
 
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 applyEnchantments(stack, arrow);
@@ -71,9 +76,9 @@ public class CrimsonNexusBow extends BowItem {
                 stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
-            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
+
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
@@ -122,19 +127,26 @@ public class CrimsonNexusBow extends BowItem {
                 List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, area,
                         e -> e != player && e.isAlive() && !(e instanceof Player));
 
+                BowLootConfig config = ManyBowsConfigHolder.CONFIG;
+
+                nearby.removeIf(target -> {
+                    String id = target.getType().builtInRegistryHolder().key().location().toString();
+                    return config.emeraldSageCrimsonNexusBlacklist.contains(id);
+                });
+
                 if (!nearby.isEmpty()) {
                     LivingEntity target = nearby.get(level.random.nextInt(nearby.size()));
                     target.hurt(player.damageSources().magic(), 2.0F);
                     player.heal(1.0F);
 
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 0.3F, 1.5F);
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 0.3F, 1.5F);
 
                     stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
                 }
             }
         }
     }
-
 
     @Override
     public boolean isEnchantable(ItemStack stack) {

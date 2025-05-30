@@ -29,11 +29,13 @@ public class BowLootConfig {
 //    public float globalBowPullSpeed = 16.0F;
 
     public int emeraldSageXpAmount = 10;
-    public List<String> emeraldSageXpBlacklist = List.of(
+
+    public List<String> emeraldSageCrimsonNexusBlacklist = List.of(
             "minecraft:armor_stand",
             "minecraft:wandering_trader",
             "dummmmmmy:target_dummy"
     );
+
 
 
     public static BowLootConfig loadConfig() {
