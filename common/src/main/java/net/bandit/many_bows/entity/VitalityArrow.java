@@ -29,9 +29,6 @@ public class VitalityArrow extends AbstractArrow {
         super(EntityRegistry.VITALITY_ARROW.get(), shooter, level);
     }
 
-    /**
-     * Sets a callback to be executed when the arrow hits a living entity.
-     */
     public void setOnHitCallback(Consumer<LivingEntity> callback) {
         this.onHitCallback = callback;
     }
@@ -44,22 +41,17 @@ public class VitalityArrow extends AbstractArrow {
             LivingEntity shooter = this.getOwner() instanceof LivingEntity ? (LivingEntity) this.getOwner() : null;
 
             if (shooter != null) {
-                DamageSource source = level().damageSources().arrow(this, shooter);
-                boolean didDamage = target.hurt(source, (float) this.getBaseDamage());
+                if (onHitCallback != null) {
+                    onHitCallback.accept(target);
+                }
 
-                if (didDamage) {
-                    if (onHitCallback != null) {
-                        onHitCallback.accept(target);
-                    }
+                float maxHeal = (float) (this.getBaseDamage() * 0.5f);
+                float actualHeal = Math.min(maxHeal, shooter.getMaxHealth() - shooter.getHealth());
 
-                    float maxHeal = (float) (this.getBaseDamage() * 0.5f);
-                    float actualHeal = Math.min(maxHeal, shooter.getMaxHealth() - shooter.getHealth());
-
-                    if (actualHeal > 0f) {
-                        shooter.heal(actualHeal);
-                        level().playSound(null, target.getX(), target.getY(), target.getZ(),
-                                SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.4F);
-                    }
+                if (actualHeal > 0f) {
+                    shooter.heal(actualHeal);
+                    level().playSound(null, target.getX(), target.getY(), target.getZ(),
+                            SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 0.8F, 1.4F);
                 }
             }
         }
