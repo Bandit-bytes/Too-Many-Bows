@@ -3,6 +3,8 @@ package net.bandit.many_bows.forge;
 import dev.architectury.platform.forge.EventBuses;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +22,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class ManyBowsModForge {
 
     public ManyBowsModForge() {
+        ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         EventBuses.registerModEventBus(ManyBowsMod.MOD_ID, modEventBus);
         modEventBus.addListener(this::onClientSetup);

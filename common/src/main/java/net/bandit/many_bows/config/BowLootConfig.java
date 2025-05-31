@@ -26,8 +26,6 @@ public class BowLootConfig {
     public boolean endgameLootEnabled = true;
     public float endgameLootDropChance = 0.2F;
 
-//    public float globalBowPullSpeed = 16.0F;
-
     public int emeraldSageXpAmount = 10;
 
     public List<String> emeraldSageCrimsonNexusBlacklist = List.of(
@@ -35,7 +33,6 @@ public class BowLootConfig {
             "minecraft:wandering_trader",
             "dummmmmmy:target_dummy"
     );
-
 
 
     public static BowLootConfig loadConfig() {

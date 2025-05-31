@@ -19,7 +19,6 @@ public final class ManyBowsMod {
         EffectRegistry.register();
         EnchantmentRegistry.register();
         ModLootModifiers.registerLootModifiers();
-        ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
 
     }
 
