@@ -3,6 +3,7 @@ package net.bandit.many_bows.entity;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -15,7 +16,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class DuskReaperArrow extends AbstractArrow {
+    private float powerMultiplier = 1.0F;
 
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
+    }
     private static final float BASE_DAMAGE = 8.0f;
     private static final int SLOWNESS_DURATION = 60;
     private static final int WEAKNESS_DURATION = 60;
@@ -40,13 +45,30 @@ public class DuskReaperArrow extends AbstractArrow {
             if (target == this.getOwner()) {
                 return;
             }
+            Level level = target.level();
+            float scaledDamage = (float) this.getBaseDamage();
 
-            // Apply effects
-            target.hurt(this.damageSources().magic(), (float) this.getBaseDamage());
+            if (this.getOwner() instanceof LivingEntity shooter) {
+                var registry = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
+                var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+                if (rangedAttrHolder != null) {
+                    var attrInstance = shooter.getAttribute(rangedAttrHolder);
+                    if (attrInstance != null) {
+                        scaledDamage = (float) attrInstance.getValue() * 2F; // AoE hit scaling
+                    } else {
+                        scaledDamage = (float) this.getBaseDamage();
+                    }
+                } else {
+                    scaledDamage = (float) this.getBaseDamage();
+                }
+            } else {
+                scaledDamage = (float) this.getBaseDamage();
+            }
+            target.hurt(this.damageSources().magic(), scaledDamage * this.powerMultiplier);
             target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, SLOWNESS_DURATION, 1));
             target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, WEAKNESS_DURATION, 1));
             target.addEffect(new MobEffectInstance(MobEffects.GLOWING, GLOW_DURATION, 0));
-            target.addEffect(new MobEffectInstance(MobEffects.HARM, HARM_DURATION, 0));
 
             // Mark the target for death
             target.setCustomName(Component.literal("Marked for Death"));

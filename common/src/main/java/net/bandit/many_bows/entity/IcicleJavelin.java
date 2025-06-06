@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,32 +30,40 @@ public class IcicleJavelin extends AbstractArrow {
 
     public IcicleJavelin(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.ICICLE_JAVELIN.get(), shooter, level, bowStack, arrowStack);
-        this.setBaseDamage(5.0);
+        this.setBaseDamage(8.0);
     }
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
-        // Check if the hit entity is a LivingEntity
-        if (result.getEntity() instanceof LivingEntity target) {
-            // Safely create damage source only if the owner is a Player
-            if (this.getOwner() instanceof Player player) {
-                DamageSource damageSource = level().damageSources().playerAttack(player);
-                target.hurt(damageSource, 8.0f);
-                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4)); // Apply slowness effect
+        if (!(result.getEntity() instanceof LivingEntity target)) return;
+
+        float scaledDamage = (float) this.getBaseDamage();
+
+        if (this.getOwner() instanceof LivingEntity shooter) {
+            var registry = level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
+            var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+            if (rangedAttrHolder != null) {
+                var attrInstance = shooter.getAttribute(rangedAttrHolder);
+                if (attrInstance != null) {
+                    scaledDamage = (float) attrInstance.getValue() * 1.5F; // Example divisor, tweak as needed
+                }
             }
         }
 
-        // Freeze area and create explosion effects
+        target.hurt(this.damageSources().magic(), scaledDamage);
+        target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 4));
+
         freezeAreaAround(this.getX(), this.getY(), this.getZ());
         createIceExplosion();
 
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                 SoundEvents.SNOW_STEP, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-
         this.discard();
     }
+
 
     @Override
     public void tick() {

@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.entity.AncientSageArrow;
 import net.bandit.many_bows.entity.FlameArrow;
 import net.bandit.many_bows.entity.FlameArrow;
+import net.bandit.many_bows.entity.HunterXPArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -10,6 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,6 +20,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -57,6 +61,21 @@ public class FlameBow extends BowItem {
                                 arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                             } else {
                                 arrow = new FlameArrow(serverLevel, player, bowStack, projectileStack);
+                                if (arrow instanceof FlameArrow flameArrow) {
+                                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                                            .registryOrThrow(Registries.ATTRIBUTE)
+                                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                            .orElse(null);
+
+                                    if (rangedDamageAttr != null) {
+                                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                                        if (attrInstance != null) {
+                                            float damage = (float) attrInstance.getValue();
+                                            flameArrow.setBaseDamage(damage / 2.5);
+                                        }
+                                    }
+                                    flameArrow.setPowerMultiplier(power);
+                                }
                             }
 
                             applyPowerEnchantment(arrow, bowStack, level);

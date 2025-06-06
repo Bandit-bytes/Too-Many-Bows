@@ -9,6 +9,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -57,6 +58,22 @@ public class CursedFlameBow extends BowItem {
                                 arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                             } else {
                                 arrow = new CursedFlameArrow(serverLevel, player, bowStack, projectileStack);
+                                if (arrow instanceof CursedFlameArrow cursedArrow) {
+                                    Holder<net.minecraft.world.entity.ai.attributes.Attribute> rangedDamageAttr = level.registryAccess()
+                                            .registryOrThrow(Registries.ATTRIBUTE)
+                                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                            .orElse(null);
+
+                                    if (rangedDamageAttr != null) {
+                                        var attrInstance = player.getAttribute(rangedDamageAttr);
+                                        if (attrInstance != null) {
+                                            float damage = (float) attrInstance.getValue();
+                                            cursedArrow.setBaseDamage(damage / 2.5F);
+                                        }
+                                    }
+                                    cursedArrow.setPowerMultiplier(power);
+                                }
+
                             }
 
                             applyPowerEnchantment(arrow, bowStack, level);

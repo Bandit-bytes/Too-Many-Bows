@@ -10,7 +10,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class EtherealArrow  extends AbstractArrow {
-
+//Need fixing
 
     public EtherealArrow(EntityType<? extends EtherealArrow> entityType, Level level) {
         super(entityType, level);

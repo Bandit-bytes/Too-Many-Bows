@@ -1,5 +1,6 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.entity.FrostbiteArrow;
 import net.bandit.many_bows.entity.RadiantArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -8,12 +9,15 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
@@ -46,7 +50,21 @@ public class RadianceBow extends BowItem {
 
             if (power >= 0.1F && hasXP) {
                 RadiantArrow arrow = new RadiantArrow(level, player, bowStack, new ItemStack(Items.ARROW));
+                if (arrow instanceof RadiantArrow radiantArrow) {
+                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                            .registryOrThrow(Registries.ATTRIBUTE)
+                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                            .orElse(null);
 
+                    if (rangedDamageAttr != null) {
+                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                        if (attrInstance != null) {
+                            float damage = (float) attrInstance.getValue();
+                            radiantArrow.setBaseDamage(damage / 2);
+                        }
+                    }
+                    radiantArrow.setPowerMultiplier(power);
+                }
                 // ✅ Apply Enchantments
                 applyPowerEnchantment(arrow, bowStack, level);
                 applyKnockbackEnchantment(arrow, bowStack, player, level);

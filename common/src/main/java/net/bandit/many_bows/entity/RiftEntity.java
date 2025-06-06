@@ -3,11 +3,13 @@ package net.bandit.many_bows.entity;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -126,18 +128,33 @@ public void tick() {
     private void explode() {
         level().playSound(null, getX(), getY(), getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-        // Damage entities directly, with owner credited
+        float baseDamage = 8.0f;
+
+        // Scale damage based on ranged_weapon:damage
+        if (owner instanceof LivingEntity livingOwner) {
+            var registry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+            var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+            if (rangedAttrHolder != null) {
+                var attrInstance = livingOwner.getAttribute(rangedAttrHolder);
+                if (attrInstance != null) {
+                    baseDamage = (float) attrInstance.getValue() * 1.5F; // Or scale it further if needed
+                }
+            }
+        }
+
+        // AABB around explosion
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class,
                 new AABB(getX() - EXPLOSION_RADIUS, getY() - EXPLOSION_RADIUS, getZ() - EXPLOSION_RADIUS,
                         getX() + EXPLOSION_RADIUS, getY() + EXPLOSION_RADIUS, getZ() + EXPLOSION_RADIUS),
-                e -> e.isAlive() && !(e instanceof Player && ((Player)e).getAbilities().instabuild));
+                e -> e.isAlive() && !(e instanceof Player p && p.getAbilities().instabuild));
 
         for (LivingEntity target : entities) {
-            float damage = 8.0f;
             var source = level().damageSources().mobAttack(owner);
-            target.hurt(source, damage);
+            target.hurt(source, baseDamage);
         }
     }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
 

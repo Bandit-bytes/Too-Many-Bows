@@ -3,6 +3,8 @@ package net.bandit.many_bows.entity;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffects;
@@ -17,7 +19,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class CursedFlameArrow extends AbstractArrow {
+    private float powerMultiplier = 1.0F;
 
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
+    }
     private int particleTimer = 0;
     private static final int MAX_PARTICLE_DURATION = 100;
 
@@ -54,24 +60,41 @@ public class CursedFlameArrow extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
+            // Set fire duration
             hitEntity.setRemainingFireTicks(200); // 10 seconds of fire
 
-            // Increase fire damage if needed (Soul Fire burns hotter)
-            hitEntity.hurt(hitEntity.damageSources().onFire(), 4.0F); // Adjust damage as needed
+            // Default base fire damage
+            float fireDamage = 4.0F;
 
-            // Remove any regeneration effects to prevent healing
-            if (hitEntity.hasEffect(MobEffects.REGENERATION)) {
-                hitEntity.removeEffect(MobEffects.REGENERATION);
+            // Check if the shooter is a living entity and get their ranged_weapon:damage
+            if (this.getOwner() instanceof LivingEntity shooter) {
+                var registry = this.level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+                var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+                if (rangedAttrHolder != null) {
+                    var attrInstance = shooter.getAttribute(rangedAttrHolder);
+                    if (attrInstance != null) {
+                        // You can adjust the scaling as needed
+                        fireDamage = (float) attrInstance.getValue() / 1.5F; // Example: 100 damage → 20 fire
+                    }
+                }
             }
 
-            if (hitEntity.hasEffect(MobEffects.HEAL)) {
-                hitEntity.removeEffect(MobEffects.HEAL);
-            }
+            // Apply fire damage
+            hitEntity.hurt(hitEntity.damageSources().onFire(), fireDamage * this.powerMultiplier);
 
+
+            // Cancel healing effects
+            hitEntity.removeEffect(MobEffects.REGENERATION);
+            hitEntity.removeEffect(MobEffects.HEAL);
+
+            // Visual effect
             createCursedSoulFireParticles(hitEntity.position());
         }
     }
+
 
     @Override
     protected void onHitBlock(BlockHitResult result) {

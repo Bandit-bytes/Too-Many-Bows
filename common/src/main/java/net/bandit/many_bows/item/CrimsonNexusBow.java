@@ -3,7 +3,10 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -12,6 +15,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -21,30 +25,52 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
 
 public class CrimsonNexusBow extends BowItem {
-
+    private final WeakHashMap<Player, Long> activeLifeDrain = new WeakHashMap<>();
     public CrimsonNexusBow(Properties properties) {
         super(properties);
     }
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && selected && !level.isClientSide) {
-            // Apply life drain aura
-            if (level.getGameTime() % 20 == 0) {
-                AABB area = new AABB(player.getX() - 10, player.getY() - 10, player.getZ() - 10,
-                        player.getX() + 10, player.getY() + 10, player.getZ() + 10);
-                level.getEntities(player, area, e -> e instanceof LivingEntity && e != player)
-                        .forEach(target -> {
-                            if (target instanceof LivingEntity livingEntity) {
-                                livingEntity.hurt(player.damageSources().magic(), 1.0F);
-                                player.heal(0.5F); // Heal player slightly
-                            }
-                        });
+        if (!(entity instanceof Player player) || !selected || level.isClientSide) return;
+
+        Long lastUsedTime = activeLifeDrain.get(player);
+        if (lastUsedTime == null || level.getGameTime() - lastUsedTime > 60) return; // Only for 3 seconds (60 ticks)
+
+        if (level.getGameTime() % 20 == 0) { // Run once per second
+            float damage; // Default
+
+            // Scale based on ranged_weapon:damage / 4
+            var registry = level.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+            var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+            if (rangedAttrHolder != null) {
+                var attrInstance = player.getAttribute(rangedAttrHolder);
+                if (attrInstance != null) {
+                    damage = (float) attrInstance.getValue() / 4.0F;
+                } else {
+                    damage = 1.0F;
+                }
+            } else {
+                damage = 1.0F;
             }
+
+            AABB area = new AABB(player.getX() - 10, player.getY() - 10, player.getZ() - 10,
+                    player.getX() + 10, player.getY() + 10, player.getZ() + 10);
+
+            level.getEntities(player, area, e -> e instanceof LivingEntity && e != player)
+                    .forEach(target -> {
+                        if (target instanceof LivingEntity livingEntity) {
+                            livingEntity.hurt(player.damageSources().magic(), damage);
+                            player.heal(0.25F);
+                        }
+                    });
         }
     }
+
 
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
@@ -71,8 +97,25 @@ public class CrimsonNexusBow extends BowItem {
 
 
                 // Fire the arrow
-                arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
+                Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                        .registryOrThrow(Registries.ATTRIBUTE)
+                        .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                        .orElse(null);
+
+                if (rangedDamageAttr != null) {
+                    var attrInstance = player.getAttribute(rangedDamageAttr);
+                    if (attrInstance != null) {
+                        float damage = (float) attrInstance.getValue();
+                        arrow.setBaseDamage(damage / 2.5F);
+                    } else {
+                        arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
+                    }
+                } else {
+                    arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
+                }
+
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+                activeLifeDrain.put(player, level.getGameTime());
 
                 // Special effect when at full health
                 if (player.getHealth() == player.getMaxHealth()) {
