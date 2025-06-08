@@ -62,10 +62,8 @@ public class CursedFlameArrow extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
-            // Set fire duration
-            hitEntity.setRemainingFireTicks(200); // 10 seconds of fire
+            hitEntity.setRemainingFireTicks(200);
 
-            // Default base fire damage
             float fireDamage = 4.0F;
 
             // Check if the shooter is a living entity and get their ranged_weapon:damage
@@ -76,21 +74,17 @@ public class CursedFlameArrow extends AbstractArrow {
                 if (rangedAttrHolder != null) {
                     var attrInstance = shooter.getAttribute(rangedAttrHolder);
                     if (attrInstance != null) {
-                        // You can adjust the scaling as needed
-                        fireDamage = (float) attrInstance.getValue() / 1.5F; // Example: 100 damage → 20 fire
+                        fireDamage = (float) attrInstance.getValue() / 1.5F;
                     }
                 }
             }
 
-            // Apply fire damage
             hitEntity.hurt(hitEntity.damageSources().onFire(), fireDamage * this.powerMultiplier);
 
 
-            // Cancel healing effects
             hitEntity.removeEffect(MobEffects.REGENERATION);
             hitEntity.removeEffect(MobEffects.HEAL);
 
-            // Visual effect
             createCursedSoulFireParticles(hitEntity.position());
         }
     }

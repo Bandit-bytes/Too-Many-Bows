@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.EtherealArrow;
-import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -9,6 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,6 +17,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
@@ -24,14 +26,12 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
 
 public class EtherealHunterBow extends BowItem {
-    // Need fixing
-    private static final int HUNGER_COST = 2;
+    private static final int HUNGER_COST = 1;
 
     public EtherealHunterBow(Properties properties) {
         super(properties);
@@ -55,8 +55,22 @@ public class EtherealHunterBow extends BowItem {
 
                         if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
                             arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
-                        } else {
+                        }  else {
                             arrow = new EtherealArrow(serverLevel, player, bowStack, projectileStack);
+                            if (arrow instanceof EtherealArrow etherealArrow) {
+                                Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                                        .registryOrThrow(Registries.ATTRIBUTE)
+                                        .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                        .orElse(null);
+
+                                if (rangedDamageAttr != null) {
+                                    AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                                    if (attrInstance != null) {
+                                        float damage = (float) attrInstance.getValue();
+                                        etherealArrow.setBaseDamage(damage / 1.5);
+                                    }
+                                }
+                            }
                         }
 
                         applyPowerEnchantment(arrow, bowStack, level);
