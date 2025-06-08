@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.LightOrbEntity;
+import net.bandit.many_bows.entity.TidalArrow;
 import net.bandit.many_bows.entity.TorchbearerArrow;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
@@ -10,6 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,6 +21,8 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -76,6 +80,20 @@ public class TorchbearerBow extends BowItem {
                                 arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                             } else {
                                 arrow = new TorchbearerArrow(serverLevel, player, bowStack, projectileStack);
+                                if (arrow instanceof TorchbearerArrow torchbearerArrow) {
+                                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                                            .registryOrThrow(Registries.ATTRIBUTE)
+                                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                            .orElse(null);
+
+                                    if (rangedDamageAttr != null) {
+                                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                                        if (attrInstance != null) {
+                                            float damage = (float) attrInstance.getValue();
+                                            torchbearerArrow.setBaseDamage(damage / 2.5);
+                                        }
+                                    }
+                                }
                             }
 
                             applyPowerEnchantment(arrow, bowStack, level);

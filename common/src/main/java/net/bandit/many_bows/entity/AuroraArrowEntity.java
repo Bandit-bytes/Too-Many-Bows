@@ -40,7 +40,7 @@ public class AuroraArrowEntity extends AbstractArrow {
         }
         this.discard();
     }
-
+    //Scaled Entity's damage
     private void spawnRift(BlockPos position) {
         if (this.getOwner() instanceof LivingEntity owner) {
             RiftEntity rift = new RiftEntity(this.level(), owner, position);

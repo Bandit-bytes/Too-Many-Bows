@@ -6,12 +6,15 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -45,37 +48,44 @@ public class ScatterBow extends BowItem {
 
                 int arrowsAvailable = player.getAbilities().instabuild ? MAX_ARROWS : Math.min(MAX_ARROWS, getArrowCount(player));
 
-                if (power >= 0.1F && arrowsAvailable > 0) {
-                    for (int i = 0; i < arrowsAvailable; i++) {
-                        Arrow arrow = EntityType.ARROW.create(level);
-                        if (arrow != null) {
-                            arrow.setOwner(player);
-                            arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
-                            arrow.setBaseDamage(1.0);
+                for (int i = 0; i < arrowsAvailable; i++) {
+                    Arrow arrow = EntityType.ARROW.create(level);
+                    if (arrow == null) continue;
 
-                            applyPowerEnchantment(arrow, bowStack, level);
-                            applyKnockbackEnchantment(arrow, bowStack, player, level);
-                            applyFlameEnchantment(arrow, bowStack, level);
+                    arrow.setOwner(player);
+                    arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
 
-                            arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+                    // ✅ Scale damage from ranged_weapon:damage
+                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                            .registryOrThrow(Registries.ATTRIBUTE)
+                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                            .orElse(null);
 
-                            float yawOffset = (level.getRandom().nextFloat() - 0.5F) * 20F;
-                            float pitchOffset = (level.getRandom().nextFloat() - 0.5F) * 10F;
-                            arrow.shootFromRotation(player, player.getXRot() + pitchOffset, player.getYRot() + yawOffset, 0.0F, power * 3.0F, 1.0F);
-
-                            level.addFreshEntity(arrow);
+                    if (rangedDamageAttr != null) {
+                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                        if (attrInstance != null) {
+                            float damage = (float) attrInstance.getValue();
+                            arrow.setBaseDamage(damage / 11);
+                        } else {
+                            arrow.setBaseDamage(2.0); // Default fallback
                         }
+                    } else {
+                        arrow.setBaseDamage(2.0); // Default fallback
                     }
 
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                    player.awardStat(Stats.ITEM_USED.get(this));
+                    applyPowerEnchantment(arrow, bowStack, level);
+                    applyKnockbackEnchantment(arrow, bowStack, player, level);
+                    applyFlameEnchantment(arrow, bowStack, level);
 
-                    if (!hasInfinity && !player.getAbilities().instabuild) {
-                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
-                        removeArrowsFromInventory(player, arrowsAvailable);
-                    }
+                    arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+
+                    float yawOffset = (level.getRandom().nextFloat() - 0.5F) * 20F;
+                    float pitchOffset = (level.getRandom().nextFloat() - 0.5F) * 10F;
+                    arrow.shootFromRotation(player, player.getXRot() + pitchOffset, player.getYRot() + yawOffset, 0.0F, power * 3.0F, 1.0F);
+
+                    level.addFreshEntity(arrow);
                 }
+
             }
         }
     }

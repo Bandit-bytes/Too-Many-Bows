@@ -2,9 +2,11 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -22,7 +24,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class FlameArrow extends AbstractArrow {
+    private float powerMultiplier = 1.0F;
 
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
+    }
     private boolean hasHit = false;
     private int hitTimer = 0;
     private final int maxHitDuration = 40;
@@ -85,10 +91,24 @@ public class FlameArrow extends AbstractArrow {
     private void createFireExplosion(Vec3 position, @Nullable LivingEntity entityHit) {
         int radius = 5;
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
+        float fireDamage = 2.0F;
+        if (this.getOwner() instanceof LivingEntity shooter) {
+            var registry = this.level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+            var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
 
+            if (rangedAttrHolder != null) {
+                var attrInstance = shooter.getAttribute(rangedAttrHolder);
+                if (attrInstance != null) {
+                    // You can adjust the scaling as needed
+                    fireDamage = (float) attrInstance.getValue() / 3F;
+                }
+            }
+        }
         for (LivingEntity entity : entities) {
             if (entity != this.getOwner() && entity != entityHit) {
                 entity.setRemainingFireTicks(80);
+                entity.hurt(entity.damageSources().onFire(), fireDamage * this.powerMultiplier);
+
             }
         }
 

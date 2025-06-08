@@ -15,7 +15,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class SonicBoomProjectile extends AbstractArrow {
+    private float powerMultiplier = 1.0F;
 
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
+    }
     private int lifetime = 60;
     private int tickCount = 0;
 
@@ -33,7 +37,23 @@ public class SonicBoomProjectile extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            target.hurt(damageSources().sonicBoom(this), 20.0F); // Adjusted damage
+            LivingEntity shooter = this.getOwner() instanceof LivingEntity le ? le : null;
+            float scaledDamage = 20.0F; // fallback value
+
+            if (shooter != null) {
+                var registry = level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
+                var rangedAttrHolder = registry.getHolder(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+                if (rangedAttrHolder != null) {
+                    var attrInstance = shooter.getAttribute(rangedAttrHolder);
+                    if (attrInstance != null) {
+                        scaledDamage = (float) attrInstance.getValue() * 1.5F + 12;
+                    }
+                }
+            }
+
+            float finalDamage = scaledDamage * this.powerMultiplier;
+            target.hurt(damageSources().sonicBoom(this), finalDamage);
             target.knockback(2.0F, Math.sin(this.getYRot() * Math.PI / 180.0F), -Math.cos(this.getYRot() * Math.PI / 180.0F));
             level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);
             this.discard(); // Remove after hitting an entity

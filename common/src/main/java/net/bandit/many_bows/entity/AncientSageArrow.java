@@ -2,17 +2,26 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.util.AncientSageDamageSource;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
-
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 public class AncientSageArrow extends AbstractArrow {
+    private float powerMultiplier = 1.0F;
 
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
+    }
     private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.33f;
     private static final int PARTICLE_LIFESPAN = 60;
     private float armorPenetration = DEFAULT_ARMOR_PENETRATION_FACTOR;
@@ -36,12 +45,32 @@ public class AncientSageArrow extends AbstractArrow {
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             float baseDamage = (float) this.getBaseDamage();
-            float armorReducedDamage = baseDamage * (1 - armorPenetration);
+
+            if (this.getOwner() instanceof Player player) {
+                Holder<Attribute> rangedDamageAttr = this.level().registryAccess()
+                        .registryOrThrow(Registries.ATTRIBUTE)
+                        .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                        .orElse(null);
+
+                if (rangedDamageAttr != null) {
+                    AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                    if (attrInstance != null) {
+                        armorPenetration = (float) (attrInstance.getValue() / 14.5F);
+                    }
+                }
+            }
+
+            // Clamp to [0, 1] just in case
+            armorPenetration = Math.min(Math.max(armorPenetration, 0F), 1F);
+
+            float armorReducedDamage = baseDamage * armorPenetration * this.powerMultiplier;
             target.hurt(AncientSageDamageSource.create(this.level(), this, this.getOwner()), armorReducedDamage);
             createHitParticles();
         }
+
         this.discard();
     }
+
 
 
     @Override

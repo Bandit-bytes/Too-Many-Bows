@@ -2,6 +2,7 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
@@ -14,7 +15,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class SolarArrow extends AbstractArrow {
+    private float powerMultiplier = 1.0F;
 
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
+    }
     private boolean tornadoActive = false;
     private int tornadoTick = 0;
     private Vec3 tornadoOrigin = null;
@@ -36,12 +41,30 @@ public class SolarArrow extends AbstractArrow {
         if (tornadoActive && tornadoOrigin != null) {
             this.setPos(tornadoOrigin.x, tornadoOrigin.y, tornadoOrigin.z);
             spawnRagingTornado((ServerLevel) level(), tornadoOrigin, tornadoTick);
+            LivingEntity shooter = this.getOwner() instanceof LivingEntity le ? le : null;
+            float scaledDamage = 4.0F; // default fallback
+
+            if (shooter != null) {
+                var registry = level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
+                var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+
+                if (rangedAttrHolder != null) {
+                    var attrInstance = shooter.getAttribute(rangedAttrHolder);
+                    if (attrInstance != null) {
+                        scaledDamage = (float) attrInstance.getValue() / 1.5f;
+                    }
+                }
+            }
+
+            final float finalDamage = scaledDamage * this.powerMultiplier;
+
             level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(3.5)).forEach(entity -> {
-                if (entity != this.getOwner()) {
+                if (entity != shooter && (shooter == null || !entity.isAlliedTo(shooter))) {
                     entity.setRemainingFireTicks(40);
-                    entity.hurt(level().damageSources().magic(), 4.0F);
+                    entity.hurt(level().damageSources().magic(), finalDamage);
                 }
             });
+
             tornadoTick++;
             if (tornadoTick > 100) {
                 this.discard();

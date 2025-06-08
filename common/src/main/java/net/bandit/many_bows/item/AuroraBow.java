@@ -8,12 +8,15 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
@@ -54,6 +57,21 @@ public class AuroraBow extends BowItem {
                                     arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                                 } else {
                                     arrow = new AuroraArrowEntity(serverLevel, player, bowStack, projectileStack);
+                                    if (arrow instanceof AuroraArrowEntity auroraArrow) {
+                                        Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                                                .registryOrThrow(Registries.ATTRIBUTE)
+                                                .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                                .orElse(null);
+
+                                        if (rangedDamageAttr != null) {
+                                            AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                                            if (attrInstance != null) {
+                                                float damage = (float) attrInstance.getValue();
+                                                auroraArrow.setBaseDamage(damage / 1.5F);
+                                            }
+                                        }
+                                    }
+
                                 }
                                 applyPowerEnchantment(arrow, bowStack, level);
                                 applyKnockbackEnchantment(arrow, bowStack, player, level);

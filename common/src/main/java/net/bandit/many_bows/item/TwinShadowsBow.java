@@ -4,6 +4,7 @@ import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -58,28 +59,38 @@ public class TwinShadowsBow extends BowItem {
     private void fireTwinArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power) {
         if (projectileStacks.isEmpty()) return;
 
-        ItemStack projectileStack = projectileStacks.get(0); // Get the first available projectile
+        ItemStack projectileStack = projectileStacks.get(0);
         ArrowItem arrowItem = (ArrowItem) (projectileStack.getItem() instanceof ArrowItem ? projectileStack.getItem() : Items.ARROW);
 
-        // Fire the first (Light) arrow
+        // Get ranged attribute value
+        float rangedDamage = 6.0f; // fallback
+        var registry = serverLevel.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
+        var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+        if (rangedAttrHolder != null) {
+            var attrInstance = player.getAttribute(rangedAttrHolder);
+            if (attrInstance != null) {
+                rangedDamage = (float) attrInstance.getValue();
+            }
+        }
+
+        // ---------- Light Arrow ----------
         AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
-        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
-        lightArrow.setBaseDamage(6.0);
-        lightArrow.addTag("light");
+        lightArrow.setBaseDamage((rangedDamage / 3.0f));
         lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
+        lightArrow.addTag("light");
         lightArrow.pickup = AbstractArrow.Pickup.ALLOWED;
+        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
         serverLevel.addFreshEntity(lightArrow);
 
-        // Fire the second (Dark) arrow
+        // ---------- Dark Arrow ----------
         AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
-        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, power * 2.5F, 1.0F);
-        darkArrow.setBaseDamage(8.0);
-        darkArrow.addTag("dark");
+        darkArrow.setBaseDamage((rangedDamage / 2.0f));
         darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
+        darkArrow.addTag("dark");
         darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, power * 2.5F, 1.0F);
         serverLevel.addFreshEntity(darkArrow);
 
-        // Consume only 1 arrow from inventory
         if (!player.getAbilities().instabuild) {
             projectileStack.shrink(1);
             if (projectileStack.isEmpty()) {
@@ -87,6 +98,7 @@ public class TwinShadowsBow extends BowItem {
             }
         }
     }
+
 
     public static float getPowerForTime(int pCharge) {
         float f = (float) pCharge / 16.0F;

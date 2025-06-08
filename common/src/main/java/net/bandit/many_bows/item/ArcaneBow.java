@@ -3,7 +3,10 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -12,11 +15,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -67,15 +71,32 @@ public class ArcaneBow extends BowItem {
         ItemStack projectileStack = projectileStacks.get(0);
         boolean arrowConsumed = false;
 
-        for (int i = -1; i <= 1; i++) { // Fires 3 arrows (-1, 0, 1)
+        for (int i = -1; i <= 1; i++) {
             AbstractArrow arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
+
+            Holder<Attribute> rangedDamageAttr = serverLevel.registryAccess()
+                    .registryOrThrow(Registries.ATTRIBUTE)
+                    .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                    .orElse(null);
+
+            if (rangedDamageAttr != null) {
+                AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                if (attrInstance != null) {
+                    float damage = (float) attrInstance.getValue();
+                    arrow.setBaseDamage(damage / 2.5);
+                }
+            }
 
             // Adjust the shooting spread
             float spreadOffset = i * spreadAngle;
             arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
+
+            // Only middle arrow is picked up
             arrow.pickup = (i == 0) ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
+
             serverLevel.addFreshEntity(arrow);
         }
+
 
         // **Consume only 1 arrow from inventory**
         if (!player.getAbilities().instabuild) {

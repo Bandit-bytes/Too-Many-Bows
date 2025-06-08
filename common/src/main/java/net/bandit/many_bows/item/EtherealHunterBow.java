@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class EtherealHunterBow extends BowItem {
-
+    // Need fixing
     private static final int HUNGER_COST = 2;
 
     public EtherealHunterBow(Properties properties) {

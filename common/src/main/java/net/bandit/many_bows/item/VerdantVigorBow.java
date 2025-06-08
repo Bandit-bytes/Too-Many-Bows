@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.AncientSageArrow;
+import net.bandit.many_bows.entity.TorchbearerArrow;
 import net.bandit.many_bows.entity.VitalityArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -9,6 +10,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -20,6 +22,9 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -32,6 +37,8 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public class VerdantVigorBow extends BowItem {
@@ -41,7 +48,7 @@ public class VerdantVigorBow extends BowItem {
     private static final int HEALTH_BOOST_DURATION = 100;
     private static final int BUFFER_DURATION = 100;
     private static final int HEALTH_BOOST_HEARTS = 4;
-
+    private static final UUID BONUS_HEALTH_UUID = UUID.fromString("d4c9e510-70a4-4a27-b4e1-7f54e882e58a");
     private int bufferTimer = 0;
 
     public VerdantVigorBow(Properties properties) {
@@ -51,40 +58,51 @@ public class VerdantVigorBow extends BowItem {
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (entity instanceof Player player && !world.isClientSide) {
             boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+            var attribute = net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH;
+
+            ResourceLocation BONUS_HEALTH_ID = ResourceLocation.fromNamespaceAndPath("many_bows", "verdant_vigor_bonus_health");
+
+            AttributeInstance attr = player.getAttribute(attribute);
+            if (attr == null) return;
 
             if (isHoldingBow) {
-                bufferTimer = BUFFER_DURATION;
-                MobEffectInstance healthBoost = player.getEffect(MobEffects.HEALTH_BOOST);
-                if (healthBoost == null || healthBoost.getAmplifier() != HEALTH_BOOST_LEVEL || healthBoost.getDuration() < 60) {
-                    player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, HEALTH_BOOST_DURATION, HEALTH_BOOST_LEVEL, true, false, false));
-                    if (player.getHealth() < player.getMaxHealth()) {
-                        player.setHealth(Math.min(player.getMaxHealth(), player.getHealth() + (HEALTH_BOOST_HEARTS * 2)));
-                    }
-                }
-                if (world.getGameTime() % 40 == 0) {
-                    AABB area = new AABB(
-                            player.getX() - 5, player.getY() - 5, player.getZ() - 5,
-                            player.getX() + 5, player.getY() + 5, player.getZ() + 5
-                    );
-
-                    world.getEntities(player, area, e -> e instanceof LivingEntity && e.isAlive() && e != player)
-                            .forEach(entityNearby -> {
-                                if (entityNearby instanceof LivingEntity livingEntity) {
-                                    livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, REGENERATION_DURATION, 0, true, false, false));
-                                }
-                            });
+                if (attr.getModifier(BONUS_HEALTH_ID) == null) {
+                    attr.addPermanentModifier(new AttributeModifier(
+                            BONUS_HEALTH_ID,
+                            HEALTH_BOOST_HEARTS * 2.0,
+                            AttributeModifier.Operation.ADD_VALUE
+                    ));
                 }
             } else {
-                if (bufferTimer > 0) {
-                    bufferTimer--;
-                } else {
-                    if (player.hasEffect(MobEffects.HEALTH_BOOST)) {
-                        player.removeEffect(MobEffects.HEALTH_BOOST);
-                    }
+                if (attr.getModifier(BONUS_HEALTH_ID) != null) {
+                    attr.removeModifier(BONUS_HEALTH_ID);
                 }
+            }
+
+            if (isHoldingBow && world.getGameTime() % 40 == 0) {
+                AABB area = new AABB(
+                        player.getX() - 5, player.getY() - 5, player.getZ() - 5,
+                        player.getX() + 5, player.getY() + 5, player.getZ() + 5
+                );
+
+                world.getEntities(player, area, e ->
+                        e instanceof LivingEntity &&
+                                e.isAlive() &&
+                                e != player &&
+                                (e.getType().getCategory().isFriendly() || e instanceof Player)
+                ).forEach(entityNearby -> {
+                    ((LivingEntity) entityNearby).addEffect(new MobEffectInstance(
+                            MobEffects.REGENERATION,
+                            REGENERATION_DURATION,
+                            0,
+                            true, false, false
+                    ));
+                });
             }
         }
     }
+
+
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
@@ -105,6 +123,20 @@ public class VerdantVigorBow extends BowItem {
                                 arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
                             } else {
                                 arrow = new VitalityArrow(serverLevel, player, bowStack, projectileStack);
+                                if (arrow instanceof VitalityArrow vitalityArrow) {
+                                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                                            .registryOrThrow(Registries.ATTRIBUTE)
+                                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                            .orElse(null);
+
+                                    if (rangedDamageAttr != null) {
+                                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                                        if (attrInstance != null) {
+                                            float damage = (float) attrInstance.getValue();
+                                            vitalityArrow.setBaseDamage(damage / 2.25);
+                                        }
+                                    }
+                                }
                             }
 
                             applyPowerEnchantment(arrow, bowStack, level);

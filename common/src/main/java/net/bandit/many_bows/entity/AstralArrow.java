@@ -14,7 +14,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class AstralArrow extends AbstractArrow {
-
+    //No need for ranged_weapon:damage scaling
     private int ricochetCount = 3;
 
     public AstralArrow(EntityType<? extends AstralArrow> entityType, Level level) {
