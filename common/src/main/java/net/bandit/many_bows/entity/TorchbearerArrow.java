@@ -33,53 +33,46 @@ public class TorchbearerArrow extends AbstractArrow {
     protected void onHit(HitResult result) {
         super.onHit(result);
 
+        boolean shouldDiscard = false;
+
         if (result instanceof EntityHitResult entityHitResult) {
-            // Fire damage when hitting an entity
-            LivingEntity entity = entityHitResult.getEntity() instanceof LivingEntity ? (LivingEntity) entityHitResult.getEntity() : null;
-            if (entity != null) {
-                entity.setSecondsOnFire(5); // Set the entity on fire for 5 seconds
+            if (entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+                livingEntity.setSecondsOnFire(5);
+                shouldDiscard = true;
             }
         } else if (result instanceof BlockHitResult blockHitResult) {
-            // Get the block position and face
             BlockPos hitPos = blockHitResult.getBlockPos();
             Direction hitFace = blockHitResult.getDirection();
             BlockPos placePos = hitPos.relative(hitFace);
 
             if (!level().isClientSide && level() instanceof ServerLevel serverLevel) {
                 if (hitFace == Direction.UP) {
-                    // Place a standing torch on top of the block
                     BlockPos torchPos = hitPos.above();
                     BlockState torchState = Blocks.TORCH.defaultBlockState();
-
                     if (torchState.canSurvive(serverLevel, torchPos)) {
                         serverLevel.setBlock(torchPos, torchState, 3);
+                        shouldDiscard = true;
                     }
-                }
-                else if (hitFace != Direction.DOWN) {
-                    // Create the wall torch state
-                    BlockState wallTorchState = Blocks.WALL_TORCH.defaultBlockState();
-
-                    // Use the hit position for placement
+                } else if (hitFace != Direction.DOWN) {
                     BlockPos torchPos = hitPos.relative(hitFace);
-
-                    // Get the state of the block being hit
                     BlockState hitBlockState = serverLevel.getBlockState(hitPos);
-
-                    // Check if the block being hit is sturdy
                     boolean isFaceSturdy = hitBlockState.isFaceSturdy(serverLevel, hitPos, hitFace);
 
                     if (isFaceSturdy && serverLevel.getBlockState(torchPos).isAir()) {
-                        // Correctly set the FACING property to point away from the hit block
-                        wallTorchState = wallTorchState.setValue(WallTorchBlock.FACING, hitFace);
-
-                        // Place the wall torch
+                        BlockState wallTorchState = Blocks.WALL_TORCH.defaultBlockState()
+                                .setValue(WallTorchBlock.FACING, hitFace);
                         serverLevel.setBlock(torchPos, wallTorchState, 3);
+                        shouldDiscard = true;
                     }
                 }
             }
         }
-        this.discard();
+
+        if (shouldDiscard) {
+            this.discard();
+        }
     }
+
 
     @Override
     protected ItemStack getPickupItem() {
