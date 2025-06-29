@@ -92,8 +92,6 @@ public class CursedFlameBow extends BowItem {
                             }
                         }
                     }
-
-                    // Play sound and apply durability loss
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.WITHER_SKELETON_AMBIENT, SoundSource.PLAYERS, 1.0F, 1.2F);
                     player.awardStat(Stats.ITEM_USED.get(this));

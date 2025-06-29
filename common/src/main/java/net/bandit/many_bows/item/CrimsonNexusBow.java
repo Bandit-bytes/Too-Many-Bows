@@ -117,18 +117,12 @@ public class CrimsonNexusBow extends BowItem {
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 activeLifeDrain.put(player, level.getGameTime());
 
-                // Special effect when at full health
                 if (player.getHealth() == player.getMaxHealth()) {
                     arrow.setCritArrow(true);
                 }
 
-                // Add arrow to the world
                 level.addFreshEntity(arrow);
-
-                // Bow durability loss
                 bowStack.hurtAndBreak(1, player,(EquipmentSlot.MAINHAND));
-
-                // Update player stats
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }

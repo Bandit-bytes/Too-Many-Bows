@@ -65,23 +65,16 @@ public class RadianceBow extends BowItem {
                     }
                     radiantArrow.setPowerMultiplier(power);
                 }
-                // ✅ Apply Enchantments
                 applyPowerEnchantment(arrow, bowStack, level);
                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                 applyFlameEnchantment(arrow, bowStack, level);
 
-                // ✅ Arrow Behavior (Infinity means it doesn't despawn)
                 arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
 
-                // ✅ Fire the arrow
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 level.addFreshEntity(arrow);
-
-                // ✅ Play XP sound effect
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0F, 1.5F);
-
-                // ✅ Durability loss
                 bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
                 player.awardStat(Stats.ITEM_USED.get(this));
             }

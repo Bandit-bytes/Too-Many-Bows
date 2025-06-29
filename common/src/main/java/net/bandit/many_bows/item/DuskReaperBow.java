@@ -94,15 +94,12 @@ public class DuskReaperBow extends BowItem {
                                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                                 serverLevel.addFreshEntity(arrow);
 
-                                // Consume the arrow only once per shot
                                 if (!hasInfinityEnchantment(bowStack, level) && !player.getAbilities().instabuild && !arrowConsumed) {
                                     projectileStack.shrink(1);
                                     arrowConsumed = true;
                                 }
                             }
                         }
-
-                        // Play sound and apply durability loss
                         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                                 SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 0.3F, 0.5F);
                         player.awardStat(Stats.ITEM_USED.get(this));
