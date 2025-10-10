@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.registry.EffectRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class CursedFlameArrow extends AbstractArrow {
     private float powerMultiplier = 1.0F;
@@ -61,34 +63,42 @@ public class CursedFlameArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
-        if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
-            hitEntity.setRemainingFireTicks(200);
+        if (!level().isClientSide() && result.getEntity() instanceof LivingEntity hit) {
+            hit.setRemainingFireTicks(200);
 
             float fireDamage = 4.0F;
 
-            // Check if the shooter is a living entity and get their ranged_weapon:damage
-            if (this.getOwner() instanceof LivingEntity shooter) {
-                var registry = this.level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-                var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
-
-                if (rangedAttrHolder != null) {
-                    var attrInstance = shooter.getAttribute(rangedAttrHolder);
-                    if (attrInstance != null) {
-                        fireDamage = (float) attrInstance.getValue() / 1.5F;
-                    }
+            if (getOwner() instanceof LivingEntity shooter) {
+                var registry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+                var rangedKey = net.minecraft.resources.ResourceKey.create(
+                        Registries.ATTRIBUTE, ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")
+                );
+                var rangedHolder = registry.getHolder(rangedKey).orElse(null);
+                if (rangedHolder != null) {
+                    var inst = shooter.getAttribute(rangedHolder);
+                    if (inst != null) fireDamage = (float) inst.getValue() / 1.5F;
                 }
             }
 
-            hitEntity.hurt(hitEntity.damageSources().onFire(), fireDamage * this.powerMultiplier);
+            hit.hurt(hit.damageSources().onFire(), fireDamage * this.powerMultiplier);
 
+            hit.removeEffect(MobEffects.REGENERATION);
+            hit.removeEffect(MobEffects.HEAL);
 
-            hitEntity.removeEffect(MobEffects.REGENERATION);
-            hitEntity.removeEffect(MobEffects.HEAL);
+            hit.addEffect(new MobEffectInstance(
+                    EffectRegistry.CURSED_FLAME,
+                    20 * 8,
+                    0,
+                    false,
+                    true
+            ));
 
-            createCursedSoulFireParticles(hitEntity.position());
+            if (level() instanceof ServerLevel sl) {
+                sl.sendParticles(ParticleTypes.SOUL, hit.getX(), hit.getY(0.5), hit.getZ(),
+                        30, 1.0, 0.5, 1.0, 0.1);
+            }
         }
     }
-
 
     @Override
     protected void onHitBlock(BlockHitResult result) {

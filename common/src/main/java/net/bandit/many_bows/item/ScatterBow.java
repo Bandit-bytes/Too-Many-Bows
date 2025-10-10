@@ -8,12 +8,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -21,21 +21,21 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.item.TooltipFlag;
 
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
 public class ScatterBow extends BowItem {
 
-    private static final int MAX_ARROWS = 8; // Max arrows fired at once
+    private static final int MAX_ARROWS = 8;
 
     public ScatterBow(Properties properties) {
         super(properties);
@@ -43,80 +43,99 @@ public class ScatterBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
-        if (entity instanceof Player player) {
-            List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
-            boolean hasInfinity = hasInfinityEnchantment(bowStack, level);
+        if (!(entity instanceof Player player)) return;
 
-            if (!projectiles.isEmpty() || hasInfinity || player.getAbilities().instabuild) {
-                int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
+        boolean hasInfinity = hasInfinityEnchantment(bowStack, level);
+        int charge = this.getUseDuration(bowStack, entity) - chargeTime;
+        float power = getPowerForTime(charge);
+        if (power < 0.1F) return;
 
-                int arrowsAvailable = player.getAbilities().instabuild ? MAX_ARROWS : Math.min(MAX_ARROWS, getArrowCount(player));
+        int arrowsToFire = hasInfinity || player.getAbilities().instabuild
+                ? MAX_ARROWS
+                : Math.min(MAX_ARROWS, countAvailableArrows(player));
+        if (arrowsToFire <= 0) return;
 
-                for (int i = 0; i < arrowsAvailable; i++) {
-                    Arrow arrow = EntityType.ARROW.create(level);
-                    if (arrow == null) continue;
+        int arrowsConsumed = 0;
 
-                    arrow.setOwner(player);
-                    arrow.setPos(player.getX(), player.getEyeY(), player.getZ());
+        for (int i = 0; i < arrowsToFire; i++) {
+            ItemStack arrowStack = player.getProjectile(bowStack);
+            if (arrowStack.isEmpty() && !hasInfinity && !player.getAbilities().instabuild) break;
 
-                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
-                            .registryOrThrow(Registries.ATTRIBUTE)
-                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
-                            .orElse(null);
+            Arrow arrow = EntityType.ARROW.create(level);
+            if (arrow == null) continue;
 
-                    if (rangedDamageAttr != null) {
-                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
-                        if (attrInstance != null) {
-                            float damage = (float) attrInstance.getValue();
-                            arrow.setBaseDamage(damage / 11);
-                        } else {
-                            arrow.setBaseDamage(2.0);
-                        }
-                    } else {
-                        arrow.setBaseDamage(2.0);
-                    }
+            arrow.setOwner(player);
+            arrow.setPos(player.getX(), player.getEyeY() - 0.1, player.getZ());
 
-                    applyPowerEnchantment(arrow, bowStack, level);
-                    applyKnockbackEnchantment(arrow, bowStack, player, level);
-                    applyFlameEnchantment(arrow, bowStack, level);
+            // Set base damage
+            float baseDamage = 2.0F;
+            Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                    .registryOrThrow(Registries.ATTRIBUTE)
+                    .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                    .orElse(null);
+            if (rangedDamageAttr != null) {
+                AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                if (attrInstance != null) baseDamage = (float) attrInstance.getValue() / 11F;
+            }
+            arrow.setBaseDamage(baseDamage);
 
-                    arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
+            applyPowerEnchantment(arrow, bowStack, level);
+            applyKnockbackEnchantment(arrow, bowStack, player, level);
+            applyFlameEnchantment(arrow, bowStack, level);
 
-                    float yawOffset = (level.getRandom().nextFloat() - 0.5F) * 20F;
-                    float pitchOffset = (level.getRandom().nextFloat() - 0.5F) * 10F;
-                    arrow.shootFromRotation(player, player.getXRot() + pitchOffset, player.getYRot() + yawOffset, 0.0F, power * 3.0F, 1.0F);
+            arrow.pickup = (hasInfinity || player.getAbilities().instabuild)
+                    ? AbstractArrow.Pickup.CREATIVE_ONLY
+                    : AbstractArrow.Pickup.ALLOWED;
 
-                    level.addFreshEntity(arrow);
-                }
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                player.awardStat(Stats.ITEM_USED.get(this));
+            float yawOffset = (level.getRandom().nextFloat() - 0.5F) * 20F;
+            float pitchOffset = (level.getRandom().nextFloat() - 0.5F) * 10F;
 
-                if (!player.getAbilities().instabuild) {
-                    bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
-                }
+            arrow.shootFromRotation(player, player.getXRot() + pitchOffset, player.getYRot() + yawOffset,
+                    0.0F, power * 3.0F, 1.0F);
+            level.addFreshEntity(arrow);
+
+            // Consume ONE arrow per fired shot
+            if (!player.getAbilities().instabuild && !hasInfinity && !arrowStack.isEmpty()) {
+                arrowStack.shrink(1);
+                arrowsConsumed++;
             }
         }
+
+        if (arrowsConsumed > 0 || hasInfinity) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
+
+        player.awardStat(Stats.ITEM_USED.get(this));
+        bowStack.hurtAndBreak(1, player,(EquipmentSlot.MAINHAND));
     }
-    private int getArrowCount(Player player) {
-        int arrowCount = 0;
+
+
+    private int countAvailableArrows(Player player) {
+        int count = 0;
         for (ItemStack stack : player.getInventory().items) {
-            ItemStack projectile = player.getProjectile(stack);
-            if (!projectile.isEmpty()) {
-                arrowCount += projectile.getCount();
+            if (ARROW_ONLY.test(stack)) {
+                count += stack.getCount();
             }
         }
-        return arrowCount;
+        return count;
     }
 
+    private void consumeArrows(Player player, int amount) {
+        int remaining = amount;
+        for (ItemStack stack : player.getInventory().items) {
+            if (!ARROW_ONLY.test(stack)) continue;
+            int toRemove = Math.min(remaining, stack.getCount());
+            stack.shrink(toRemove);
+            remaining -= toRemove;
+            if (remaining <= 0) break;
+        }
+    }
 
     private void applyFlameEnchantment(AbstractArrow arrow, ItemStack bow, Level level) {
         Holder<Enchantment> flame = getEnchantmentHolder(level, Enchantments.FLAME);
         int flameLevel = EnchantmentHelper.getItemEnchantmentLevel(flame, bow);
-        if (flameLevel > 0) {
-            arrow.igniteForSeconds(5);
-        }
+        if (flameLevel > 0) arrow.igniteForSeconds(5);
     }
 
     private void applyKnockbackEnchantment(AbstractArrow arrow, ItemStack bow, LivingEntity shooter, Level level) {
@@ -124,7 +143,7 @@ public class ScatterBow extends BowItem {
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(punch, bow);
         if (punchLevel > 0) {
             double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
-            net.minecraft.world.phys.Vec3 knockbackVec = arrow.getDeltaMovement().normalize().scale(punchLevel * 0.6 * resistance);
+            var knockbackVec = arrow.getDeltaMovement().normalize().scale(punchLevel * 0.6 * resistance);
             arrow.push(knockbackVec.x, 0.1, knockbackVec.z);
         }
     }
@@ -148,12 +167,9 @@ public class ScatterBow extends BowItem {
                 .registryOrThrow(Registries.ENCHANTMENT)
                 .getHolderOrThrow(enchantmentKey);
     }
-    protected void shootProjectile(LivingEntity shooter, Projectile projectile, int index, float velocity, float inaccuracy, float angle, @Nullable LivingEntity target) {
-        projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
-    }
 
-    public static float getPowerForTime(int pCharge) {
-        float f = (float) pCharge / 16.0F;
+    public static float getPowerForTime(int charge) {
+        float f = (float) charge / 16.0F;
         f = (f * f + f * 2.0F) / 3.0F;
         return Math.min(f, 1.0F);
     }
@@ -199,6 +215,7 @@ public class ScatterBow extends BowItem {
     public int getDefaultProjectileRange() {
         return 64;
     }
+
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());

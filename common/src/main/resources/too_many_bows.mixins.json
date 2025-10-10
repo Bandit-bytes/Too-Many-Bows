@@ -6,6 +6,7 @@
   "client": [
   ],
   "mixins": [
+    "EntityWaterExtinguishMixin",
     "LivingEntityMixin"
   ],
   "injectors": {
