@@ -1,7 +1,5 @@
 package net.bandit.many_bows.item;
 
-import net.bandit.many_bows.entity.AncientSageArrow;
-import net.bandit.many_bows.entity.TorchbearerArrow;
 import net.bandit.many_bows.entity.VitalityArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -25,6 +23,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -37,7 +36,6 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -54,30 +52,47 @@ public class VerdantVigorBow extends BowItem {
     public VerdantVigorBow(Properties properties) {
         super(properties);
     }
-    @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && !world.isClientSide) {
-            boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
-            var attribute = net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH;
+//    @Override
+//    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+//        if (entity instanceof Player player && !world.isClientSide) {
+//            boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+//            var attribute = Attributes.MAX_HEALTH;
+//
+//            ResourceLocation BONUS_HEALTH_ID = ResourceLocation.fromNamespaceAndPath("many_bows", "verdant_vigor_bonus_health");
+//
+//            AttributeInstance attr = player.getAttribute(attribute);
+//            if (attr == null) return;
+//
+//            if (isHoldingBow) {
+//                if (attr.getModifier(BONUS_HEALTH_ID) == null) {
+//                    attr.addPermanentModifier(new AttributeModifier(
+//                            BONUS_HEALTH_ID,
+//                            HEALTH_BOOST_HEARTS * 2.0,
+//                            AttributeModifier.Operation.ADD_VALUE
+//                    ));
+//                }
+//            } else {
+//                if (attr.getModifier(BONUS_HEALTH_ID) != null) {
+//                    attr.removeModifier(BONUS_HEALTH_ID);
+//                }
+//            }
+@Override
+public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+    if (entity instanceof Player player && !world.isClientSide) {
+        boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
 
-            ResourceLocation BONUS_HEALTH_ID = ResourceLocation.fromNamespaceAndPath("many_bows", "verdant_vigor_bonus_health");
-
-            AttributeInstance attr = player.getAttribute(attribute);
-            if (attr == null) return;
-
-            if (isHoldingBow) {
-                if (attr.getModifier(BONUS_HEALTH_ID) == null) {
-                    attr.addPermanentModifier(new AttributeModifier(
-                            BONUS_HEALTH_ID,
-                            HEALTH_BOOST_HEARTS * 2.0,
-                            AttributeModifier.Operation.ADD_VALUE
-                    ));
-                }
-            } else {
-                if (attr.getModifier(BONUS_HEALTH_ID) != null) {
-                    attr.removeModifier(BONUS_HEALTH_ID);
-                }
-            }
+        // >>> Held-only HEALTH BOOST (4 hearts) <<<
+        // amplifier 1 = +8 health (4 hearts). Duration is short and refreshed while held.
+        if (isHoldingBow) {
+            player.addEffect(new MobEffectInstance(
+                    MobEffects.HEALTH_BOOST,
+                    15,                // ~0.75s; we refresh every tick anyway
+                    1,                 // amplifier 1 -> +8 HP (4 hearts)
+                    true,              // ambient (no swirly particles)
+                    false,             // showParticles
+                    false              // showIcon
+            ));
+        }
 
             if (isHoldingBow && world.getGameTime() % 40 == 0) {
                 AABB area = new AABB(
