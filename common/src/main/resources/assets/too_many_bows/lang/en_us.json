@@ -73,10 +73,10 @@
   "item.many_bows.ancient_sage_bow.tooltip.ability": "Pierces through 33% of armor defenses.",
   "item.many_bows.ancient_sage_bow.tooltip.legend": "Only the wise can wield its true might.",
 
-  "item.too_many_bows.wind_bow.tooltip": "Harness the power of the wind",
-  "item.too_many_bows.wind_bow.tooltip.ability": "Special Ability: Levitation Shot",
-  "item.too_many_bows.wind_bow.tooltip.effect": "Draw the bow to move swiftly; enemies hit may be lifted skyward",
-  "item.too_many_bows.wind_bow.tooltip.legend": "Ancient whispers say this bow was crafted from a storm's fury",
+  "item.too_many_bows.wind_bow.tooltip": "A bow that harnesses the breath of the skies.",
+  "item.too_many_bows.wind_bow.tooltip.ability": "Ability: §bGale Burst§r\n • On impact, release a gust of wind\n • Knocks nearby foes outward\n • Direct hits deal light magic damage",
+  "item.too_many_bows.wind_bow.tooltip.effect": "Tailwind: Hitting an enemy or surface grants\n • Speed II for a short duration\n • Slow Falling to reposition mid-air",
+  "item.too_many_bows.wind_bow.tooltip.legend": "\"The wind does not follow—it leads.\"",
 
   "item.many_bows.icicle_javelin_bow.tooltip": "A bow imbued with the power of freezing winds.",
   "item.many_bows.icicle_javelin_bow.tooltip.ability": "Fires icicle javelins that pierce enemies.",
@@ -240,6 +240,6 @@
   "item.many_bows.demon_bow.tooltip.extended": "The Demons Bow",
   "item.many_bows.demon_bow.tooltip": "No real power emits from this bow anymore....",
 
-  "item.many_bows.aether_bow.tooltip.extended": "The angels Bow",
-  "item.many_bows.aether_bow.tooltip": "No real power emits from this bow anymore...."
+  "item.many_bows.aether_bow.tooltip": "A bow attuned to the winds of the Aether.",
+  "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact"
 }

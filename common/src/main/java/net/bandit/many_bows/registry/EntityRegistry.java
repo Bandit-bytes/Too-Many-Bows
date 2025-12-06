@@ -140,6 +140,11 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "webstring_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<AethersCallArrow>> AETHERS_CALL_ARROW = ENTITY_TYPES.register("aethers_call_arrow",
+            () -> EntityType.Builder.<AethersCallArrow>of(AethersCallArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "webstring_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<TorchbearerArrow>> TORCHBEARER_ARROW = ENTITY_TYPES.register("torchbearer_arrow",
             () -> EntityType.Builder.<TorchbearerArrow>of(TorchbearerArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)

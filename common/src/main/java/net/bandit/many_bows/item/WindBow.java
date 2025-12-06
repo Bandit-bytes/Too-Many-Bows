@@ -38,8 +38,8 @@ import java.util.function.Predicate;
 
 public class WindBow extends BowItem {
 
-    private static final int MOVEMENT_SPEED_DURATION = 0;
-    private static final int MOVEMENT_SPEED_LEVEL = 15;
+    private static final int MOVEMENT_SPEED_DURATION = 5;
+    private static final int MOVEMENT_SPEED_LEVEL = 0;
 
     public WindBow(Properties properties) {
         super(properties);
@@ -49,10 +49,17 @@ public class WindBow extends BowItem {
     @Override
     public void onUseTick(Level level, LivingEntity entity, ItemStack stack, int count) {
         if (entity instanceof Player player && !level.isClientSide()) {
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, MOVEMENT_SPEED_DURATION * 20, MOVEMENT_SPEED_LEVEL, true, false));
+            player.addEffect(new MobEffectInstance(
+                    MobEffects.MOVEMENT_SPEED,
+                    MOVEMENT_SPEED_DURATION * 20,
+                    MOVEMENT_SPEED_LEVEL,
+                    true,
+                    false
+            ));
         }
         super.onUseTick(level, entity, stack, count);
     }
+
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {

@@ -69,14 +69,17 @@ public class CursedFlameArrow extends AbstractArrow {
             float fireDamage = 4.0F;
 
             if (getOwner() instanceof LivingEntity shooter) {
-                var registry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+                var attrRegistry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
                 var rangedKey = net.minecraft.resources.ResourceKey.create(
-                        Registries.ATTRIBUTE, ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")
+                        Registries.ATTRIBUTE,
+                        ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")
                 );
-                var rangedHolder = registry.getHolder(rangedKey).orElse(null);
+                var rangedHolder = attrRegistry.getHolder(rangedKey).orElse(null);
                 if (rangedHolder != null) {
                     var inst = shooter.getAttribute(rangedHolder);
-                    if (inst != null) fireDamage = (float) inst.getValue() / 1.5F;
+                    if (inst != null) {
+                        fireDamage = (float) inst.getValue() / 1.5F;
+                    }
                 }
             }
 
@@ -85,8 +88,12 @@ public class CursedFlameArrow extends AbstractArrow {
             hit.removeEffect(MobEffects.REGENERATION);
             hit.removeEffect(MobEffects.HEAL);
 
+            var mobEffectRegistry = level().registryAccess().registryOrThrow(Registries.MOB_EFFECT);
+            var cursedFlameHolder = mobEffectRegistry
+                    .getHolderOrThrow(EffectRegistry.CURSED_FLAME.getKey());
+
             hit.addEffect(new MobEffectInstance(
-                    EffectRegistry.CURSED_FLAME,
+                    cursedFlameHolder,
                     20 * 8,
                     0,
                     false,
