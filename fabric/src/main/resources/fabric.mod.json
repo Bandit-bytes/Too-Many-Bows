@@ -8,8 +8,8 @@
     "Bandit-Bytes"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://pixeldreamstudios.net/",
+    "sources": "https://github.com/Bandit-bytes/too_many_bows"
   },
   "license": "ALL RIGHTS RESERVED",
   "icon": "assets/too_many_bows/icon.png",
@@ -26,8 +26,8 @@
     "too_many_bows.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.10",
-    "minecraft": "~1.21",
+    "fabricloader": ">=0.18.3",
+    "minecraft": "~1.21.1",
     "java": ">=21",
     "architectury": ">=13.0.8",
     "fabric-api": "*"
