@@ -76,7 +76,8 @@ public class EtherealHunterBow extends ModBowItem {
                         applyPowerEnchantment(arrow, bowStack, level);
                         applyKnockbackEnchantment(arrow, bowStack, player, level);
                         applyFlameEnchantment(arrow, bowStack, level);
-                applyBowDamageAttribute(arrow, player);
+                        applyBowDamageAttribute(arrow, player);
+                        tryApplyBowCrit(arrow, player, 1.5D);
 
                         arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                         arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
@@ -93,7 +94,7 @@ public class EtherealHunterBow extends ModBowItem {
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {
-                        bowStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+                        damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                     }
                 }
             }

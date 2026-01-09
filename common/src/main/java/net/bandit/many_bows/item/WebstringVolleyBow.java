@@ -61,7 +61,7 @@ public class WebstringVolleyBow extends ModBowItem {
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {
-                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                        damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                     }
                 }
             }
@@ -100,7 +100,8 @@ public class WebstringVolleyBow extends ModBowItem {
             applyPowerEnchantment(arrow, bowStack, level);
             applyKnockbackEnchantment(arrow, bowStack, player, level);
             applyFlameEnchantment(arrow, bowStack, level);
-                applyBowDamageAttribute(arrow, player);
+            applyBowDamageAttribute(arrow, player);
+            tryApplyBowCrit(arrow, player, 1.5D);
 
             float spreadOffset = i * spreadAngle;
             arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);

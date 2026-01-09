@@ -14,6 +14,8 @@ public class ModAttributesFabric {
                 Player.createAttributes()
                         .add(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(AttributesRegistry.BOW_DRAW_SPEED.get()), 1.0D)
                         .add(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(AttributesRegistry.BOW_DAMAGE.get()), 1.0D)
+                        .add(BuiltInRegistries.ATTRIBUTE.wrapAsHolder(AttributesRegistry.BOW_CRIT_CHANCE.get()), 0.0D)
+
         );
     }
 }

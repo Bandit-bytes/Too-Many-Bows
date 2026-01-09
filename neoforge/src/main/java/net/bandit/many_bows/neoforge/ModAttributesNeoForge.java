@@ -18,17 +18,24 @@ public class ModAttributesNeoForge {
 
     @SubscribeEvent
     public static void onEntityAttributeModification(EntityAttributeModificationEvent event) {
-        Holder<Attribute> holder = BuiltInRegistries.ATTRIBUTE
-                .getHolderOrThrow(ResourceKey.create(Registries.ATTRIBUTE,
+        Holder<Attribute> bowDrawSpeed = BuiltInRegistries.ATTRIBUTE
+                .getHolderOrThrow(ResourceKey.create(
+                        Registries.ATTRIBUTE,
                         ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_draw_speed")
                 ));
-        var bowDamage = BuiltInRegistries.ATTRIBUTE.getHolderOrThrow(
-                ResourceKey.create(Registries.ATTRIBUTE, ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_damage"))
-        );
+        Holder<Attribute> bowDamage = BuiltInRegistries.ATTRIBUTE
+                .getHolderOrThrow(ResourceKey.create(
+                        Registries.ATTRIBUTE,
+                        ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_damage")
+                ));
+        Holder<Attribute> bowCritChance = BuiltInRegistries.ATTRIBUTE
+                .getHolderOrThrow(ResourceKey.create(
+                        Registries.ATTRIBUTE,
+                        ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_crit_chance")
+                ));
+
         event.add(EntityType.PLAYER, bowDamage);
-
-
-        event.add(EntityType.PLAYER, holder);
+        event.add(EntityType.PLAYER, bowDrawSpeed);
+        event.add(EntityType.PLAYER, bowCritChance);
     }
-
 }

@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -69,6 +70,7 @@ public class RadianceBow extends ModBowItem {
                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                 applyFlameEnchantment(arrow, bowStack, level);
                 applyBowDamageAttribute(arrow, player);
+                tryApplyBowCrit(arrow, player, 1.5D);
 
                 arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
 
@@ -76,7 +78,7 @@ public class RadianceBow extends ModBowItem {
                 level.addFreshEntity(arrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0F, 1.5F);
-                bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }

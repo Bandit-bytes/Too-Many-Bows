@@ -21,9 +21,10 @@
   "item.too_many_bows.dragons_breath": "Dragons Breath",
   "item.too_many_bows.cursed_stone": "Cursed Stone",
   "item.too_many_bows.shulker_blast": "Shulker's Blast",
-  "item.too_many_bows.wind_glove": "Wind Glove",
   "item.too_many_bows.sharpshot_ring": "Sharpshot Ring",
   "item.too_many_bows.stormbound_signet": "Stormbound Signet",
+  "item.too_many_bows.fletchers_talisman": "Fletchers Talisman",
+  "item.too_many_bows.dead_eyes_pendant": "Dead Eyes Pendant",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
@@ -239,11 +240,19 @@
   "item.too_many_bows.torchbearer": "Torchbearer",
   "attribute.too_many_bows.bow_draw_speed": "Bow Draw Speed",
   "attribute.too_many_bows.bow_damage": "Bow Damage",
+  "attribute.too_many_bows.bow_crit_chance": "Bow Crit Chance",
   "item.too_many_bows.torchbearer_bow.shift": "Ignites enemies and lights your path.",
   "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact.",
 
   "item.many_bows.demon_bow.tooltip.extended": "The Demons Bow",
   "item.many_bows.demon_bow.tooltip": "No real power emits from this bow anymore....",
+  "item.too_many_bows.wind_glove": "Windwoven Gloves",
+
+  "item.too_many_bows.draw_speed_glove.lore_1": "Lightweight leather reinforced with etched filaments.",
+  "item.too_many_bows.draw_speed_glove.lore_2": "The string answers faster than the mind can react.",
+
+  "item.too_many_bows.draw_speed_glove.effect": "Increases bow draw speed.",
+  "item.too_many_bows.equip.glove": "Equip in a glove slot.",
 
   "item.many_bows.aether_bow.tooltip": "A bow attuned to the winds of the Aether.",
   "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact"

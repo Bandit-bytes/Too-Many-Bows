@@ -50,7 +50,7 @@ public class TwinShadowsBow extends ModBowItem {
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {
-                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                        damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                     }
                 }
             }
@@ -77,6 +77,7 @@ public class TwinShadowsBow extends ModBowItem {
         AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
         lightArrow.setBaseDamage((rangedDamage / 3.0f));
         applyBowDamageAttribute(lightArrow, player);
+        tryApplyBowCrit(lightArrow, player, 1.5D);
         lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
         lightArrow.addTag("light");
         lightArrow.pickup = AbstractArrow.Pickup.ALLOWED;
@@ -86,7 +87,8 @@ public class TwinShadowsBow extends ModBowItem {
         // ---------- Dark Arrow ----------
         AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
         darkArrow.setBaseDamage((rangedDamage / 2.0f));
-        applyBowDamageAttribute(lightArrow, player);
+        applyBowDamageAttribute(darkArrow, player);
+        tryApplyBowCrit(darkArrow, player, 1.5D);
         darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
         darkArrow.addTag("dark");
         darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;

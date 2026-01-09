@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -76,7 +77,8 @@ public class AuroraBow extends ModBowItem {
                                 applyPowerEnchantment(arrow, bowStack, level);
                                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                                 applyFlameEnchantment(arrow, bowStack, level);
-                applyBowDamageAttribute(arrow, player);
+                                applyBowDamageAttribute(arrow, player);
+                                tryApplyBowCrit(arrow, player, 1.5D);
 
                                 if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                     arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
@@ -97,7 +99,7 @@ public class AuroraBow extends ModBowItem {
                         player.awardStat(Stats.ITEM_USED.get(this));
 
                         if (!player.getAbilities().instabuild) {
-                            bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                            damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                         }
                     } else {
                         // Not enough Rift Shards

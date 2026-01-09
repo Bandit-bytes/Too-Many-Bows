@@ -82,7 +82,8 @@ public class DuskReaperBow extends ModBowItem {
                                 applyPowerEnchantment(arrow, bowStack, level);
                                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                                 applyFlameEnchantment(arrow, bowStack, level);
-                applyBowDamageAttribute(arrow, player);
+                                applyBowDamageAttribute(arrow, player);
+                                tryApplyBowCrit(arrow, player, 1.5D);
 
                                 // Handle Infinity
                                 if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
@@ -106,7 +107,7 @@ public class DuskReaperBow extends ModBowItem {
                         player.awardStat(Stats.ITEM_USED.get(this));
 
                         if (!player.getAbilities().instabuild) {
-                            bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                           damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                         }
                     } else {
                         player.displayClientMessage(Component.translatable("item.many_bows.dusk_reaper.no_soul_fragments")

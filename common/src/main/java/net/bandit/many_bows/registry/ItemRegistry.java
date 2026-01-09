@@ -108,9 +108,11 @@ public class ItemRegistry {
     public static final RegistrySupplier<Item> SHARPSHOT_RING = ITEMS.register("sharpshot_ring",
             () -> new BowDamageRingItem( BowDamageRingItem.Tier.SHARPSHOT,new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
     public static final RegistrySupplier<Item> STORMBOUND_SIGNET = ITEMS.register("stormbound_signet",
-            () -> new BowDamageRingItem( BowDamageRingItem.Tier.STORMBOUND,new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)
-            )
-    );
+            () -> new BowDamageRingItem( BowDamageRingItem.Tier.STORMBOUND,new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> FLETCHERS_TALISMAN = ITEMS.register("fletchers_talisman",
+            () -> new BowNecklaceItem(BowNecklaceItem.Tier.FLETCHER, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> DEAD_EYES_PENDANT = ITEMS.register("dead_eyes_pendant",
+            () -> new BowNecklaceItem(BowNecklaceItem.Tier.DEAD_EYE, new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
 
     public static void register() {
         ITEMS.register();

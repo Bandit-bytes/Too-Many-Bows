@@ -78,6 +78,8 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.EMERALD_SAGE_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.TORCHBEARER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.DEMONS_GRASP.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.DEAD_EYES_PENDANT.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.FLETCHERS_TALISMAN.get()))
                 .when(LootItemRandomChanceCondition.randomChance(chance));
     }
 
@@ -92,6 +94,8 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.EMERALD_SAGE_BOW.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.DEMONS_GRASP.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.STORMBOUND_SIGNET.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.DEAD_EYES_PENDANT.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.FLETCHERS_TALISMAN.get()))
                 .when(LootItemRandomChanceCondition.randomChance(chance));
     }
 
@@ -109,6 +113,8 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.VITALITY_WEAVER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.SPECTRAL_WHISPER.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.WEBSTRING.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.DEAD_EYES_PENDANT.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.FLETCHERS_TALISMAN.get()))
                 .when(LootItemRandomChanceCondition.randomChance(chance));
     }
 
@@ -125,6 +131,8 @@ public class ModLootModifiers {
                 .add(LootItem.lootTableItem(ItemRegistry.SHULKER_BLAST.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.ASTRAL_BOUND.get()))
                 .add(LootItem.lootTableItem(ItemRegistry.AURORAS_GRACE.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.DEAD_EYES_PENDANT.get()))
+                .add(LootItem.lootTableItem(ItemRegistry.FLETCHERS_TALISMAN.get()))
                 .when(LootItemRandomChanceCondition.randomChance(chance));
     }
 }

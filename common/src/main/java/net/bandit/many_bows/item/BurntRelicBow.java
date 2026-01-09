@@ -68,6 +68,7 @@ public class BurntRelicBow extends ModBowItem {
                             }
                         }
                         applyBowDamageAttribute(arrow, player);
+                        tryApplyBowCrit(arrow, player, 1.5D);
 
                         arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                         arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.5F, 1.0F);
@@ -82,7 +83,7 @@ public class BurntRelicBow extends ModBowItem {
                         arrowStack.shrink(0);
                     }
                     if (!isCreative) {
-                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                        damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                     }
                 }
             }

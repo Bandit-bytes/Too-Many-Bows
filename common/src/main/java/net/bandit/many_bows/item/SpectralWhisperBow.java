@@ -80,6 +80,7 @@ public class SpectralWhisperBow extends ModBowItem {
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
                 applyBowDamageAttribute(arrow, player);
+tryApplyBowCrit(arrow, player, 1.5D);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {
@@ -98,7 +99,7 @@ public class SpectralWhisperBow extends ModBowItem {
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {
-                        bowStack.hurtAndBreak(1, player, (EquipmentSlot.MAINHAND));
+                        damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                     }
                 }
             }

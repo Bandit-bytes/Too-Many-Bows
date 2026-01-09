@@ -108,7 +108,7 @@ public class CrimsonNexusBow extends ModBowItem {
                     arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
                 }
                 applyBowDamageAttribute(arrow, player);
-
+                tryApplyBowCrit(arrow, player, 1.5D);
 
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 activeLifeDrain.put(player, level.getGameTime());
@@ -118,7 +118,7 @@ public class CrimsonNexusBow extends ModBowItem {
                 }
 
                 level.addFreshEntity(arrow);
-                bowStack.hurtAndBreak(1, player,(EquipmentSlot.MAINHAND));
+                damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }

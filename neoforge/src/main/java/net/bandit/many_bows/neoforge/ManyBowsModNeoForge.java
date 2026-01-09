@@ -1,9 +1,7 @@
 package net.bandit.many_bows.neoforge;
 
 import net.bandit.many_bows.client.renderer.*;
-import net.bandit.many_bows.neoforge.curio.DrawSpeedGloveCurio;
-import net.bandit.many_bows.neoforge.curio.SharpshotRingCurio;
-import net.bandit.many_bows.neoforge.curio.StormboundSignetCurio;
+import net.bandit.many_bows.neoforge.curio.*;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -33,6 +31,8 @@ public final class ManyBowsModNeoForge {
             CuriosApi.registerCurio(ItemRegistry.WIND_GLOVE.get(), new DrawSpeedGloveCurio());
             CuriosApi.registerCurio(ItemRegistry.SHARPSHOT_RING.get(), new SharpshotRingCurio());
             CuriosApi.registerCurio(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetCurio());
+            CuriosApi.registerCurio(ItemRegistry.FLETCHERS_TALISMAN.get(), new FletchersTalismanCurio());
+            CuriosApi.registerCurio(ItemRegistry.DEAD_EYES_PENDANT.get(), new DeadEyesPendantCurio());
         });
     }
     private void onClientSetup(final FMLClientSetupEvent event) {

@@ -26,6 +26,16 @@ public class AttributesRegistry {
                             1.0D, 0.0D, 10.0D
                     ).setSyncable(true));
 
+    public static final RegistrySupplier<Attribute> BOW_CRIT_CHANCE =
+            ATTRIBUTES.register("bow_crit_chance",
+                    () -> new RangedAttribute(
+                            "attribute.too_many_bows.bow_crit_chance",
+                            0.0D,
+                            0.0D,
+                            1.0D
+                    ).setSyncable(true));
+
+
     public static void register() {
         ATTRIBUTES.register();
     }
