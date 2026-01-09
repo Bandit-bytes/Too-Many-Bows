@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public class DemonsGrasp extends BowItem {
+public class DemonsGrasp extends ModBowItem {
 
     public DemonsGrasp(Properties properties) {
         super(properties);
@@ -42,6 +42,7 @@ public class DemonsGrasp extends BowItem {
                     level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + f * 0.5F);
                     player.awardStat(Stats.ITEM_USED.get(this));
                 }
+
             }
         }
     }

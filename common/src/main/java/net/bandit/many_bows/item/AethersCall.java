@@ -1,5 +1,6 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.client.PullSpeedItem;
 import net.bandit.many_bows.entity.AethersCallArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class AethersCall extends BowItem {
+public class AethersCall extends ModBowItem  {
 
     public AethersCall(Properties properties) {
         super(properties);
@@ -69,6 +70,7 @@ public class AethersCall extends BowItem {
                 applyPowerEnchantment(arrow, bowStack, level);
                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                 applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
                 if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                     arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;

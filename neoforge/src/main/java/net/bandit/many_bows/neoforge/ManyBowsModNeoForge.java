@@ -1,7 +1,11 @@
 package net.bandit.many_bows.neoforge;
 
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.neoforge.curio.DrawSpeedGloveCurio;
+import net.bandit.many_bows.neoforge.curio.SharpshotRingCurio;
+import net.bandit.many_bows.neoforge.curio.StormboundSignetCurio;
 import net.bandit.many_bows.registry.EntityRegistry;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -11,16 +15,25 @@ import net.neoforged.fml.common.Mod;
 
 import net.bandit.many_bows.ManyBowsMod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(ManyBowsMod.MOD_ID)
 @EventBusSubscriber(modid = ManyBowsMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ManyBowsModNeoForge {
     public ManyBowsModNeoForge(IEventBus modEventBus) {
-        // Run our common setup.
         ManyBowsMod.init();
         modEventBus.addListener(this::onClientSetup);
+        modEventBus.addListener(this::commonSetup);
+    }
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            CuriosApi.registerCurio(ItemRegistry.WIND_GLOVE.get(), new DrawSpeedGloveCurio());
+            CuriosApi.registerCurio(ItemRegistry.SHARPSHOT_RING.get(), new SharpshotRingCurio());
+            CuriosApi.registerCurio(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetCurio());
+        });
     }
     private void onClientSetup(final FMLClientSetupEvent event) {
         ManyBowsMod.initClient();

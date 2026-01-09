@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class VerdantVigorBow extends BowItem {
+public class VerdantVigorBow extends ModBowItem {
 
     private static final int HEALTH_BOOST_LEVEL = 1;
     private static final int REGENERATION_DURATION = 40;
@@ -81,16 +81,14 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
     if (entity instanceof Player player && !world.isClientSide) {
         boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
 
-        // >>> Held-only HEALTH BOOST (4 hearts) <<<
-        // amplifier 1 = +8 health (4 hearts). Duration is short and refreshed while held.
         if (isHoldingBow) {
             player.addEffect(new MobEffectInstance(
                     MobEffects.HEALTH_BOOST,
-                    15,                // ~0.75s; we refresh every tick anyway
-                    1,                 // amplifier 1 -> +8 HP (4 hearts)
-                    true,              // ambient (no swirly particles)
-                    false,             // showParticles
-                    false              // showIcon
+                    15,
+                    1,
+                    true,
+                    false,
+                    false
             ));
         }
 
@@ -157,6 +155,7 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {

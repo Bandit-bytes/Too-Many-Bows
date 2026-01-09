@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class BurntRelicBow extends BowItem {
+public class BurntRelicBow extends ModBowItem {
 
     public BurntRelicBow(Properties properties) {
         super(properties);
@@ -67,8 +67,7 @@ public class BurntRelicBow extends BowItem {
                                 arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
                             }
                         }
-
-
+                        applyBowDamageAttribute(arrow, player);
 
                         arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                         arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.5F, 1.0F);

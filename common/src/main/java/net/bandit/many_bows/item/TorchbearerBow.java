@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 
-public class TorchbearerBow extends BowItem {
+public class TorchbearerBow extends ModBowItem {
 
 
     public TorchbearerBow(Properties properties) {
@@ -99,6 +99,7 @@ public class TorchbearerBow extends BowItem {
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {

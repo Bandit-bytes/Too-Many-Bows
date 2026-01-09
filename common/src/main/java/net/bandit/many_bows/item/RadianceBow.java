@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class RadianceBow extends BowItem {
+public class RadianceBow extends ModBowItem {
 
     private static final int EXPERIENCE_COST = 5; // XP required per shot
 
@@ -68,6 +68,7 @@ public class RadianceBow extends BowItem {
                 applyPowerEnchantment(arrow, bowStack, level);
                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                 applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
                 arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
 

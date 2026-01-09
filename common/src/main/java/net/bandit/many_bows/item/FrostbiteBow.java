@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class FrostbiteBow extends BowItem {
+public class FrostbiteBow extends ModBowItem {
     private boolean hasPlayedPullSound = false;
 
     public FrostbiteBow(Properties properties) {
@@ -115,6 +115,7 @@ public class FrostbiteBow extends BowItem {
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {

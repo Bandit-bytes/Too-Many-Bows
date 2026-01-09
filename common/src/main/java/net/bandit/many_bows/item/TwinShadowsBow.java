@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class TwinShadowsBow extends BowItem {
+public class TwinShadowsBow extends ModBowItem {
 
     public TwinShadowsBow(Properties properties) {
         super(properties);
@@ -62,9 +63,8 @@ public class TwinShadowsBow extends BowItem {
         ItemStack projectileStack = projectileStacks.get(0);
         ArrowItem arrowItem = (ArrowItem) (projectileStack.getItem() instanceof ArrowItem ? projectileStack.getItem() : Items.ARROW);
 
-        // Get ranged attribute value
-        float rangedDamage = 6.0f; // fallback
-        var registry = serverLevel.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
+        float rangedDamage = 6.0f;
+        var registry = serverLevel.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
         var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
         if (rangedAttrHolder != null) {
             var attrInstance = player.getAttribute(rangedAttrHolder);
@@ -76,6 +76,7 @@ public class TwinShadowsBow extends BowItem {
         // ---------- Light Arrow ----------
         AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
         lightArrow.setBaseDamage((rangedDamage / 3.0f));
+        applyBowDamageAttribute(lightArrow, player);
         lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
         lightArrow.addTag("light");
         lightArrow.pickup = AbstractArrow.Pickup.ALLOWED;
@@ -85,6 +86,7 @@ public class TwinShadowsBow extends BowItem {
         // ---------- Dark Arrow ----------
         AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
         darkArrow.setBaseDamage((rangedDamage / 2.0f));
+        applyBowDamageAttribute(lightArrow, player);
         darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
         darkArrow.addTag("dark");
         darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;

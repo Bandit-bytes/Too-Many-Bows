@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class VerdantViperBow extends BowItem {
+public class VerdantViperBow extends ModBowItem {
 
     public VerdantViperBow(Properties properties) {
         super(properties);
@@ -79,6 +79,7 @@ public class VerdantViperBow extends BowItem {
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {

@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class SonicBoomBow extends BowItem {
+public class SonicBoomBow extends ModBowItem {
 
     public SonicBoomBow(Properties properties) {
         super(properties);
@@ -80,6 +80,7 @@ public class SonicBoomBow extends BowItem {
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
                             if (hasInfinity || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;

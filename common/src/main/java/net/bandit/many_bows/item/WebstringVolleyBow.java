@@ -20,6 +20,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class WebstringVolleyBow extends BowItem {
+public class WebstringVolleyBow extends ModBowItem {
 
     private static final int ARROWS_TO_FIRE = 5;
 
@@ -99,6 +100,7 @@ public class WebstringVolleyBow extends BowItem {
             applyPowerEnchantment(arrow, bowStack, level);
             applyKnockbackEnchantment(arrow, bowStack, player, level);
             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
             float spreadOffset = i * spreadAngle;
             arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
@@ -124,7 +126,7 @@ public class WebstringVolleyBow extends BowItem {
         Holder<Enchantment> punch = getEnchantmentHolder(level, Enchantments.PUNCH);
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(punch, bow);
         if (punchLevel > 0) {
-            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
+            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             net.minecraft.world.phys.Vec3 knockbackVec = arrow.getDeltaMovement().normalize().scale(punchLevel * 0.6 * resistance);
             arrow.push(knockbackVec.x, 0.1, knockbackVec.z);
         }

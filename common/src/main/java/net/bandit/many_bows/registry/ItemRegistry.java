@@ -103,7 +103,14 @@ public class ItemRegistry {
             () -> new RiftShardItem(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> POWER_CRYSTAL = ITEMS.register("power_crystal",
             () -> new RepairCrystalItem(new Properties().rarity(Rarity.EPIC).stacksTo(16).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
-
+    public static final RegistrySupplier<Item> WIND_GLOVE = ITEMS.register("wind_glove",
+            () -> new DrawSpeedGloveItem(new Item.Properties().stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
+    public static final RegistrySupplier<Item> SHARPSHOT_RING = ITEMS.register("sharpshot_ring",
+            () -> new BowDamageRingItem( BowDamageRingItem.Tier.SHARPSHOT,new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> STORMBOUND_SIGNET = ITEMS.register("stormbound_signet",
+            () -> new BowDamageRingItem( BowDamageRingItem.Tier.STORMBOUND,new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)
+            )
+    );
 
     public static void register() {
         ITEMS.register();

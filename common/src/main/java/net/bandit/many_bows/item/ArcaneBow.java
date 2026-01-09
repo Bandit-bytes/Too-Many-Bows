@@ -24,7 +24,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ArcaneBow extends BowItem {
+public class ArcaneBow extends ModBowItem {
 
     public ArcaneBow(Properties properties) {
         super(properties);
@@ -60,14 +60,12 @@ public class ArcaneBow extends BowItem {
     private void fireTripleArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power) {
         float basePitch = player.getXRot();
         float baseYaw = player.getYRot();
-        float spreadAngle = 5.0F; // Small spread between arrows
+        float spreadAngle = 5.0F;
 
-        // Ensure we have at least one projectile
         if (projectileStacks.isEmpty() && !player.getAbilities().instabuild) {
             return;
         }
 
-        // Get the first available projectile
         ItemStack projectileStack = projectileStacks.get(0);
         boolean arrowConsumed = false;
 
@@ -86,19 +84,15 @@ public class ArcaneBow extends BowItem {
                     arrow.setBaseDamage(damage / 2.5);
                 }
             }
+            applyBowDamageAttribute(arrow, player);
 
-            // Adjust the shooting spread
             float spreadOffset = i * spreadAngle;
             arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
-
-            // Only middle arrow is picked up
             arrow.pickup = (i == 0) ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
 
             serverLevel.addFreshEntity(arrow);
         }
 
-
-        // **Consume only 1 arrow from inventory**
         if (!player.getAbilities().instabuild) {
             projectileStack.shrink(1);
         }

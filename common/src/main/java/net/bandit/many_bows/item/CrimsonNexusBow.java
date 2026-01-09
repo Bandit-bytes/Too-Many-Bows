@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.function.Predicate;
 
-public class CrimsonNexusBow extends BowItem {
+public class CrimsonNexusBow extends ModBowItem {
     private final WeakHashMap<Player, Long> activeLifeDrain = new WeakHashMap<>();
     public CrimsonNexusBow(Properties properties) {
         super(properties);
@@ -38,12 +38,11 @@ public class CrimsonNexusBow extends BowItem {
         if (!(entity instanceof Player player) || !selected || level.isClientSide) return;
 
         Long lastUsedTime = activeLifeDrain.get(player);
-        if (lastUsedTime == null || level.getGameTime() - lastUsedTime > 60) return; // Only for 3 seconds (60 ticks)
+        if (lastUsedTime == null || level.getGameTime() - lastUsedTime > 60) return;
 
-        if (level.getGameTime() % 20 == 0) { // Run once per second
-            float damage; // Default
+        if (level.getGameTime() % 20 == 0) {
+            float damage;
 
-            // Scale based on ranged_weapon:damage / 4
             var registry = level.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
             var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
 
@@ -71,7 +70,6 @@ public class CrimsonNexusBow extends BowItem {
         }
     }
 
-
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player && !level.isClientSide()) {
@@ -79,15 +77,12 @@ public class CrimsonNexusBow extends BowItem {
             float power = getPowerForTime(charge);
 
             if (power >= 0.1F) {
-                // Play custom sound
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-                // Calculate health cost (Prevents self-kill)
                 float healthCost = player.getHealth() > 4.0F ? 2.0F : 0.0F;
                 player.hurt(player.damageSources().magic(), healthCost);
 
-                // Determine arrow type
                 ItemStack arrowStack = player.getProjectile(bowStack);
                 ArrowItem arrowItem = arrowStack.getItem() instanceof ArrowItem ?
                         (ArrowItem) arrowStack.getItem() : (ArrowItem) Items.ARROW;
@@ -96,7 +91,6 @@ public class CrimsonNexusBow extends BowItem {
                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 
 
-                // Fire the arrow
                 Holder<Attribute> rangedDamageAttr = level.registryAccess()
                         .registryOrThrow(Registries.ATTRIBUTE)
                         .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
@@ -113,6 +107,8 @@ public class CrimsonNexusBow extends BowItem {
                 } else {
                     arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
                 }
+                applyBowDamageAttribute(arrow, player);
+
 
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 activeLifeDrain.put(player, level.getGameTime());

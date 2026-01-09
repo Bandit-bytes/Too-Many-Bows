@@ -21,6 +21,9 @@
   "item.too_many_bows.dragons_breath": "Dragons Breath",
   "item.too_many_bows.cursed_stone": "Cursed Stone",
   "item.too_many_bows.shulker_blast": "Shulker's Blast",
+  "item.too_many_bows.wind_glove": "Wind Glove",
+  "item.too_many_bows.sharpshot_ring": "Sharpshot Ring",
+  "item.too_many_bows.stormbound_signet": "Stormbound Signet",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
@@ -234,6 +237,8 @@
   "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets.",
   "item.too_many_bows.torchbearer_bow": "Torchbearer Bow",
   "item.too_many_bows.torchbearer": "Torchbearer",
+  "attribute.too_many_bows.bow_draw_speed": "Bow Draw Speed",
+  "attribute.too_many_bows.bow_damage": "Bow Damage",
   "item.too_many_bows.torchbearer_bow.shift": "Ignites enemies and lights your path.",
   "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact.",
 

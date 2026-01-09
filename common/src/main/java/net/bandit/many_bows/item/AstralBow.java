@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class AstralBow extends BowItem {
+public class AstralBow extends ModBowItem {
 
     public AstralBow(Properties properties) {
         super(properties);
@@ -76,23 +76,19 @@ public class AstralBow extends BowItem {
                                 }
                             }
 
-                            // ✅ Apply Enchantments
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                             applyBowDamageAttribute(arrow, player);
 
-                            // ✅ Set arrow pickup behavior (No Infinity check)
                             if (player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {
                                 arrow.pickup = AbstractArrow.Pickup.ALLOWED;
                             }
 
-                            // ✅ Ensure the arrow is actually spawned
                             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
                             serverLevel.addFreshEntity(arrow);
-
-                            // ✅ Only consume an arrow if needed
                             if (!player.getAbilities().instabuild && !arrowConsumed) {
                                 projectileStack.shrink(1);
                                 arrowConsumed = true;

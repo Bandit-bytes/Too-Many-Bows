@@ -30,7 +30,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class EtherealHunterBow extends BowItem {
+public class EtherealHunterBow extends ModBowItem {
     private static final int HUNGER_COST = 1;
 
     public EtherealHunterBow(Properties properties) {
@@ -76,6 +76,7 @@ public class EtherealHunterBow extends BowItem {
                         applyPowerEnchantment(arrow, bowStack, level);
                         applyKnockbackEnchantment(arrow, bowStack, player, level);
                         applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
                         arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                         arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);

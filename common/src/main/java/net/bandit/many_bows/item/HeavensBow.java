@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class HeavensBow extends BowItem {
+public class HeavensBow extends ModBowItem {
 
     public HeavensBow(Properties properties) {
         super(properties);
@@ -80,6 +80,7 @@ public class HeavensBow extends BowItem {
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {

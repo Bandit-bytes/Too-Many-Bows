@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class DuskReaperBow extends BowItem {
+public class DuskReaperBow extends ModBowItem {
 
     public DuskReaperBow(Properties properties) {
         super(properties);
@@ -82,6 +82,7 @@ public class DuskReaperBow extends BowItem {
                                 applyPowerEnchantment(arrow, bowStack, level);
                                 applyKnockbackEnchantment(arrow, bowStack, player, level);
                                 applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
                                 // Handle Infinity
                                 if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {

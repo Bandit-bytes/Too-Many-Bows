@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class VitalityWeaverBow extends BowItem {
+public class VitalityWeaverBow extends ModBowItem {
 
     public VitalityWeaverBow(Properties properties) {
         super(properties);
@@ -77,6 +77,7 @@ public class VitalityWeaverBow extends BowItem {
                             applyPowerEnchantment(arrow, bowStack, level);
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {

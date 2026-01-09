@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class ScatterBow extends BowItem {
+public class ScatterBow extends ModBowItem {
 
     private static final int MAX_ARROWS = 8;
 
@@ -82,6 +82,7 @@ public class ScatterBow extends BowItem {
             applyPowerEnchantment(arrow, bowStack, level);
             applyKnockbackEnchantment(arrow, bowStack, player, level);
             applyFlameEnchantment(arrow, bowStack, level);
+                applyBowDamageAttribute(arrow, player);
 
             arrow.pickup = (hasInfinity || player.getAbilities().instabuild)
                     ? AbstractArrow.Pickup.CREATIVE_ONLY
