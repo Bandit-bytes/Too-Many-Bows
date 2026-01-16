@@ -2,116 +2,87 @@ package net.bandit.many_bows.loot;
 
 import dev.architectury.event.events.common.LootEvent;
 import net.bandit.many_bows.config.BowLootConfig;
-import net.bandit.many_bows.registry.ItemRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ModLootModifiers {
 
     private static final BowLootConfig CONFIG = BowLootConfig.loadConfig();
 
-    private static ResourceLocation createKey(String namespace, String path) {
-        return new ResourceLocation(namespace, path);
-    }
-
-    private static final Set<ResourceLocation> EASY_LOOT_TABLES = Set.of(
-            createKey("minecraft", "chests/simple_dungeon"),
-            createKey("minecraft", "chests/abandoned_mineshaft")
-    );
-
-    private static final Set<ResourceLocation> MEDIUM_LOOT_TABLES = Set.of(
-            createKey("minecraft", "chests/jungle_temple"),
-            createKey("minecraft", "chests/pillager_outpost"),
-            createKey("minecraft", "chests/abandoned_mineshaft"),
-            createKey("minecraft", "chests/simple_dungeon")
-    );
-
-    private static final Set<ResourceLocation> HARD_LOOT_TABLES = Set.of(
-            createKey("minecraft", "chests/stronghold_corridor"),
-            createKey("minecraft", "chests/nether_bridge"),
-            createKey("minecraft", "chests/bastion_treasure")
-    );
-
-    private static final Set<ResourceLocation> ENDGAME_LOOT_TABLES = Set.of(
-            createKey("minecraft", "chests/end_city_treasure"),
-            createKey("minecraft", "chests/nether_bridge"),
-            createKey("minecraft", "chests/bastion_treasure")
-    );
-
     public static void registerLootModifiers() {
+        final Set<ResourceLocation> easyTables = parseLootTables(CONFIG.easyLootTables);
+        final Set<ResourceLocation> mediumTables = parseLootTables(CONFIG.mediumLootTables);
+        final Set<ResourceLocation> hardTables = parseLootTables(CONFIG.hardLootTables);
+        final Set<ResourceLocation> endgameTables = parseLootTables(CONFIG.endgameLootTables);
+
         LootEvent.MODIFY_LOOT_TABLE.register((lootDataManager, id, context, builtin) -> {
             if (!builtin) return;
 
-            if (CONFIG.easyLootEnabled && EASY_LOOT_TABLES.contains(id)) {
-                context.addPool(createCommonBowPool(CONFIG.easyLootDropChance));
+            if (Boolean.TRUE.equals(CONFIG.easyLootEnabled) && easyTables.contains(id)) {
+                context.addPool(createConfigDrivenPool(CONFIG.easyLootDropChance, CONFIG.easyLootItems));
             }
-            if (CONFIG.mediumLootEnabled && MEDIUM_LOOT_TABLES.contains(id)) {
-                context.addPool(createUncommonBowPool(CONFIG.mediumLootDropChance));
+            if (Boolean.TRUE.equals(CONFIG.mediumLootEnabled) && mediumTables.contains(id)) {
+                context.addPool(createConfigDrivenPool(CONFIG.mediumLootDropChance, CONFIG.mediumLootItems));
             }
-            if (CONFIG.hardLootEnabled && HARD_LOOT_TABLES.contains(id)) {
-                context.addPool(createRareBowPool(CONFIG.hardLootDropChance));
+            if (Boolean.TRUE.equals(CONFIG.hardLootEnabled) && hardTables.contains(id)) {
+                context.addPool(createConfigDrivenPool(CONFIG.hardLootDropChance, CONFIG.hardLootItems));
             }
-            if (CONFIG.endgameLootEnabled && ENDGAME_LOOT_TABLES.contains(id)) {
-                context.addPool(createEpicBowPool(CONFIG.endgameLootDropChance));
+            if (Boolean.TRUE.equals(CONFIG.endgameLootEnabled) && endgameTables.contains(id)) {
+                context.addPool(createConfigDrivenPool(CONFIG.endgameLootDropChance, CONFIG.endgameLootItems));
             }
         });
     }
 
-        private static LootPool.Builder createCommonBowPool(float chance) {
-        return LootPool.lootPool()
-                .setRolls(UniformGenerator.between(0.0F, 1.0F))
-                .add(LootItem.lootTableItem(ItemRegistry.ANCIENT_SAGE_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.AETHERS_CALL.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.BURNT_RELIC.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.POWER_CRYSTAL.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.EMERALD_SAGE_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.TORCHBEARER.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.DEMONS_GRASP.get()))
-                .when(LootItemRandomChanceCondition.randomChance(chance));
+    private static Set<ResourceLocation> parseLootTables(List<String> ids) {
+        Set<ResourceLocation> out = new HashSet<>();
+        if (ids == null) return out;
+
+        for (String s : ids) {
+            ResourceLocation rl = ResourceLocation.tryParse(s);
+            if (rl != null) out.add(rl);
+            else {
+                System.err.println("[too_many_bows] Invalid loot table id in config: " + s);
+            }
+        }
+        return out;
     }
 
-    private static LootPool.Builder createUncommonBowPool(float chance) {
-        return LootPool.lootPool()
+    private static LootPool.Builder createConfigDrivenPool(float chance, List<String> itemIds) {
+        LootPool.Builder pool = LootPool.lootPool()
                 .setRolls(UniformGenerator.between(0.0F, 1.0F))
-                .add(LootItem.lootTableItem(ItemRegistry.CYROHEART_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.POWER_CRYSTAL.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.TORCHBEARER.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.EMERALD_SAGE_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.DEMONS_GRASP.get()))
                 .when(LootItemRandomChanceCondition.randomChance(chance));
+
+        if (itemIds == null || itemIds.isEmpty()) {
+            return pool;
+        }
+
+        for (String id : itemIds) {
+            ResourceLocation rl = ResourceLocation.tryParse(id);
+            if (rl == null) {
+                System.err.println("[too_many_bows] Invalid item id in loot config: " + id);
+                continue;
+            }
+
+            Item item = BuiltInRegistries.ITEM.get(rl);
+            if (item == Items.AIR) {
+                System.err.println("[too_many_bows] Unknown item in loot config (not registered): " + id);
+                continue;
+            }
+
+            pool.add(LootItem.lootTableItem(item));
+        }
+
+        return pool;
     }
 
-    private static LootPool.Builder createRareBowPool(float chance) {
-        return LootPool.lootPool()
-                .setRolls(UniformGenerator.between(0.0F, 1.0F))
-                .add(LootItem.lootTableItem(ItemRegistry.SENTINELS_WRAITH.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.CURSED_STONE.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.SOLAR_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.ARC_HEAVENS.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.SCATTER_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.VITALITY_WEAVER.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.SPECTRAL_WHISPER.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.WEBSTRING.get()))
-                .when(LootItemRandomChanceCondition.randomChance(chance));
-    }
-
-    private static LootPool.Builder createEpicBowPool(float chance) {
-        return LootPool.lootPool()
-                .setRolls(UniformGenerator.between(0.0F, 1.0F))
-                .add(LootItem.lootTableItem(ItemRegistry.FLAME_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.DARK_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.ARCANE_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.DRAGONS_BREATH.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.WIND_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.CYROHEART_BOW.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.SHULKER_BLAST.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.ASTRAL_BOUND.get()))
-                .add(LootItem.lootTableItem(ItemRegistry.AURORAS_GRACE.get()))
-                .when(LootItemRandomChanceCondition.randomChance(chance));
-    }
 }
