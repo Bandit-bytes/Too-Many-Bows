@@ -20,7 +20,6 @@ public class DragonsBreathArrowRenderer extends EntityRenderer<DragonsBreathArro
     public void render(DragonsBreathArrow entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         Vec3 entityPos = entity.position();
 
-        // Use level's random instead
         for (int i = 0; i < 5; i++) {
             double offsetX = Mth.nextDouble(entity.level().random, -0.2, 0.2);
             double offsetY = Mth.nextDouble(entity.level().random, -0.2, 0.2);

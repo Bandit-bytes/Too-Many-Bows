@@ -31,6 +31,11 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "sonic_boom_projectile").toString()));
 
+    public static final RegistrySupplier<EntityType<BeaconBeamArrow>> BEACON_BEAM_ARROW = ENTITY_TYPES.register("beacon_beam_arrow",
+            () -> EntityType.Builder.<BeaconBeamArrow>of(BeaconBeamArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "beacon_beam_arrow").toString()));
+
     public static final RegistrySupplier<EntityType<VenomArrow>> VENOM_ARROW = ENTITY_TYPES.register("venom_arrow",
             () -> EntityType.Builder.<VenomArrow>of(VenomArrow::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)

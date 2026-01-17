@@ -253,6 +253,10 @@
 
   "item.too_many_bows.draw_speed_glove.effect": "Increases bow draw speed.",
   "item.too_many_bows.equip.glove": "Equip in a glove slot.",
+  "item.too_many_bows.beacon_beam_bow.tooltip": "Beacon Beam Bow",
+  "item.too_many_bows.beacon_beam_bow": "Beacon Beam Bow",
+  "item.too_many_bows.beacon_beam_bow.tooltip.ability": "Impact releases a linking burst of light.",
+  "item.too_many_bows.beacon_beam_bow.tooltip.legend": "Beacon energy seeks nearby targets.",
 
   "item.many_bows.aether_bow.tooltip": "A bow attuned to the winds of the Aether.",
   "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact"

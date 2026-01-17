@@ -7,7 +7,6 @@ import net.bandit.many_bows.client.renderer.*;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
-import net.bandit.many_bows.registry.AttributesRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -59,7 +58,8 @@ public class ClientInit {
                 ItemRegistry.DUSK_REAPER.get(),
                 ItemRegistry.ETHEREAL_HUNTER.get(),
                 ItemRegistry.TORCHBEARER.get(),
-                ItemRegistry.WEBSTRING.get()
+                ItemRegistry.WEBSTRING.get(),
+                ItemRegistry.BEACON_BEAM_BOW.get()
         );
 
         bows.forEach(ClientInit::registerBowProperties);
@@ -138,5 +138,7 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         EntityRendererRegistry.register(()  ->EntityRegistry.AETHERS_CALL_ARROW.get(),AethersCallArrowRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
+
     }
 }

@@ -95,7 +95,7 @@ public class FrostbiteArrow extends AbstractArrow {
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
         for (LivingEntity entity : entities) {
             if (entity != this.getOwner() && entity != entityHit) {
-                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 75, 5)); // Apply slowness
+                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 75, 5));
             }
         }
 

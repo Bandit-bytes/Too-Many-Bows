@@ -94,6 +94,8 @@ public class ItemRegistry {
             () -> new ScatterBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> WIND_BOW = ITEMS.register("wind_bow",
             () -> new WindBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
+    public static final RegistrySupplier<Item> BEACON_BEAM_BOW = ITEMS.register("beacon_beam_bow",
+            () -> new BeaconBeamBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     //item
     public static final RegistrySupplier<Item> CURSED_STONE = ITEMS.register("cursed_stone",
             () -> new CursedStone(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));

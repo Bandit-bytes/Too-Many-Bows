@@ -46,8 +46,7 @@ public class DragonsBreathArrow extends AbstractArrow {
         level.playSound(null, target.getX(), target.getY(), target.getZ(),
                 SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-        // === AoE Impact Damage ===
-        float scaledDamage; // fallback
+        float scaledDamage;
 
         if (this.getOwner() instanceof LivingEntity shooter) {
             var registry = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
@@ -56,7 +55,7 @@ public class DragonsBreathArrow extends AbstractArrow {
             if (rangedAttrHolder != null) {
                 var attrInstance = shooter.getAttribute(rangedAttrHolder);
                 if (attrInstance != null) {
-                    scaledDamage = (float) attrInstance.getValue() / 1.5F; // AoE hit scaling
+                    scaledDamage = (float) attrInstance.getValue() / 1.5F;
                 } else {
                     scaledDamage = 4.0F;
                 }
@@ -74,7 +73,6 @@ public class DragonsBreathArrow extends AbstractArrow {
                     }
                 });
 
-        // === DoT Area Effect Cloud ===
         float dotDamage; // fallback
         if (this.getOwner() instanceof LivingEntity shooter) {
             var registry = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
@@ -93,7 +91,6 @@ public class DragonsBreathArrow extends AbstractArrow {
             dotDamage = 6.0F;
         }
         final float power = this.powerMultiplier;
-        // Custom ticking AreaEffectCloud
         AreaEffectCloud damagingCloud = new AreaEffectCloud(level, target.getX(), target.getY(), target.getZ()) {
             int ticksExisted = 0;
 
@@ -109,8 +106,8 @@ public class DragonsBreathArrow extends AbstractArrow {
         };
 
         damagingCloud.setOwner((LivingEntity) this.getOwner());
-        damagingCloud.setDuration(100); // 5 seconds
-        damagingCloud.setWaitTime(10);  // Delay before effect starts
+        damagingCloud.setDuration(100);
+        damagingCloud.setWaitTime(10);
         damagingCloud.setRadius(3.0F);
         damagingCloud.setRadiusPerTick(-0.05F);
         damagingCloud.setParticle(ParticleTypes.DRAGON_BREATH);
@@ -120,7 +117,6 @@ public class DragonsBreathArrow extends AbstractArrow {
 
         this.discard();
     }
-
 
     @Override
     public void tick() {
@@ -139,18 +135,52 @@ public class DragonsBreathArrow extends AbstractArrow {
     }
 
     private void createImpactParticles(double x, double y, double z) {
-        for (int i = 0; i < 20; i++) {
-            double xOffset = (random.nextDouble() - 0.5D) * 1.5D;
-            double yOffset = random.nextDouble() * 1.5D;
-            double zOffset = (random.nextDouble() - 0.5D) * 1.5D;
-            level().addParticle(new DustParticleOptions(new Vector3f(0.0F, 1.0F, 0.0F), 1.0F),
-                    x + xOffset, y + yOffset, z + zOffset, 0.0D, 0.0D, 0.0D);
+        for (int i = 0; i < 40; i++) {
+            double dx = (random.nextDouble() - 0.5D) * 0.8D;
+            double dy = random.nextDouble() * 0.4D;
+            double dz = (random.nextDouble() - 0.5D) * 0.8D;
+
+            double vx = dx * 0.10;
+            double vy = dy * 0.10;
+            double vz = dz * 0.10;
+
+            level().addParticle(ParticleTypes.DRAGON_BREATH,
+                    x + dx, y + 0.1D + dy, z + dz,
+                    vx, vy, vz);
         }
     }
 
     private void createTrailParticles() {
-        level().addParticle(ParticleTypes.DRAGON_BREATH, this.getX(), this.getY(), this.getZ(), 0.0D, -0.05D, 0.0D);
+        var vel = this.getDeltaMovement();
+        double speed = vel.length();
+
+        if (speed < 0.01) {
+            level().addParticle(ParticleTypes.DRAGON_BREATH,
+                    this.getX(), this.getY(), this.getZ(),
+                    0.0D, 0.0D, 0.0D);
+            return;
+        }
+
+        double nx = -vel.x / speed;
+        double ny = -vel.y / speed;
+        double nz = -vel.z / speed;
+
+        int steps = 10;
+        double spacing = 0.15;
+
+        for (int i = 0; i < steps; i++) {
+            double px = this.getX() + nx * i * spacing + (random.nextDouble() - 0.5) * 0.05;
+            double py = this.getY() + ny * i * spacing + (random.nextDouble() - 0.5) * 0.05;
+            double pz = this.getZ() + nz * i * spacing + (random.nextDouble() - 0.5) * 0.05;
+
+            double vx = nx * 0.02 + (random.nextDouble() - 0.5) * 0.01;
+            double vy = ny * 0.02 + (random.nextDouble() - 0.5) * 0.01;
+            double vz = nz * 0.02 + (random.nextDouble() - 0.5) * 0.01;
+
+            level().addParticle(ParticleTypes.DRAGON_BREATH, px, py, pz, vx, vy, vz);
+        }
     }
+
 
     @Override
     protected ItemStack getPickupItem() {

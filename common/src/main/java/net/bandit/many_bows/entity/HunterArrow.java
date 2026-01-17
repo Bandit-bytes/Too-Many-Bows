@@ -71,15 +71,15 @@ public class HunterArrow extends AbstractArrow {
         boolean cooked = entity.isOnFire();
 
         if (entity.getType() == EntityType.COW && entity instanceof Cow) {
-            int beef = 1 + rng.nextInt(3);   // 1–3
-            int leather = rng.nextInt(2);    // 0–1
+            int beef = 1 + rng.nextInt(3);
+            int leather = rng.nextInt(2);
             entity.spawnAtLocation(new ItemStack(cooked ? Items.COOKED_BEEF : Items.BEEF, beef));
             if (leather > 0) entity.spawnAtLocation(new ItemStack(Items.LEATHER, leather));
         } else if (entity.getType() == EntityType.PIG && entity instanceof Pig) {
-            int pork = 1 + rng.nextInt(3);   // 1–3
+            int pork = 1 + rng.nextInt(3);
             entity.spawnAtLocation(new ItemStack(cooked ? Items.COOKED_PORKCHOP : Items.PORKCHOP, pork));
         } else if (entity.getType() == EntityType.SHEEP && entity instanceof Sheep sheep) {
-            int mutton = 1 + rng.nextInt(3); // 1–3
+            int mutton = 1 + rng.nextInt(3);
             entity.spawnAtLocation(new ItemStack(cooked ? Items.COOKED_MUTTON : Items.MUTTON, mutton));
 
             // Sheep drop 1 wool of their fleece color if not sheared

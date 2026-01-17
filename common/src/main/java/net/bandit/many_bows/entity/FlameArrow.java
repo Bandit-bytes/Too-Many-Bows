@@ -68,7 +68,6 @@ public class FlameArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
         if (!this.level().isClientSide()) {
-            // Check if the hit entity is a LivingEntity before casting
             if (result.getEntity() instanceof LivingEntity hitEntity) {
                 hitEntity.setRemainingFireTicks(80);
                 hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 1));
@@ -99,7 +98,6 @@ public class FlameArrow extends AbstractArrow {
             if (rangedAttrHolder != null) {
                 var attrInstance = shooter.getAttribute(rangedAttrHolder);
                 if (attrInstance != null) {
-                    // You can adjust the scaling as needed
                     fireDamage = (float) attrInstance.getValue() / 3F;
                 }
             }

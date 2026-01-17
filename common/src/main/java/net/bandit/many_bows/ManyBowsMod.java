@@ -52,5 +52,6 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         EntityRendererRegistry.register(()  ->EntityRegistry.AETHERS_CALL_ARROW.get(),AethersCallArrowRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
     }
 }

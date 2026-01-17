@@ -74,5 +74,6 @@ public final class ManyBowsModNeoForge {
         event.registerEntityRenderer(EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AETHERS_CALL_ARROW.get(), AethersCallArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
     }
 }

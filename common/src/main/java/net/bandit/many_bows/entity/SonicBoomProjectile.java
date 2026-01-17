@@ -38,7 +38,7 @@ public class SonicBoomProjectile extends AbstractArrow {
         super.onHitEntity(result);
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             LivingEntity shooter = this.getOwner() instanceof LivingEntity le ? le : null;
-            float scaledDamage = 20.0F; // fallback value
+            float scaledDamage = 20.0F;
 
             if (shooter != null) {
                 var registry = level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.ATTRIBUTE);
@@ -56,7 +56,7 @@ public class SonicBoomProjectile extends AbstractArrow {
             target.hurt(damageSources().sonicBoom(this), finalDamage);
             target.knockback(2.0F, Math.sin(this.getYRot() * Math.PI / 180.0F), -Math.cos(this.getYRot() * Math.PI / 180.0F));
             level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);
-            this.discard(); // Remove after hitting an entity
+            this.discard();
         }
     }
 
@@ -65,7 +65,6 @@ public class SonicBoomProjectile extends AbstractArrow {
         super.tick();
         tickCount++;
 
-        // Server-side lifetime control
         if (!this.level().isClientSide && --this.lifetime <= 0) {
             this.discard();
         }
@@ -74,7 +73,6 @@ public class SonicBoomProjectile extends AbstractArrow {
             createSonicBoomSpiral();
         }
     }
-    // Enhanced particle effect for warden-like sonic boom
     private void createSonicBoomSpiral() {
         int particles = 25;
         double radius = 0.5;
