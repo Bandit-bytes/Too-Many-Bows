@@ -24,14 +24,14 @@ configurations {
     }
 }
 repositories {
-    maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
-    }
-    maven {
-        name = "Ladysnake Libs"
-        url = 'https://maven.ladysnake.org/releases'
-    }
+//    maven {
+//        name = "TerraformersMC"
+//        url = "https://maven.terraformersmc.com/"
+//    }
+//    maven {
+//        name = "Ladysnake Libs"
+//        url = 'https://maven.ladysnake.org/releases'
+//    }
 }
 
 
@@ -40,7 +40,7 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
-    modImplementation "dev.emi:trinkets:${trinkets_version}"
+//    modImplementation "dev.emi:trinkets:${trinkets_version}"
 
     // Architectury API. This is optional, and you can comment it out if you don't need it.
     modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"

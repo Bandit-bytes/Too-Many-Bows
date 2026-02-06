@@ -1,5 +1,7 @@
 {
+  "replace": false,
   "values": [
-    "#minecraft:enchantable/bow"
+    "#minecraft:enchantable/bow",
+    "too_many_bows:aethers_call"
   ]
 }

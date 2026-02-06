@@ -46,14 +46,12 @@ public abstract class LivingEntityMixin {
         LivingEntity self = (LivingEntity)(Object)this;
         if (!tmb$hasCursedByKey(self)) return;
 
-        // keep at least 1s of fire
+
         if (self.getRemainingFireTicks() < 20) self.setRemainingFireTicks(20);
 
-        // strip vanilla heals trying to tick
         self.removeEffect(MobEffects.REGENERATION);
-        self.removeEffect(MobEffects.HEAL);
+        self.removeEffect(MobEffects.INSTANT_HEALTH);
 
-        // explicit damage cadence (works even while wet)
         if (!self.fireImmune() && (self.tickCount % 20 == 0)) {
             self.hurt(self.damageSources().onFire(), 1.0F);
         }

@@ -8,13 +8,14 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class AethersCallArrow extends AbstractArrow {
             return;
         }
 
-        if (level().isClientSide) {
+        if (level().isClientSide()) {
             level().addParticle(
                     ParticleTypes.END_ROD,
                     this.getX(),
@@ -68,7 +69,7 @@ public class AethersCallArrow extends AbstractArrow {
     }
 
     private void triggerAetherBurst() {
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide()) return;
 
         Level level = this.level();
         double x = this.getX();
@@ -133,12 +134,12 @@ public class AethersCallArrow extends AbstractArrow {
     }
 
     @Override
-    protected ItemStack getPickupItem() {
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return null;
     }
 }

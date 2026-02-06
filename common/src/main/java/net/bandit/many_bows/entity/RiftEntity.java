@@ -3,20 +3,18 @@ package net.bandit.many_bows.entity;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
@@ -48,12 +46,12 @@ public void tick() {
     super.tick();
 
     if (this.lifeTime-- <= 0) {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             this.explode();
         }
         this.discard();
     } else {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             // Pull entities in
             List<Entity> entities = this.level().getEntities(this, new AABB(this.getX() - PULL_RADIUS, this.getY() - PULL_RADIUS, this.getZ() - PULL_RADIUS,
                     this.getX() + PULL_RADIUS, this.getY() + PULL_RADIUS, this.getZ() + PULL_RADIUS));
@@ -71,7 +69,7 @@ public void tick() {
             }
         }
 
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             double corePulse = Math.sin(this.lifeTime * 0.1) * 0.5 + 1.5;
             for (int i = 0; i < 30; i++) {
                 this.level().addParticle(ParticleTypes.REVERSE_PORTAL,
@@ -125,32 +123,49 @@ public void tick() {
     }
 }
 
+    @Override
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float amount) {
+        return false;
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput in) {
+        this.lifeTime = in.getInt("LifeTime").orElse(60);
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput out) {
+        out.putInt("LifeTime", this.lifeTime);
+    }
+
     private void explode() {
-        level().playSound(null, getX(), getY(), getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
+        level().playSound(null, getX(), getY(), getZ(),
+                SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
         float baseDamage = 8.0f;
 
-        // Scale damage based on ranged_weapon:damage
-        if (owner instanceof LivingEntity livingOwner) {
-            var registry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-            var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
+        if (owner instanceof Player player) {
+            var dmgInst = player.getAttribute(net.bandit.many_bows.registry.AttributesRegistry.BOW_DAMAGE);
+            if (dmgInst != null) baseDamage *= (float) dmgInst.getValue();
 
-            if (rangedAttrHolder != null) {
-                var attrInstance = livingOwner.getAttribute(rangedAttrHolder);
-                if (attrInstance != null) {
-                    baseDamage = (float) attrInstance.getValue() * 1.5F; // Or scale it further if needed
-                }
+            var critInst = player.getAttribute(net.bandit.many_bows.registry.AttributesRegistry.BOW_CRIT_CHANCE);
+            if (critInst != null && player.getRandom().nextDouble() < critInst.getValue()) {
+                baseDamage *= 1.5F;
             }
         }
 
-        // AABB around explosion
-        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class,
+        List<LivingEntity> entities = level().getEntitiesOfClass(
+                LivingEntity.class,
                 new AABB(getX() - EXPLOSION_RADIUS, getY() - EXPLOSION_RADIUS, getZ() - EXPLOSION_RADIUS,
                         getX() + EXPLOSION_RADIUS, getY() + EXPLOSION_RADIUS, getZ() + EXPLOSION_RADIUS),
-                e -> e.isAlive() && !(e instanceof Player p && p.getAbilities().instabuild));
+                e -> e.isAlive() && !(e instanceof Player p && p.getAbilities().instabuild)
+        );
+
+        var source = (owner != null)
+                ? level().damageSources().mobAttack(owner)
+                : level().damageSources().generic();
 
         for (LivingEntity target : entities) {
-            var source = level().damageSources().mobAttack(owner);
             target.hurt(source, baseDamage);
         }
     }
@@ -159,16 +174,4 @@ public void tick() {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
 
     }
-
-
-    @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.lifeTime = compound.getInt("LifeTime");
-    }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        compound.putInt("LifeTime", this.lifeTime);
-    }
-
 }

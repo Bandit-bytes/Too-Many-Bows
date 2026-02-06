@@ -16,21 +16,21 @@ An Awesome bow mod that has a lot of unique bows and abilities!
 [[dependencies.too_many_bows]]
 modId = "neoforge"
 type = "required"
-versionRange = "[1.21.1-2.3.4,)"
+versionRange = "[1.21.11-1.0.0,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.too_many_bows]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,)"
+versionRange = "[1.21.11,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.too_many_bows]]
 modId = "architectury"
 type = "required"
-versionRange = "[13.0.8,)"
+versionRange = "[19.0.1,)"
 ordering = "AFTER"
 side = "BOTH"
 

@@ -1,4 +1,5 @@
 {
+	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "too_many_bows:item/astral_bound_pulling_1",

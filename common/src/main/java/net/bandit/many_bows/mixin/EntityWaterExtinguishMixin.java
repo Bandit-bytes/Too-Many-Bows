@@ -1,8 +1,6 @@
 package net.bandit.many_bows.mixin;
 
 import net.bandit.many_bows.registry.EffectRegistry;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffect;
@@ -31,7 +29,6 @@ public abstract class EntityWaterExtinguishMixin {
         return false;
     }
 
-    // water current path
     @Inject(method = "updateInWaterStateAndDoWaterCurrentPushing", at = @At("TAIL"))
     private void tmb$afterWaterCurrentPushing(CallbackInfo ci) {
         Entity e = (Entity)(Object)this;
@@ -41,7 +38,6 @@ public abstract class EntityWaterExtinguishMixin {
         }
     }
 
-    // non-vanilla/extinguishing fluids path
     @Inject(method = "updateInWaterStateAndDoFluidPushing", at = @At("TAIL"))
     private void tmb$afterFluidPushing(CallbackInfoReturnable<Boolean> cir) {
         Entity e = (Entity)(Object)this;

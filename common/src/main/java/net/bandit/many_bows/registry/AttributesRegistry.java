@@ -11,6 +11,9 @@ public class AttributesRegistry {
 
     public static final DeferredRegister<Attribute> ATTRIBUTES =
             DeferredRegister.create(ManyBowsMod.MOD_ID, Registries.ATTRIBUTE);
+    public static Attribute bowDamage() { return BOW_DAMAGE.get(); }
+    public static Attribute bowCritChance() { return BOW_CRIT_CHANCE.get(); }
+
 
     public static final RegistrySupplier<Attribute> BOW_DRAW_SPEED =
             ATTRIBUTES.register("bow_draw_speed",

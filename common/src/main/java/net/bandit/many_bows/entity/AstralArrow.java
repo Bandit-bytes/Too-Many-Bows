@@ -5,7 +5,7 @@ import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -14,7 +14,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class AstralArrow extends AbstractArrow {
-    //No need for ranged_weapon:damage scaling
     private int ricochetCount = 3;
 
     public AstralArrow(EntityType<? extends AstralArrow> entityType, Level level) {
@@ -29,40 +28,43 @@ public class AstralArrow extends AbstractArrow {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            target.hurt(damageSources().arrow(this, this.getOwner()), (float) this.getBaseDamage());
+        super.onHitEntity(result);
+        if (!level().isClientSide()) {
             this.discard();
         }
     }
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
-        if (!level().isClientSide()) {
-            int maxRicochets = 6;
-            if (ricochetCount < maxRicochets) {
-                ricochetCount++;
+        if (level().isClientSide()) return;
 
-                Vec3 velocity = this.getDeltaMovement();
-                Vec3 normal = Vec3.atLowerCornerOf(result.getDirection().getNormal());
-                Vec3 reflected = velocity.subtract(normal.scale(2 * velocity.dot(normal)));
-
-
-                this.setDeltaMovement(reflected.scale(0.7));
-
-                Vec3 positionOffset = reflected.normalize().scale(0.1);
-                this.setPos(this.getX() + positionOffset.x, this.getY() + positionOffset.y, this.getZ() + positionOffset.z);
-
-
-                this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                        SoundEvents.METAL_HIT,
-                        net.minecraft.sounds.SoundSource.PLAYERS,
-                        1.0F,
-                        1.0F);
-
-            } else {
-                this.discard();
-            }
+        int maxRicochets = 6;
+        if (ricochetCount >= maxRicochets) {
+            this.discard();
+            return;
         }
+
+        ricochetCount++;
+
+        Vec3 velocity = this.getDeltaMovement();
+
+        var face = result.getDirection();
+        Vec3 normal = new Vec3(face.getStepX(), face.getStepY(), face.getStepZ());
+
+        Vec3 reflected = velocity.subtract(normal.scale(2.0D * velocity.dot(normal)));
+
+        this.setDeltaMovement(reflected.scale(0.7D));
+
+        Vec3 nudgeDir = reflected.lengthSqr() < 1.0E-6 ? normal : reflected.normalize();
+        Vec3 positionOffset = nudgeDir.scale(0.1D);
+
+        this.setPos(this.getX() + positionOffset.x, this.getY() + positionOffset.y, this.getZ() + positionOffset.z);
+
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                SoundEvents.METAL_HIT,
+                net.minecraft.sounds.SoundSource.PLAYERS,
+                1.0F,
+                1.0F);
     }
 
     @Override

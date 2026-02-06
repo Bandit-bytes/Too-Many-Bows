@@ -2,23 +2,22 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
+import org.jetbrains.annotations.NotNull;
 
 public class LightningArrow extends AbstractArrow {
     private boolean lightningStruck = false;
 
-    public LightningArrow(EntityType<? extends LightningArrow> entityType, Level level) {
+    public LightningArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -31,7 +30,7 @@ public class LightningArrow extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!level().isClientSide() && !lightningStruck) {
-            summonLightning(result.getLocation().x(), result.getLocation().y(), result.getLocation().z());
+            summonLightning(this.getX(), this.getY(), this.getZ());
             lightningStruck = true;
             this.discard();
         }
@@ -41,51 +40,48 @@ public class LightningArrow extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        // Summon lightning if the arrow is stuck in the ground and hasn't struck yet
-        if (!level().isClientSide() && this.inGround && !lightningStruck) {
+        if (!level().isClientSide() && this.isInGround() && !lightningStruck) {
             summonLightning(this.getX(), this.getY(), this.getZ());
             lightningStruck = true;
             this.discard();
         }
 
-        // Create visual effects on the client side
         if (level().isClientSide()) {
             createParticles();
         }
     }
 
     private void summonLightning(double x, double y, double z) {
-        LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(level());
-        if (lightningBolt == null) {
-            return;
-        }
-        lightningBolt.moveTo(x, y, z);
+        if (!(level() instanceof ServerLevel serverLevel)) return;
 
-        // Set the cause of the lightning bolt to the shooter if applicable
+        LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, serverLevel);
+        bolt.setPos(x, y, z);
+
         if (this.getOwner() instanceof ServerPlayer player) {
-            lightningBolt.setCause(player);
+            bolt.setCause(player);
         }
 
-        level().addFreshEntity(lightningBolt);
+        serverLevel.addFreshEntity(bolt);
     }
 
     private void createParticles() {
         for (int i = 0; i < 10; i++) {
-            double offsetX = (this.random.nextDouble() - 0.5) * 0.5;
-            double offsetY = this.random.nextDouble() * 0.5;
-            double offsetZ = (this.random.nextDouble() - 0.5) * 0.5;
-            level().addParticle(ParticleTypes.ELECTRIC_SPARK, this.getX() + offsetX, this.getY() + offsetY, this.getZ() + offsetZ, 0.0, 0.1, 0.0);
+            double ox = (this.random.nextDouble() - 0.5) * 0.5;
+            double oy = (this.random.nextDouble() * 0.5);
+            double oz = (this.random.nextDouble() - 0.5) * 0.5;
+            level().addParticle(ParticleTypes.ELECTRIC_SPARK,
+                    this.getX() + ox, this.getY() + oy, this.getZ() + oz,
+                    0.0, 0.1, 0.0);
         }
     }
 
-
     @Override
-    protected ItemStack getPickupItem() {
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return null;
     }
 }

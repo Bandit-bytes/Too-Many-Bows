@@ -5,7 +5,7 @@ import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -26,7 +26,7 @@ public class AuroraArrowEntity extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             spawnRift(BlockPos.containing(result.getLocation()));
         }
         this.discard();
@@ -35,7 +35,7 @@ public class AuroraArrowEntity extends AbstractArrow {
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             spawnRift(result.getBlockPos());
         }
         this.discard();

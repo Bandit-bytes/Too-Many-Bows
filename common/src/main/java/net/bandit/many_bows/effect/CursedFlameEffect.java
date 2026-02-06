@@ -10,10 +10,10 @@ public class CursedFlameEffect extends MobEffect {
         super(MobEffectCategory.HARMFUL, 0x660066);
     }
 
-    @Override
-    public boolean applyEffectTick(LivingEntity livingEntity, int i) {
-        return super.applyEffectTick(livingEntity, i);
-    }
+//    @Override
+//    public boolean applyEffectTick(LivingEntity livingEntity, int i) {
+//        return super.applyEffectTick(livingEntity, i);
+//    }
     @Override
     public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
         return true;

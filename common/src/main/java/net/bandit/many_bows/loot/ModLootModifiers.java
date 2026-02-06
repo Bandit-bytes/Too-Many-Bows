@@ -2,10 +2,11 @@ package net.bandit.many_bows.loot;
 
 import dev.architectury.event.events.common.LootEvent;
 import net.bandit.many_bows.config.BowLootConfig;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class ModLootModifiers {
@@ -58,7 +60,7 @@ public class ModLootModifiers {
         if (ids == null) return out;
 
         for (String s : ids) {
-            ResourceLocation rl = ResourceLocation.tryParse(s);
+            Identifier rl = Identifier.tryParse(s);
             if (rl == null) {
                 System.err.println("[too_many_bows] Invalid loot table id in config: " + s);
                 continue;
@@ -80,22 +82,24 @@ public class ModLootModifiers {
         boolean addedAny = false;
 
         for (String id : itemIds) {
-            ResourceLocation rl = ResourceLocation.tryParse(id);
+            Identifier rl = Identifier.tryParse(id);
             if (rl == null) {
                 System.err.println("[too_many_bows] Invalid item id in loot config: " + id);
                 continue;
             }
 
-            Item item = BuiltInRegistries.ITEM.get(rl);
-            if (item == Items.AIR) {
+            Optional<Holder.Reference<Item>> ref = BuiltInRegistries.ITEM.get(rl);
+            if (ref.isEmpty()) {
                 System.err.println("[too_many_bows] Unknown item in loot config (not registered): " + id);
                 continue;
             }
 
+            Item item = ref.get().value();
             pool.add(LootItem.lootTableItem(item));
             addedAny = true;
         }
 
         return addedAny ? pool : null;
     }
+
 }

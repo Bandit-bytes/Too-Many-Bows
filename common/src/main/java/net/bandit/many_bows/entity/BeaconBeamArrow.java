@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.mixin.AbstractArrowAccessor;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -7,7 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -41,7 +42,7 @@ public class BeaconBeamArrow extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide) {
+        if (this.level().isClientSide()) {
             if (lastPos == null) lastPos = this.position();
 
             Vec3 now = this.position();
@@ -55,7 +56,6 @@ public class BeaconBeamArrow extends AbstractArrow {
                 int samples = TRAIL_SAMPLES + extra;
 
                 spawnBeamTrail(lastPos, now, samples, ParticleTypes.ELECTRIC_SPARK);
-                // you can swap END_ROD -> ELECTRIC_SPARK, SOUL_FIRE_FLAME, GLOW, etc.
             }
 
             lastPos = now;
@@ -87,10 +87,10 @@ public class BeaconBeamArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult hit) {
         super.onHitEntity(hit);
 
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide()) return;
 
         if (hit.getEntity() instanceof LivingEntity target) {
-            float base = (float) this.getBaseDamage();
+            float base = (float) ((AbstractArrowAccessor) this).manybows$getBaseDamage();
 
             target.hurt(this.damageSources().arrow(this, this.getOwner()), base);
             doLinkDamage(target, base);
@@ -103,6 +103,7 @@ public class BeaconBeamArrow extends AbstractArrow {
                     1.0F, 1.35F
             );
         }
+
         this.discard();
     }
 

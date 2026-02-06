@@ -1,32 +1,11 @@
 {
+	"format_version": "1.21.11",
 	"credit": "MadewithBlockbench",
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "too_many_bows:item/ancient_sage_bow",
 		"particle": "too_many_bows:item/ancient_sage_bow"
 	},
-"overrides": [
-{
-"predicate": {
-"minecraft:pulling": 1
-},
-"model": "too_many_bows:item/ancient_sage_bow_0"
-},
-{
-"predicate": {
-"minecraft:pulling": 1,
-"minecraft:pull": 0.65
-},
-"model": "too_many_bows:item/ancient_sage_bow_1"
-},
-{
-"predicate": {
-"minecraft:pulling": 1,
-"minecraft:pull": 0.9
-},
-"model": "too_many_bows:item/ancient_sage_bow_2"
-}
-],
 	"elements": [
 		{
 			"from": [7.93981, -5.92038, 11.21481],
