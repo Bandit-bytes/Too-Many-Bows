@@ -37,6 +37,8 @@ public class ItemRegistry {
     public static final RegistrySupplier<Item> DEAD_EYES_PENDANT = ITEMS.register("dead_eyes_pendant",
             () -> new BowNecklaceItem(BowNecklaceItem.Tier.DEAD_EYE, props("dead_eyes_pendant")
                     .stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> CURSED_STONE = ITEMS.register("cursed_stone",
+            () -> new CursedStone(props("cursed_stone").rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 
     //BOWS
     public static final RegistrySupplier<Item> AETHERS_CALL = ITEMS.register("aethers_call",
@@ -57,12 +59,14 @@ public class ItemRegistry {
             () -> new BurntRelicBow(props("burnt_relic").durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
     public static final RegistrySupplier<Item> CRIMSON_NEXUS = ITEMS.register("crimson_nexus",
             () -> new CrimsonNexusBow(props("crimson_nexus").durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
+    public static final RegistrySupplier<Item> DRAGONS_BREATH = ITEMS.register("dragons_breath",
+            () -> new DragonsBreathBow(props("dragons_breath").durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
+    public static final RegistrySupplier<Item> NECRO_FLAME_BOW = ITEMS.register("necro_flame_bow",
+            () -> new CursedFlameBow(props("necro_flame_bow").durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 //    public static final RegistrySupplier<Item> DARK_BOW = ITEMS.register("dark_bow",
 //            () -> new SonicBoomBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 //    public static final RegistrySupplier<Item> FROSTBITE = ITEMS.register("frostbite",
 //            () -> new FrostbiteBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
-//    public static final RegistrySupplier<Item> DRAGONS_BREATH = ITEMS.register("dragons_breath",
-//            () -> new DragonsBreathBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 //    public static final RegistrySupplier<Item> VERDANT_VIPER = ITEMS.register("verdant_viper",
 //            () -> new VerdantViperBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 
@@ -107,16 +111,11 @@ public class ItemRegistry {
 //            () -> new FlameBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 //    public static final RegistrySupplier<Item> TIDAL_BOW = ITEMS.register("tidal_bow",
 //            () -> new TidalBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
-//    public static final RegistrySupplier<Item> NECRO_FLAME_BOW = ITEMS.register("necro_flame_bow",
-//            () -> new CursedFlameBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 //    public static final RegistrySupplier<Item> SCATTER_BOW = ITEMS.register("scatter_bow",
 //            () -> new ScatterBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 //    public static final RegistrySupplier<Item> WIND_BOW = ITEMS.register("wind_bow",
 //            () -> new WindBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON).enchantable(16).repairable(ItemRegistry.POWER_CRYSTAL.get())));
 
-    //item
-//    public static final RegistrySupplier<Item> CURSED_STONE = ITEMS.register("cursed_stone",
-//            () -> new CursedStone(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 //    public static final RegistrySupplier<Item> SOUL_FRAGMENT = ITEMS.register("soul_fragment",
 //            () -> new SoulFragment(new Properties().stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 //    public static final RegistrySupplier<Item> WIND_GLOVE = ITEMS.register("wind_glove",

@@ -72,16 +72,24 @@ public class EntityRegistry {
                             Registries.ENTITY_TYPE,
                             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "beacon_beam_arrow")
                     )));
-
+    public static final RegistrySupplier<EntityType<CursedFlameArrow>> CURSED_FLAME_ARROW = ENTITY_TYPES.register("cursed_flame_arrow",
+            () -> EntityType.Builder.<CursedFlameArrow>of(CursedFlameArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID,"cursed_flame_arrow")
+                    )));
+    public static final RegistrySupplier<EntityType<DragonsBreathArrow>> DRAGONS_BREATH_ARROW = ENTITY_TYPES.register("dragons_breath_arrow",
+            () -> EntityType.Builder.<DragonsBreathArrow>of(DragonsBreathArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceKey.create(
+                            Registries.ENTITY_TYPE,
+                            Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID,"dragons_breath_arrow")
+                    )));
 //    public static final RegistrySupplier<EntityType<FrostbiteArrow>> FROSTBITE_ARROW = ENTITY_TYPES.register("frostbite_arrow",
 //            () -> EntityType.Builder.<FrostbiteArrow>of(FrostbiteArrow::new, MobCategory.MISC)
 //                    .sized(0.5f, 0.5f)
 //                    .build("frostbite_arrow"));
-//    public static final RegistrySupplier<EntityType<DragonsBreathArrow>> DRAGONS_BREATH_ARROW = ENTITY_TYPES.register("dragons_breath_arrow",
-//            () -> EntityType.Builder.<DragonsBreathArrow>of(DragonsBreathArrow::new, MobCategory.MISC)
-//                    .sized(0.5F, 0.5F)
-//                    .build(Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "dragons_breath_arrow").toString()));
-//
 //    public static final RegistrySupplier<EntityType<SonicBoomProjectile>> SONIC_BOOM_PROJECTILE = ENTITY_TYPES.register("sonic_boom_projectile",
 //            () -> EntityType.Builder.<SonicBoomProjectile>of(SonicBoomProjectile::new, MobCategory.MISC)
 //                    .sized(0.5F, 0.5F)
@@ -102,10 +110,6 @@ public class EntityRegistry {
 //            () -> EntityType.Builder.<TidalArrow>of(TidalArrow::new, MobCategory.MISC)
 //                    .sized(0.5F, 0.5F)
 //                    .build("tidal_arrow"));
-//    public static final RegistrySupplier<EntityType<CursedFlameArrow>> CURSED_FLAME_ARROW = ENTITY_TYPES.register("cursed_flame_arrow",
-//            () -> EntityType.Builder.<CursedFlameArrow>of(CursedFlameArrow::new, MobCategory.MISC)
-//                    .sized(0.5F, 0.5F)
-//                    .build("cursed_flame_arrow"));
 //    public static final RegistrySupplier<EntityType<WindProjectile>> WIND_PROJECTILE = ENTITY_TYPES.register("wind_projectile",
 //            () -> EntityType.Builder.<WindProjectile>of(WindProjectile::new, MobCategory.MISC)
 //                    .sized(0.5F, 0.5F)

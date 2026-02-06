@@ -6,28 +6,6 @@
 		"1": "too_many_bows:item/necro_1",
 		"particle": "too_many_bows:item/necromancer_bow_texture_0"
 	},
-	"overrides": [
-		{
-			"predicate": {
-				"minecraft:pulling": 1
-			},
-			"model": "too_many_bows:item/necro_flame_bow_pulling_0"
-		},
-		{
-			"predicate": {
-				"minecraft:pulling": 1,
-				"minecraft:pull": 0.65
-			},
-			"model": "too_many_bows:item/necro_flame_bow_pulling_1"
-		},
-		{
-			"predicate": {
-				"minecraft:pulling": 1,
-				"minecraft:pull": 0.9
-			},
-			"model": "too_many_bows:item/necro_flame_bow_pulling_2"
-		}
-	],
 	"elements": [
 		{
 			"from": [7.45792, 1.10123, 8.54777],

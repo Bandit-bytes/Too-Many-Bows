@@ -8,7 +8,8 @@
     "too_many_bows:lightning_arrow",
     "too_many_bows:aurora_arrow",
     "too_many_bows:rift_entity",
-    "too_many_bows:beacon_beam_arrow"
-
+    "too_many_bows:beacon_beam_arrow",
+    "too_many_bows:cursed_flame_arrow",
+    "too_many_bows:dragons_breath_arrow"
   ]
 }

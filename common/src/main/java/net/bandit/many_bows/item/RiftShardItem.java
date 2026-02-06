@@ -22,7 +22,6 @@ public class RiftShardItem extends Item {
         super(properties);
     }
     @Override
-    @SuppressWarnings("deprecation")
     public void appendHoverText(ItemStack stack,
                                 Item.TooltipContext context,
                                 TooltipDisplay display,

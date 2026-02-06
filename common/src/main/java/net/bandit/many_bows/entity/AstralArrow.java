@@ -3,6 +3,7 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
@@ -62,7 +63,7 @@ public class AstralArrow extends AbstractArrow {
 
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                 SoundEvents.METAL_HIT,
-                net.minecraft.sounds.SoundSource.PLAYERS,
+                SoundSource.PLAYERS,
                 1.0F,
                 1.0F);
     }
