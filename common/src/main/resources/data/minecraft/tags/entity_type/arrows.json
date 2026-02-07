@@ -10,6 +10,25 @@
     "too_many_bows:rift_entity",
     "too_many_bows:beacon_beam_arrow",
     "too_many_bows:cursed_flame_arrow",
-    "too_many_bows:dragons_breath_arrow"
+    "too_many_bows:dragons_breath_arrow",
+    "too_many_bows:dusk_reaper_arrow",
+    "too_many_bows:hunter_xp_arrow",
+    "too_many_bows:ethereal_arrow",
+    "too_many_bows:frostbite_arrow",
+    "too_many_bows:hunter_arrow",
+    "too_many_bows:venom_arrow",
+    "too_many_bows:flame_arrow",
+    "too_many_bows:icicle_javelin",
+    "too_many_bows:solar_arrow",
+    "too_many_bows:tidal_arrow",
+    "too_many_bows:wind_projectile",
+    "too_many_bows:sentinel_arrow",
+    "too_many_bows:vitality_arrow",
+    "too_many_bows:shulker_blast_projectile",
+    "too_many_bows:spectral_arrow",
+    "too_many_bows:radiant_arrow",
+    "too_many_bows:ironclad_arrow",
+    "too_many_bows:webstring_arrow",
+    "too_many_bows:torchbearer_arrow"
   ]
 }

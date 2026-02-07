@@ -14,7 +14,6 @@ public class RepairCrystalItem extends Item {
         super(properties);
     }
     @Override
-    @SuppressWarnings("deprecation")
     public void appendHoverText(ItemStack stack,
                                 Item.TooltipContext context,
                                 TooltipDisplay display,

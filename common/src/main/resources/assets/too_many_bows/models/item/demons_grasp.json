@@ -5,28 +5,6 @@
 		"0": "too_many_bows:item/demons_grasp",
 		"particle": "too_many_bows:item/demons_grasp"
 	},
-	"overrides": [
-		{
-			"predicate": {
-				"minecraft:pulling": 1
-			},
-			"model": "too_many_bows:item/demons_grasp_pulling_0"
-		},
-		{
-			"predicate": {
-				"minecraft:pulling": 1,
-				"minecraft:pull": 0.65
-			},
-			"model": "too_many_bows:item/demons_grasp_pulling_1"
-		},
-		{
-			"predicate": {
-				"minecraft:pulling": 1,
-				"minecraft:pull": 0.9
-			},
-			"model": "too_many_bows:item/demons_grasp_pulling_2"
-		}
-	],
 	"elements": [
 		{
 			"from": [6, 11.5, 7.5],

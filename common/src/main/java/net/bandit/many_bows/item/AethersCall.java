@@ -32,46 +32,51 @@ public class AethersCall extends ModBowItem {
 
     @Override
     public boolean releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
-        if (!(entity instanceof Player player)) return false;
+        try {
+            if (!(entity instanceof Player player)) return false;
 
-        ItemStack ammoInInv = player.getProjectile(bowStack);
-        if (ammoInInv.isEmpty() && !player.hasInfiniteMaterials()) {
-            return false;
+            ItemStack ammoInInv = player.getProjectile(bowStack);
+            if (ammoInInv.isEmpty() && !player.hasInfiniteMaterials()) {
+                return false;
+            }
+
+            int charge = this.getUseDuration(bowStack, entity) - chargeTime;
+
+            float mult = this.manybows$getChargeMultiplier(bowStack, entity);
+            int scaledCharge = Math.max(0, (int) (charge * mult));
+
+            float power = getPowerForTime(scaledCharge);
+            if (power < 0.1F) return false;
+
+            List<ItemStack> projectiles = ProjectileWeaponItem.draw(bowStack, ammoInInv, player);
+            if (projectiles.isEmpty()) return false;
+
+            if (level instanceof ServerLevel serverLevel) {
+                this.shoot(
+                        serverLevel,
+                        player,
+                        player.getUsedItemHand(),
+                        bowStack,
+                        projectiles,
+                        power * 2.5F,
+                        1.0F,
+                        power == 1.0F,
+                        null
+                );
+            }
+
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS,
+                    1.0F, 1.4F + (power * 0.2F));
+
+            player.awardStat(Stats.ITEM_USED.get(this));
+            return true;
+        } finally {
+            if (level.isClientSide()) {
+                this.manybows$resetPullVisual(bowStack);
+            }
         }
-
-        int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-
-        float mult = this.manybows$getChargeMultiplier(bowStack, entity);
-        int scaledCharge = Math.max(0, (int)(charge * mult));
-
-        float power = getPowerForTime(scaledCharge);
-        if (power < 0.1F) return false;
-
-        List<ItemStack> projectiles = ProjectileWeaponItem.draw(bowStack, ammoInInv, player);
-        if (projectiles.isEmpty()) return false;
-
-        if (level instanceof ServerLevel serverLevel) {
-            this.shoot(
-                    serverLevel,
-                    player,
-                    player.getUsedItemHand(),
-                    bowStack,
-                    projectiles,
-                    power * 2.5F,
-                    1.0F,
-                    power == 1.0F,
-                    null
-            );
-        }
-
-        level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS,
-                1.0F, 1.4F + (power * 0.2F));
-
-        player.awardStat(Stats.ITEM_USED.get(this));
-        return true;
     }
-
 
     @Override
     protected Projectile createProjectile(Level level, LivingEntity shooter, ItemStack weaponStack, ItemStack ammoStack, boolean crit) {
@@ -107,7 +112,7 @@ public class AethersCall extends ModBowItem {
         projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
     }
 
-    
+
     public static float getPowerForTime(int i) {
         float f = (float)i / 20.0F;
         f = (f * f + f * 2.0F) / 3.0F;

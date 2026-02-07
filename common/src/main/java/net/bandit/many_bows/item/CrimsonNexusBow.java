@@ -69,7 +69,9 @@ public class CrimsonNexusBow extends ModBowItem {
 
     @Override
     public boolean releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
-        if (!(entity instanceof Player player)) return false;
+       try{
+           if (!(entity instanceof Player player)) return false;
+
 
         int charge = this.getUseDuration(bowStack, entity) - chargeTime;
 
@@ -79,17 +81,15 @@ public class CrimsonNexusBow extends ModBowItem {
         float power = getPowerForTime(scaledCharge);
         if (power < 0.1F) return false;
 
-        // Server-side: sound + health cost
         if (!level.isClientSide()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
             float healthCost = player.getHealth() > 4.0F ? 2.0F : 0.0F;
-            if (healthCost <= 0.0F) return false; // optional: block firing if too low
+            if (healthCost <= 0.0F) return false;
             player.hurt(player.damageSources().magic(), healthCost);
         }
 
-        // Fake ammo so the bow can shoot without requiring/consuming real arrows
         ItemStack fakeAmmo = new ItemStack(Items.ARROW);
         List<ItemStack> projectiles = List.of(fakeAmmo);
 
@@ -112,6 +112,11 @@ public class CrimsonNexusBow extends ModBowItem {
 
         player.awardStat(Stats.ITEM_USED.get(this));
         return true;
+    }finally {
+           if (level.isClientSide()) {
+               this.manybows$resetPullVisual(bowStack);
+           }
+       }
     }
 
 

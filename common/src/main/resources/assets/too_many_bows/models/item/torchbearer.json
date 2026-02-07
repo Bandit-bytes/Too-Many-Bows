@@ -5,28 +5,6 @@
 		"0": "too_many_bows:item/torchbearer",
 		"particle": "too_many_bows:item/torchbearer"
 	},
-	"overrides": [
-		{
-			"predicate": {
-				"minecraft:pulling": 1
-			},
-			"model": "too_many_bows:item/torchbearer_pulling_0"
-		},
-		{
-			"predicate": {
-				"minecraft:pulling": 1,
-				"minecraft:pull": 0.65
-			},
-			"model": "too_many_bows:item/torchbearer_pulling_1"
-		},
-		{
-			"predicate": {
-				"minecraft:pulling": 1,
-				"minecraft:pull": 0.9
-			},
-			"model": "too_many_bows:item/torchbearer_pulling_2"
-		}
-	],
 	"elements": [
 		{
 			"from": [4.31194, 10.1927, 7.125],

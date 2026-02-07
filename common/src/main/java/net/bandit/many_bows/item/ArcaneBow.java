@@ -32,7 +32,8 @@ public class ArcaneBow extends ModBowItem {
 
     @Override
     public boolean releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
-        if (!(entity instanceof Player player)) return false;
+        try{
+            if (!(entity instanceof Player player)) return false;
 
         ItemStack ammoInInv = player.getProjectile(bowStack);
         if (ammoInInv.isEmpty() && !player.hasInfiniteMaterials()) {
@@ -62,7 +63,12 @@ public class ArcaneBow extends ModBowItem {
 
         player.awardStat(Stats.ITEM_USED.get(this));
         return true;
+    }finally {
+        if (level.isClientSide()) {
+            this.manybows$resetPullVisual(bowStack);
+        }
     }
+}
 
     private void fireTriple(ServerLevel level, Player player, ItemStack bowStack, ItemStack ammoStack, float power) {
         for (int i = -1; i <= 1; i++) {
