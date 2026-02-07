@@ -39,7 +39,7 @@ public class DrawSpeedGloveItem extends Item {
             tooltip.accept(Component.translatable("item.too_many_bows.equip.glove")
                     .withStyle(ChatFormatting.DARK_GRAY));
         } else {
-            tooltip.accept(Component.translatable("item.too_many_bows.hold_shift")
+            tooltip.accept(Component.literal("item not yet working/implemented")
                     .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
         }
     }

@@ -9,7 +9,7 @@
     "description": {
       "translate": "advancement.too_many_bows.root.description"
     },
-    "background": "minecraft:textures/block/end_stone.png",
+    "background": "minecraft:gui/advancements/backgrounds/adventure",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false

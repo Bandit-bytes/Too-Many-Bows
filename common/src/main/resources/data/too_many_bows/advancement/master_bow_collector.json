@@ -207,6 +207,18 @@
         "items": [{ "items": ["too_many_bows:radiance"] }]
       }
     },
+    "beacon_beam_bow": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:beacon_beam_bow"] }]
+      }
+    },
+    "webstring": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:webstring"] }]
+      }
+    },
     "crimson_nexus": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
@@ -247,6 +259,8 @@
     ["astral_bound"],
     ["spectral_whisper"],
     ["auroras_grace"],
+    ["beacon_beam_bow"],
+    ["webstring"],
     ["torchbearer"]
   ],
   "rewards": {
