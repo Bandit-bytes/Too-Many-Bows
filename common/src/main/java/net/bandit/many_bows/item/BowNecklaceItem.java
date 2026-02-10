@@ -56,7 +56,7 @@ public class BowNecklaceItem extends Item {
         tooltip.accept(Component.empty());
 
         tooltip.accept(Component.literal(tier.effectHint).withStyle(ChatFormatting.BLUE));
-        tooltip.accept(Component.literal("Equip in a necklace slot.(not yet working/implemented)").withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.accept(Component.literal("Equip in a necklace slot.").withStyle(ChatFormatting.DARK_GRAY));
 
         super.appendHoverText(stack, context, display, tooltip, flag);
     }

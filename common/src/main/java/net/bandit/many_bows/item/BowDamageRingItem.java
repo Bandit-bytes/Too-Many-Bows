@@ -69,7 +69,7 @@ public class BowDamageRingItem extends Item {
         tooltip.accept(Component.literal("Increases bow damage by +" + percent + "%")
                 .withStyle(ChatFormatting.BLUE));
 
-        tooltip.accept(Component.literal("Equip in a ring slot.(not yet working/implemented)")
+        tooltip.accept(Component.literal("Equip in a ring slot.")
                 .withStyle(ChatFormatting.DARK_GRAY));
 
         super.appendHoverText(stack, context, display, tooltip, flag);
