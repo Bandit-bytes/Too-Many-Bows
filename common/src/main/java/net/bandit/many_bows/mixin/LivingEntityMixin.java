@@ -1,8 +1,6 @@
 package net.bandit.many_bows.mixin;
 
 import net.bandit.many_bows.registry.EffectRegistry;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffect;
