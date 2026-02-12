@@ -63,6 +63,6 @@ public class RadiantArrow extends AbstractArrow {
 
     @Override
     protected ItemStack getPickupItem() {
-        return ItemStack.EMPTY; // No item pickup
+        return ItemStack.EMPTY; // No items pickup
     }
 }

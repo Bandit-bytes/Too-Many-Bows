@@ -11,15 +11,19 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Predicate;
 
-public class SonicBoomBow extends BowItem {
+public class SonicBoomBow extends ModBowItem {
 
     public SonicBoomBow(Properties properties) {
         super(properties);
@@ -27,66 +31,76 @@ public class SonicBoomBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide()) {
-            int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
+        if (!(entity instanceof Player player)) return;
+        if (level.isClientSide) return;
 
-            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
+        int charge = this.getUseDuration(stack) - timeCharged;
+        float power = getPowerForTime(charge);
 
-            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
-                SonicBoomProjectile sonicBoom = new SonicBoomProjectile(level, player);
+        boolean hasInfinity = canFireWithoutArrows(stack, player);
+        ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
-                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-                if (powerLevel > 0) {
-                    sonicBoom.setBaseDamage(sonicBoom.getBaseDamage() + powerLevel * 0.5 + 0.5);
-                }
+        if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
+            SonicBoomProjectile sonicBoom = new SonicBoomProjectile(level, player);
 
-                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-                if (punchLevel > 0) {
-                    sonicBoom.setKnockback(punchLevel);
-                }
-
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-                    sonicBoom.setSecondsOnFire(100);
-                }
-
-                sonicBoom.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 5.0F, 0.5F);
-
-                if (hasInfinity) {
-                    sonicBoom.pickup = AbstractArrow.Pickup.DISALLOWED;
-                }
-
-                level.addFreshEntity(sonicBoom);
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 1.0F, 1.0F);
-
-                if (!hasInfinity && !arrowStack.isEmpty()) {
-                    arrowStack.shrink(1);
-                    if (arrowStack.isEmpty()) {
-                        player.getInventory().removeItem(arrowStack);
-                    }
-                }
-
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-            } else if (power >= 0.1F) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
+            int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
+            if (powerLevel > 0) {
+                sonicBoom.setBaseDamage(sonicBoom.getBaseDamage() + powerLevel * 0.5D + 0.5D);
             }
-            player.awardStat(Stats.ITEM_USED.get(this));
+
+            int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
+            if (punchLevel > 0) {
+                sonicBoom.setKnockback(punchLevel);
+            }
+
+            if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
+                sonicBoom.setSecondsOnFire(100);
+            }
+
+            sonicBoom.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 5.0F, 0.5F);
+
+            if (hasInfinity) {
+                sonicBoom.pickup = AbstractArrow.Pickup.DISALLOWED;
+            }
+
+            level.addFreshEntity(sonicBoom);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+            if (!hasInfinity && !arrowStack.isEmpty()) {
+                arrowStack.shrink(1);
+                if (arrowStack.isEmpty()) {
+                    player.getInventory().removeItem(arrowStack);
+                }
+            }
+
+            damageBow(stack, player, player.getUsedItemHand());
+        } else if (power >= 0.1F) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
         }
+
+        player.awardStat(Stats.ITEM_USED.get(this));
+    }
+
+    @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
+    }
+
+    @Override
+    public @org.jetbrains.annotations.NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
+        return stack -> stack.getItem() instanceof ArrowItem;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-        tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip").withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip.ability").withStyle(ChatFormatting.AQUA));
-        tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip.legend").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
-    }else {
+            tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip").withStyle(ChatFormatting.GOLD));
+            tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip.ability").withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("item.too_many_bows.sonic_bow.tooltip.legend").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+        } else {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
-    }
-    @Override
-    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
 }

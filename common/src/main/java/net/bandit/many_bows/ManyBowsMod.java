@@ -17,6 +17,7 @@ public final class ManyBowsMod {
         TabRegistry.init();
         EntityRegistry.register();
         EffectRegistry.register();
+        AttributesRegistry.register();
         EnchantmentRegistry.register();
         ModLootModifiers.registerLootModifiers();
 

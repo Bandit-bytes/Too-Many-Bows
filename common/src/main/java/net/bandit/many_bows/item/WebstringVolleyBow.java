@@ -11,19 +11,20 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
-public class WebstringVolleyBow extends BowItem {
+public class WebstringVolleyBow extends ModBowItem {
     private static final int ARROW_COUNT = 5;
     private static final float SPREAD_ANGLE = 15.0F;
+    private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
 
     public WebstringVolleyBow(Properties properties) {
         super(properties);
@@ -35,16 +36,23 @@ public class WebstringVolleyBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
+            boolean isCreative = player.getAbilities().instabuild;
+            boolean hasInfinity = hasInfinity(stack, player);
+            boolean canFireNoArrows = canFireWithoutArrows(stack, player);
 
-            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
+            ItemStack arrowStack = player.getProjectile(stack);
+            boolean hasArrows = !arrowStack.isEmpty() || isCreative || canFireNoArrows;
+
+            if (power >= 0.1F && hasArrows) {
+                if (arrowStack.isEmpty() && canFireNoArrows) {
+                    arrowStack = new ItemStack(Items.ARROW);
+                }
+
                 boolean hasPickedUpArrow = false;
 
                 for (int i = 0; i < ARROW_COUNT; i++) {
                     WebstringArrow arrow = new WebstringArrow(level, player);
 
-                    // Calculate angle for spread
                     float angleOffset = SPREAD_ANGLE * (i - (ARROW_COUNT - 1) / 2.0F) / (ARROW_COUNT - 1);
                     arrow.shootFromRotation(player, player.getXRot(), player.getYRot() + angleOffset, 0.0F, power * 3.0F, 1.0F);
 
@@ -53,13 +61,19 @@ public class WebstringVolleyBow extends BowItem {
                     if (powerLevel > 0) {
                         arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
                     }
+
                     int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
                     if (punchLevel > 0) {
                         arrow.setKnockback(punchLevel);
                     }
+
                     if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
                         arrow.setSecondsOnFire(100);
                     }
+
+                    applyBowDamageAttribute(arrow, player);
+                    tryApplyBowCrit(arrow, player, DEFAULT_CRIT_MULTIPLIER);
+
                     if (!hasPickedUpArrow) {
                         arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
                         hasPickedUpArrow = true;
@@ -69,21 +83,23 @@ public class WebstringVolleyBow extends BowItem {
 
                     level.addFreshEntity(arrow);
                 }
+
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                if (!hasInfinity && !arrowStack.isEmpty()) {
+
+                if (!isCreative && !hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
                     if (arrowStack.isEmpty()) {
                         player.getInventory().removeItem(arrowStack);
                     }
                 }
-                stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+
+                damageBow(stack, player, player.getUsedItemHand());
             } else {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
-
 
     @Override
     public boolean isEnchantable(ItemStack stack) {

@@ -95,7 +95,7 @@ public class ItemRegistry {
             () -> new WindBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.UNCOMMON)));
     public static final RegistrySupplier<Item> TORCHBEARER = ITEMS.register("torchbearer",
             () -> new TorchbearerBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
-    //item
+    //items
     public static final RegistrySupplier<Item> CURSED_STONE = ITEMS.register("cursed_stone",
             () -> new CursedStone(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> SOUL_FRAGMENT = ITEMS.register("soul_fragment",
@@ -104,6 +104,17 @@ public class ItemRegistry {
             () -> new RiftShardItem(new Properties().rarity(Rarity.EPIC).stacksTo(64).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> POWER_CRYSTAL = ITEMS.register("power_crystal",
             () -> new RepairCrystalItem(new Properties().rarity(Rarity.EPIC).stacksTo(16).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+    public static final RegistrySupplier<Item> WIND_GLOVE = ITEMS.register("wind_glove",
+            () -> new DrawSpeedGloveItem(new Item.Properties().stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.RARE)));
+    public static final RegistrySupplier<Item> SHARPSHOT_RING = ITEMS.register("sharpshot_ring",
+            () -> new BowDamageRingItem( BowDamageRingItem.Tier.SHARPSHOT,new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> STORMBOUND_SIGNET = ITEMS.register("stormbound_signet",
+            () -> new BowDamageRingItem( BowDamageRingItem.Tier.STORMBOUND,new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> FLETCHERS_TALISMAN = ITEMS.register("fletchers_talisman",
+            () -> new BowNecklaceItem(BowNecklaceItem.Tier.FLETCHER, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> DEAD_EYES_PENDANT = ITEMS.register("dead_eyes_pendant",
+            () -> new BowNecklaceItem(BowNecklaceItem.Tier.DEAD_EYE, new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+
 
 
 

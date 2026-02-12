@@ -11,7 +11,9 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -19,70 +21,84 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class EmeraldSageBow extends BowItem {
+public class EmeraldSageBow extends ModBowItem {
+
+    private static final double CRIT_MULTIPLIER = 1.5D;
 
     public EmeraldSageBow(Properties properties) {
         super(properties);
     }
 
-
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide()) {
-            int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
-            if (power >= 0.1F) {
-                ItemStack arrowStack = player.getProjectile(stack);
-                boolean isCreative = player.getAbilities().instabuild;
-                boolean hasInfinity = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-                boolean hasArrows = !arrowStack.isEmpty() || isCreative || hasInfinity;
+        if (!(entity instanceof Player player)) return;
+        if (level.isClientSide) return;
 
-                if (hasArrows) {
-                    if (arrowStack.isEmpty() && hasInfinity) {
-                        arrowStack = new ItemStack(Items.ARROW);
-                    }
+        int charge = this.getUseDuration(stack) - timeCharged;
+        float power = getPowerForTime(charge);
 
-                   HunterXPArrow HunterXPArrow = new HunterXPArrow(level, player);
-                   HunterXPArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                    applyEnchantments(stack,HunterXPArrow);
+        if (power < 0.1F) return;
 
-                    if (hasInfinity) {
-                       HunterXPArrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
-                    }
+        ItemStack arrowStack = player.getProjectile(stack);
+        boolean isCreative = player.getAbilities().instabuild;
+        boolean hasInfinity = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
+        boolean hasArrows = !arrowStack.isEmpty() || isCreative || hasInfinity;
 
-                    if (!isCreative && !hasInfinity) {
-                        arrowStack.shrink(1);
-                        if (arrowStack.isEmpty()) {
-                            player.getInventory().removeItem(arrowStack);
-                        }
-                    }
+        if (!hasArrows) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
+            player.awardStat(Stats.ITEM_USED.get(this));
+            return;
+        }
 
-                    level.addFreshEntity(HunterXPArrow);
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+        if (arrowStack.isEmpty() && hasInfinity) {
+            arrowStack = new ItemStack(Items.ARROW);
+        }
 
-                    stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                } else {
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
+        HunterXPArrow hunterXpArrow = new HunterXPArrow(level, player);
+        hunterXpArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+
+        applyEnchantments(stack, hunterXpArrow);
+
+        applyBowDamageAttribute(hunterXpArrow, player);
+        tryApplyBowCrit(hunterXpArrow, player, CRIT_MULTIPLIER);
+
+        if (hasInfinity) {
+            hunterXpArrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+        }
+
+        if (!isCreative && !hasInfinity) {
+            if (!arrowStack.isEmpty()) {
+                arrowStack.shrink(1);
+                if (arrowStack.isEmpty()) {
+                    player.getInventory().removeItem(arrowStack);
                 }
-                player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
+
+        level.addFreshEntity(hunterXpArrow);
+
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+
+        damageBow(stack, player, player.getUsedItemHand());
+
+        player.awardStat(Stats.ITEM_USED.get(this));
     }
 
-
-    private void applyEnchantments(ItemStack stack,HunterXPArrow HunterXPArrow) {
+    private void applyEnchantments(ItemStack stack, HunterXPArrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
-           HunterXPArrow.setBaseDamage(HunterXPArrow.getBaseDamage() + (powerLevel * 0.5) + 1.0);
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.0D);
         }
 
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
         if (punchLevel > 0) {
-           HunterXPArrow.setKnockback(punchLevel);
+            arrow.setKnockback(punchLevel);
         }
 
         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-           HunterXPArrow.setSecondsOnFire(100);
+            arrow.setSecondsOnFire(100);
         }
     }
 

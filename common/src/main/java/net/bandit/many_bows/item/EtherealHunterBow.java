@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -24,9 +23,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class EtherealHunterBow extends BowItem {
+public class EtherealHunterBow extends ModBowItem {
 
-    private static final int HUNGER_COST = 2; // Hunger points required per shot
+    private static final int HUNGER_COST = 2;
+    private static final double CRIT_MULTIPLIER = 1.5D;
 
     public EtherealHunterBow(Properties properties) {
         super(properties);
@@ -34,29 +34,31 @@ public class EtherealHunterBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide) {
-            int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
+        if (!(entity instanceof Player player)) return;
+        if (level.isClientSide) return;
 
-            if (power >= 0.1F && consumeHunger(player)) { // Check if hunger is consumed
-                // Play custom sound
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.5F);
+        int charge = this.getUseDuration(stack) - timeCharged;
+        float power = getPowerForTime(charge);
 
-                // Explicitly create and fire the vanilla arrow
-                Arrow arrow = new Arrow(level, player);
-                arrow.setBaseDamage(9.0);
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                arrow.setCritArrow(charge >= 20);
+        if (power >= 0.1F && consumeHunger(player)) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-                // Apply enchantments to the arrow
-                applyEnchantments(stack, arrow);
+            Arrow arrow = new Arrow(level, player);
+            arrow.setBaseDamage(9.0D);
+            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+            arrow.setCritArrow(charge >= 20);
 
-                level.addFreshEntity(arrow);
+            applyEnchantments(stack, arrow);
 
-                // Damage the bow after firing
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                player.awardStat(Stats.ITEM_USED.get(this));
-            }
+            applyBowDamageAttribute(arrow, player);
+            tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
+
+            level.addFreshEntity(arrow);
+
+            damageBow(stack, player, player.getUsedItemHand());
+            player.awardStat(Stats.ITEM_USED.get(this));
+        } else {
             player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
@@ -64,19 +66,20 @@ public class EtherealHunterBow extends BowItem {
     private boolean consumeHunger(Player player) {
         int currentHunger = player.getFoodData().getFoodLevel();
         if (currentHunger >= HUNGER_COST) {
-            player.getFoodData().setFoodLevel(currentHunger - HUNGER_COST); // Deduct hunger points
+            player.getFoodData().setFoodLevel(currentHunger - HUNGER_COST);
             return true;
         }
-
-        // Notify player if insufficient hunger
-        player.displayClientMessage(Component.translatable("item.many_bows.ethereal_hunter.no_hunger").withStyle(ChatFormatting.RED), true);
+        player.displayClientMessage(
+                Component.translatable("item.many_bows.ethereal_hunter.no_hunger").withStyle(ChatFormatting.RED),
+                true
+        );
         return false;
     }
 
-    private void applyEnchantments(ItemStack stack, net.minecraft.world.entity.projectile.Arrow arrow) {
+    private void applyEnchantments(ItemStack stack, Arrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
         }
 
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
@@ -103,31 +106,26 @@ public class EtherealHunterBow extends BowItem {
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());
     }
+
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-
-        if (player.getAbilities().instabuild || player.getProjectile(stack).isEmpty() || this.getAllSupportedProjectiles().test(player.getProjectile(stack))) {
-            player.startUsingItem(hand);
-            return InteractionResultHolder.consume(stack);
-        } else {
-            return InteractionResultHolder.fail(stack);
-        }
+        player.startUsingItem(hand);
+        return InteractionResultHolder.consume(stack);
     }
+
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true; // No arrows required
+        return s -> true;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-            // Detailed information when holding Shift
             tooltip.add(Component.translatable("item.many_bows.ethereal_hunter.tooltip.info").withStyle(ChatFormatting.DARK_PURPLE));
             tooltip.add(Component.translatable("item.many_bows.ethereal_hunter.tooltip.hunger", HUNGER_COST).withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("item.many_bows.ethereal_hunter.tooltip.legend").withStyle(ChatFormatting.AQUA, ChatFormatting.ITALIC));
         } else {
-            // Base message prompting to hold Shift
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift").withStyle(ChatFormatting.YELLOW));
         }
     }

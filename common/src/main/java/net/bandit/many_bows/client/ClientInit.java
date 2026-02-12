@@ -3,10 +3,13 @@ package net.bandit.many_bows.client;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.registry.AttributesRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
@@ -69,31 +72,55 @@ public class ClientInit {
     }
 
     private static void registerBowProperties(Item item) {
-        ItemPropertiesRegistry.register(item, new ResourceLocation("pull"), (itemStack, level, entity, seed) -> {
-            if (entity == null) return 0.0F;
-            return entity.getUseItem() != itemStack ? 0.0F : (float) (itemStack.getUseDuration() - entity.getUseItemRemainingTicks()) / 20.0F;
-        });
+        ItemPropertiesRegistry.register(item,
+                new ResourceLocation("minecraft", "pull"),
+                (stack, level, entity, seed) -> {
+                    if (entity == null) return 0.0F;
+                    if (entity.getUseItem() != stack) return 0.0F;
 
-        ItemPropertiesRegistry.register(item, new ResourceLocation("pulling"), (itemStack, level, entity, seed) -> {
-            return entity != null && entity.isUsingItem() && entity.getUseItem() == itemStack ? 1.0F : 0.0F;
-        });
+                    float basePullTicks = 20.0F;
+
+                    if (item instanceof PullSpeedItem) {
+                        basePullTicks = ((PullSpeedItem) item).getPullTicks(stack, entity);
+                    }
+
+                    float drawSpeed = 1.0F;
+                    if (entity instanceof LivingEntity) {
+                        LivingEntity living = (LivingEntity) entity;
+                        AttributeInstance inst = living.getAttribute(AttributesRegistry.BOW_DRAW_SPEED.get());
+                        if (inst != null) {
+                            drawSpeed = (float) inst.getValue();
+                        }
+                    }
+
+                    float pullTicks = basePullTicks / Math.max(0.05F, drawSpeed);
+
+                    int used = stack.getUseDuration() - entity.getUseItemRemainingTicks();
+                    return (float) used / pullTicks;
+                });
+
+        ItemPropertiesRegistry.register(item,
+                new ResourceLocation("minecraft", "pulling"),
+                (stack, level, entity, seed) ->
+                        entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
     }
+
 //
-//    private static void registerCrossbowProperties(Item item) {
-//        ItemPropertiesRegistry.register(item, new ResourceLocation("charged"), (stack, level, entity, seed) -> {
+//    private static void registerCrossbowProperties(Item items) {
+//        ItemPropertiesRegistry.register(items, new ResourceLocation("charged"), (stack, level, entity, seed) -> {
 //            return CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
 //        });
 //
-//        ItemPropertiesRegistry.register(item, new ResourceLocation("firework"), (stack, level, entity, seed) -> {
+//        ItemPropertiesRegistry.register(items, new ResourceLocation("firework"), (stack, level, entity, seed) -> {
 //            return CrossbowItem.containsChargedProjectile(stack, Items.FIREWORK_ROCKET) ? 1.0F : 0.0F;
 //        });
 //
-//        ItemPropertiesRegistry.register(item, new ResourceLocation("pull"), (stack, level, entity, seed) -> {
+//        ItemPropertiesRegistry.register(items, new ResourceLocation("pull"), (stack, level, entity, seed) -> {
 //            if (entity == null || CrossbowItem.isCharged(stack)) return 0.0F;
 //            return (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / CrossbowItem.getChargeDuration(stack);
 //        });
 //
-//        ItemPropertiesRegistry.register(item, new ResourceLocation("pulling"), (stack, level, entity, seed) -> {
+//        ItemPropertiesRegistry.register(items, new ResourceLocation("pulling"), (stack, level, entity, seed) -> {
 //            return entity != null && entity.isUsingItem() && entity.getUseItem() == stack && !CrossbowItem.isCharged(stack) ? 1.0F : 0.0F;
 //        });
 //    }

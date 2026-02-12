@@ -6,6 +6,7 @@ import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.config.BowLootConfig;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.registry.EntityRegistry;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -15,7 +16,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(ManyBowsMod.MOD_ID)
 @EventBusSubscriber(modid = ManyBowsMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -29,6 +32,7 @@ public class ManyBowsModForge {
         ManyBowsMod.init();
 
     }
+
 
     private void onClientSetup(final FMLClientSetupEvent event) {
         // This is where the client-specific code should be registered

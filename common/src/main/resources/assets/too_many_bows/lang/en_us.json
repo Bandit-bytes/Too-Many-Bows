@@ -18,21 +18,27 @@
   "item.too_many_bows.ironclad_bow": "Ironclad Bow",
   "item.too_many_bows.arc_heavens": "Arc Of The Heavens",
   "item.too_many_bows.solar_bow": "Solar Flare",
-  "item.too_many_bows.dragons_breath": "Dragon Breath",
+  "item.too_many_bows.dragons_breath": "Dragons Breath",
   "item.too_many_bows.cursed_stone": "Cursed Stone",
   "item.too_many_bows.shulker_blast": "Shulker's Blast",
-  "item.too_many_bows.webstring": "Webstring",
-  "item.too_many_bows.torchbearer": "Torchebearer",
+  "item.too_many_bows.sharpshot_ring": "Sharpshot Ring",
+  "item.too_many_bows.stormbound_signet": "Stormbound Signet",
+  "item.too_many_bows.fletchers_talisman": "Fletchers Talisman",
+  "item.too_many_bows.dead_eyes_pendant": "Dead Eyes Pendant",
 
   "too_many_bows_tab": "Too Many Bows",
   "category.many_bows": "Too Many Bows",
+
+  "item.too_many_bows.cursed_flame_bow.tooltip.sigil.title": "✦ Cursed Sigil",
+  "item.too_many_bows.cursed_flame_bow.tooltip.sigil.desc": "Fully drawn shots gain increased critical chance",
+
 
   "item.many_bows.arcane_bow.tooltip": "Unleashes a mystical spread of arrows with arcane energy.",
   "item.many_bows.arcane_bow.tooltip.ability": "Ability: Fires three arrows in a spread pattern, dealing extra arcane damage.",
   "item.many_bows.arcane_bow.tooltip.legend": "Ancient secrets lie within its enchanted limbs...",
 
-  "item.many_bows.solar_bow.tooltip": "§eA powerful bow charged by the sun",
-  "item.many_bows.solar_bow.tooltip.ability": "§cShoots flaming solar arrows on full charge.",
+  "item.many_bows.solar_bow.tooltip": "§eCharged by the Sun, fire at enemy feet for death..",
+  "item.many_bows.solar_bow.tooltip.ability": "§cSummons Fire Tornados on ground blocks near entities.",
 
   "item.many_bows.frostbite_bow.tooltip": "A bow forged from the chilling essence of ice.",
   "item.many_bows.frostbite_bow.tooltip.ability": "Shoots frost arrows that slow and freeze enemies on full charge.",
@@ -58,7 +64,7 @@
 
   "item.too_many_bows.tidal_bow.tooltip": "The power of the ocean flows through this bow.",
   "item.too_many_bows.tidal_bow.tooltip.ability": "You are able to shoot arrows underwater as normal arrows.",
-  "item.too_many_bows.tidal_bow.tooltip.legend": "A bow that harnesses the ancient power of the seas, you get a 2.5 damage multi underwater.",
+  "item.too_many_bows.tidal_bow.tooltip.legend": "A bow that harnesses the ancient power of the seas.",
 
   "item.too_many_bows.cursed_flame_bow.tooltip": "A bow imbued with cursed flames, known to halt regeneration and burn with inextinguishable fury.",
   "item.too_many_bows.cursed_flame_bow.tooltip.ability": "Ignites foes with cursed fire: blocks all regen, can't be extinguished by water, and deals a heart of damage per tick.",
@@ -75,18 +81,18 @@
   "item.many_bows.ancient_sage_bow.tooltip.ability": "Pierces through 33% of armor defenses.",
   "item.many_bows.ancient_sage_bow.tooltip.legend": "Only the wise can wield its true might.",
 
-  "item.too_many_bows.wind_bow.tooltip": "Harness the power of the wind",
-  "item.too_many_bows.wind_bow.tooltip.ability": "Special Ability: Levitation Shot",
-  "item.too_many_bows.wind_bow.tooltip.effect": "Draw the bow to move swiftly; enemies hit may be lifted skyward",
-  "item.too_many_bows.wind_bow.tooltip.legend": "Ancient whispers say this bow was crafted from a storm's fury",
+  "item.too_many_bows.wind_bow.tooltip": "A bow that harnesses the breath of the skies.",
+  "item.too_many_bows.wind_bow.tooltip.ability": "Ability: §bGale Burst§r\n • On impact, release a gust of wind\n • Knocks nearby foes outward\n • Direct hits deal light magic damage",
+  "item.too_many_bows.wind_bow.tooltip.effect": "Tailwind: Hitting an enemy or surface grants\n • Speed II for a short duration\n • Slow Falling to reposition mid-air",
+  "item.too_many_bows.wind_bow.tooltip.legend": "\"The wind does not follow—it leads.\"",
 
   "item.many_bows.icicle_javelin_bow.tooltip": "A bow imbued with the power of freezing winds.",
   "item.many_bows.icicle_javelin_bow.tooltip.ability": "Fires icicle javelins that pierce enemies.",
   "item.many_bows.icicle_javelin_bow.tooltip.freeze": "summon ice upon block hit.",
 
   "item.too_many_bows.ironclad_bow.tooltip": "Forged with iron, tempered in battle",
-  "item.too_many_bows.ironclad_bow.tooltip.ability": "Magnetic Pulse: Pulls enemies towards the point of impact of arrow..",
-  "item.too_many_bows.ironclad_bow.tooltip.legend": "Including yourself (block radius 5)..",
+  "item.too_many_bows.ironclad_bow.tooltip.ability": "Magnetic Pulse: Pulls enemies towards the point of impact",
+  "item.too_many_bows.ironclad_bow.tooltip.legend": "Arrows have magnetic force..",
 
   "item.too_many_bows.hunter_bow_bow": "The Hunter's trusty bow.",
   "item.too_many_bows.hunter_bow.tooltip": "§7Effective against passive mobs.",
@@ -213,6 +219,7 @@
   "item.many_bows.radiance.tooltip.legend": "“The light shall guide and protect.”",
   "item.many_bows.radiance.tooltip.info": "Consumes experience points to fire radiant arrows.",
   "item.many_bows.radiance.tooltip.xp": "Experience Cost: §c%d XP§r per shot.",
+  "item.many_bows.radiance.no_experience": "Need Experience to fire this bow!",
 
   "item.many_bows.dusk_reaper.tooltip.info": "Marks enemies.",
   "item.many_bows.dusk_reaper.tooltip.mark": "Marked enemies take increased damage and leave a damaging trail.",
@@ -221,6 +228,7 @@
   "item.many_bows.dusk_reaper.tooltip.debuff": "Applies Weakness, Slowness, and constant damage to marked targets.",
   "item.many_bows.dusk_reaper.tooltip.glow": "Marked enemies are visible through walls.",
   "item.many_bows.soulfragment.tooltip.info":"Used to fire the Dusk Reaper bow",
+  "item.many_bows.soulfragment.tooltip.info_2": "Infinity Enchantment has no power over Souls..",
   "item.many_bows.dusk_reaper.tooltip.soul_fragments": "Consumes Soul Fragments to fire.",
   "item.many_bows.ethereal_hunter.tooltip.info": "A mystical bow that fires radiant arrows fueled by your hunger.",
   "item.many_bows.ethereal_hunter.tooltip.hunger": "Consumes %s hunger points per shot.",
@@ -228,13 +236,32 @@
   "item.many_bows.ethereal_hunter.no_hunger": "You are too hungry to fire the bow!",
   "item.many_bows.dusk_reaper.no_soul_fragments": "You need Soul Fragments to fire this bow!",
   "item.many_bows.aurora_bow.no_rift_shard": "You need a Rift shard to fire this bow!",
-  "item.many_bows.radiance.no_experience": "This bow requires XP to fire!",
-
+  "item.too_many_bows.webstring": "Webstring",
   "item.too_many_bows.webstring_volley": "Webstring Volley",
   "item.too_many_bows.webstring_volley.tooltip": "Unleash a volley of arrows in a wide spread.",
   "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets.",
   "item.too_many_bows.torchbearer_bow": "Torchbearer Bow",
-  "item.too_many_bows.torchbearer_bow.tooltip": "Holding the bow gives off light.",
+  "item.too_many_bows.torchbearer": "Torchbearer",
+  "attribute.too_many_bows.bow_draw_speed": "Bow Draw Speed",
+  "attribute.too_many_bows.bow_damage": "Bow Damage",
+  "attribute.too_many_bows.bow_crit_chance": "Bow Crit Chance",
   "item.too_many_bows.torchbearer_bow.shift": "Ignites enemies and lights your path.",
-  "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact."
+  "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact.",
+
+  "item.many_bows.demon_bow.tooltip.extended": "The Demons Bow",
+  "item.many_bows.demon_bow.tooltip": "No real power emits from this bow anymore....",
+  "item.too_many_bows.wind_glove": "Windwoven Gloves",
+
+  "item.too_many_bows.draw_speed_glove.lore_1": "Lightweight leather reinforced with etched filaments.",
+  "item.too_many_bows.draw_speed_glove.lore_2": "The string answers faster than the mind can react.",
+
+  "item.too_many_bows.draw_speed_glove.effect": "Increases bow draw speed.",
+  "item.too_many_bows.equip.glove": "Equip in a glove slot.",
+  "item.too_many_bows.beacon_beam_bow.tooltip": "Beacon Beam Bow",
+  "item.too_many_bows.beacon_beam_bow": "Beacon Beam Bow",
+  "item.too_many_bows.beacon_beam_bow.tooltip.ability": "Impact releases a linking burst of light.",
+  "item.too_many_bows.beacon_beam_bow.tooltip.legend": "Beacon energy seeks nearby targets.",
+
+  "item.many_bows.aether_bow.tooltip": "A bow attuned to the winds of the Aether.",
+  "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact"
 }

@@ -11,7 +11,9 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -19,7 +21,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class VerdantViperBow extends BowItem {
+public class VerdantViperBow extends ModBowItem {
+
+    private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
 
     public VerdantViperBow(Properties properties) {
         super(properties);
@@ -31,15 +35,20 @@ public class VerdantViperBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime(charge);
 
-            // Check for Infinity enchantment or Creative mode
-            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
+            boolean isCreative = player.getAbilities().instabuild;
+            boolean hasInfinity = hasInfinity(stack, player);
+            boolean canFireNoArrows = canFireWithoutArrows(stack, player);
 
-            // Fire the Venom Arrow if power is adequate and arrows are consumed or Infinity is enabled
-            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
+            ItemStack arrowStack = player.getProjectile(stack);
+            boolean hasArrows = !arrowStack.isEmpty() || isCreative || canFireNoArrows;
+
+            if (power >= 0.1F && hasArrows) {
+                if (arrowStack.isEmpty() && canFireNoArrows) {
+                    arrowStack = new ItemStack(Items.ARROW);
+                }
+
                 VenomArrow venomArrow = new VenomArrow(level, player);
 
-                // Apply enchantment
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
                     venomArrow.setBaseDamage(venomArrow.getBaseDamage() + (double) powerLevel * 0.5 + 0.5);
@@ -56,7 +65,9 @@ public class VerdantViperBow extends BowItem {
 
                 venomArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-                // Prevent pickup if Infinity is enabled
+                applyBowDamageAttribute(venomArrow, player);
+                tryApplyBowCrit(venomArrow, player, DEFAULT_CRIT_MULTIPLIER);
+
                 if (hasInfinity) {
                     venomArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                 }
@@ -64,31 +75,32 @@ public class VerdantViperBow extends BowItem {
                 level.addFreshEntity(venomArrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HONEYCOMB_WAX_ON, SoundSource.PLAYERS, 1.0F, 1.0F);
 
-                // Consume arrow if not in Creative mode or with Infinity enchantment
-                if (!hasInfinity && !arrowStack.isEmpty()) {
+                if (!isCreative && !hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
                     if (arrowStack.isEmpty()) {
                         player.getInventory().removeItem(arrowStack);
                     }
                 }
 
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                damageBow(stack, player, player.getUsedItemHand());
             } else if (power >= 0.1F) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_HIT_PLAYER, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-        tooltip.add(Component.translatable("item.too_many_bows.verdant_viper_bow.tooltip").withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.translatable("item.too_many_bows.verdant_viper_bow.tooltip.ability").withStyle(ChatFormatting.GREEN));
-        tooltip.add(Component.translatable("item.too_many_bows.verdant_viper_bow.tooltip.legend").withStyle(ChatFormatting.DARK_GREEN, ChatFormatting.ITALIC));
-    }else {
+            tooltip.add(Component.translatable("item.too_many_bows.verdant_viper_bow.tooltip").withStyle(ChatFormatting.GOLD));
+            tooltip.add(Component.translatable("item.too_many_bows.verdant_viper_bow.tooltip.ability").withStyle(ChatFormatting.GREEN));
+            tooltip.add(Component.translatable("item.too_many_bows.verdant_viper_bow.tooltip.legend").withStyle(ChatFormatting.DARK_GREEN, ChatFormatting.ITALIC));
+        } else {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
     }
+
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());

@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -24,9 +23,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class RadianceBow extends BowItem {
+public class RadianceBow extends ModBowItem {
 
-    private static final int EXPERIENCE_COST = 5; // Experience points required per shot
+    private static final int EXPERIENCE_COST = 5;
+    private static final double CRIT_MULTIPLIER = 1.5D;
 
     public RadianceBow(Properties properties) {
         super(properties);
@@ -34,41 +34,48 @@ public class RadianceBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide) {
-            int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
+        if (!(entity instanceof Player player)) return;
 
-            if (power >= 0.1F && consumeExperience(player)) { // Check if experience is consumed
-                // Create and fire RadiantArrow
+        int charge = this.getUseDuration(stack) - timeCharged;
+        float power = getPowerForTime(charge);
+
+        if (!level.isClientSide) {
+            if (power >= 0.1F && consumeExperience(player)) {
                 RadiantArrow arrow = new RadiantArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 arrow.setCritArrow(charge >= 20);
 
-                // Apply enchantments
                 applyEnchantments(stack, arrow);
 
-                level.addFreshEntity(arrow);
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 1.0F, 1.5F);
+                applyBowDamageAttribute(arrow, player);
+                tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
 
-                // Damage the bow after firing
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                level.addFreshEntity(arrow);
+
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.PLAYERS, 1.0F, 1.5F);
+
+                damageBow(stack, player, player.getUsedItemHand());
+                player.awardStat(Stats.ITEM_USED.get(this));
+            } else {
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
-            player.awardStat(Stats.ITEM_USED.get(this));
         }
     }
 
     private boolean consumeExperience(Player player) {
         int totalExperience = player.totalExperience;
         if (totalExperience >= EXPERIENCE_COST) {
-            player.giveExperiencePoints(-EXPERIENCE_COST); // Deduct experience points
+            player.giveExperiencePoints(-EXPERIENCE_COST);
             return true;
         }
-
-        // Notify player if insufficient experience
-        player.displayClientMessage(Component.translatable("item.many_bows.radiance.no_experience").withStyle(ChatFormatting.RED), true);
+        player.displayClientMessage(
+                Component.translatable("item.many_bows.radiance.no_experience").withStyle(ChatFormatting.RED),
+                true
+        );
         return false;
     }
+
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
@@ -84,7 +91,7 @@ public class RadianceBow extends BowItem {
     private void applyEnchantments(ItemStack stack, RadiantArrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
         }
 
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
@@ -114,20 +121,17 @@ public class RadianceBow extends BowItem {
 
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true; // No arrows required
+        return s -> true;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-            // Detailed information when holding Shift
             tooltip.add(Component.translatable("item.many_bows.radiance.tooltip.info").withStyle(ChatFormatting.GOLD));
             tooltip.add(Component.translatable("item.many_bows.radiance.tooltip.xp", EXPERIENCE_COST).withStyle(ChatFormatting.RED));
             tooltip.add(Component.translatable("item.many_bows.radiance.tooltip.legend").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
-            // Base message prompting to hold Shift
             tooltip.add(Component.translatable("item.too_many_bows.shulker_blast_bow.hold_shift"));
         }
     }
-
 }

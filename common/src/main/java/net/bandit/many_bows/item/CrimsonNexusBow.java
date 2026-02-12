@@ -16,7 +16,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
-import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
@@ -30,9 +29,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static net.bandit.many_bows.config.ManyBowsConfigHolder.CONFIG;
+public class CrimsonNexusBow extends ModBowItem {
 
-public class CrimsonNexusBow extends BowItem {
+    private static final double CRIT_MULTIPLIER = 1.5D;
 
     public CrimsonNexusBow(Properties properties) {
         super(properties);
@@ -40,43 +39,50 @@ public class CrimsonNexusBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide) {
-            int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
+        if (!(entity instanceof Player player)) return;
+        if (level.isClientSide) return;
 
-            if (power >= 0.1F) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
+        int charge = this.getUseDuration(stack) - timeCharged;
+        float power = getPowerForTime(charge);
 
-                float healthCost = player.getHealth() <= 4.0F ? 0 : 2.0F;
-                player.hurt(player.damageSources().magic(), healthCost);
-                ItemStack arrowStack = player.getProjectile(stack);
-                ArrowItem arrowItem;
+        if (power < 0.1F) return;
 
-                if (arrowStack.isEmpty() || !(arrowStack.getItem() instanceof ArrowItem)) {
-                    arrowItem = (ArrowItem) Items.ARROW;
-                    arrowStack = new ItemStack(Items.ARROW);
-                } else {
-                    arrowItem = (ArrowItem) arrowStack.getItem();
-                }
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-                AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
-                arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                applyEnchantments(stack, arrow);
-
-                if (player.getHealth() == player.getMaxHealth()) {
-                    arrow.setCritArrow(true);
-                    arrow.setSecondsOnFire(200);
-                }
-
-                level.addFreshEntity(arrow);
-
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                player.awardStat(Stats.ITEM_USED.get(this));
-            }
+        float healthCost = player.getHealth() <= 4.0F ? 0.0F : 2.0F;
+        if (healthCost > 0.0F) {
+            player.hurt(player.damageSources().magic(), healthCost);
         }
+
+        ItemStack arrowStack = player.getProjectile(stack);
+        ArrowItem arrowItem;
+
+        if (arrowStack.isEmpty() || !(arrowStack.getItem() instanceof ArrowItem)) {
+            arrowItem = (ArrowItem) Items.ARROW;
+            arrowStack = new ItemStack(Items.ARROW);
+        } else {
+            arrowItem = (ArrowItem) arrowStack.getItem();
+        }
+
+        AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
+        arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+
+        arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+        applyEnchantments(stack, arrow);
+
+        applyBowDamageAttribute(arrow, player);
+        tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
+
+        if (player.getHealth() == player.getMaxHealth()) {
+            arrow.setCritArrow(true);
+            arrow.setSecondsOnFire(200);
+        }
+
+        level.addFreshEntity(arrow);
+
+        damageBow(stack, player, player.getUsedItemHand());
+        player.awardStat(Stats.ITEM_USED.get(this));
     }
 
     @Override
@@ -91,11 +97,10 @@ public class CrimsonNexusBow extends BowItem {
         }
     }
 
-
     private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
         }
 
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
@@ -109,9 +114,9 @@ public class CrimsonNexusBow extends BowItem {
     }
 
     private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack stack : player.getInventory().items) {
-            if (stack.getItem() instanceof ArrowItem) {
-                return stack;
+        for (ItemStack invStack : player.getInventory().items) {
+            if (invStack.getItem() instanceof ArrowItem) {
+                return invStack;
             }
         }
         return ItemStack.EMPTY;
@@ -119,33 +124,36 @@ public class CrimsonNexusBow extends BowItem {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && selected && !level.isClientSide) {
-            if (level.getGameTime() % 20 == 0 && player.getHealth() < player.getMaxHealth()) {
-                AABB area = new AABB(player.getX() - 8, player.getY() - 4, player.getZ() - 8,
-                        player.getX() + 8, player.getY() + 4, player.getZ() + 8);
+        if (!(entity instanceof Player player)) return;
+        if (!selected) return;
+        if (level.isClientSide) return;
 
-                List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, area,
-                        e -> e != player && e.isAlive() && !(e instanceof Player));
+        if (level.getGameTime() % 20 != 0) return;
+        if (player.getHealth() >= player.getMaxHealth()) return;
 
-                BowLootConfig config = ManyBowsConfigHolder.CONFIG;
+        AABB area = new AABB(player.getX() - 8, player.getY() - 4, player.getZ() - 8,
+                player.getX() + 8, player.getY() + 4, player.getZ() + 8);
 
-                nearby.removeIf(target -> {
-                    String id = target.getType().builtInRegistryHolder().key().location().toString();
-                    return config.emeraldSageCrimsonNexusBlacklist.contains(id);
-                });
+        List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, area,
+                e -> e != player && e.isAlive() && !(e instanceof Player));
 
-                if (!nearby.isEmpty()) {
-                    LivingEntity target = nearby.get(level.random.nextInt(nearby.size()));
-                    target.hurt(player.damageSources().magic(), 2.0F);
-                    player.heal(1.0F);
+        BowLootConfig config = ManyBowsConfigHolder.CONFIG;
 
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 0.3F, 1.5F);
+        nearby.removeIf(target -> {
+            String id = target.getType().builtInRegistryHolder().key().location().toString();
+            return config.emeraldSageCrimsonNexusBlacklist.contains(id);
+        });
 
-                    stack.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(p.getUsedItemHand()));
-                }
-            }
-        }
+        if (nearby.isEmpty()) return;
+
+        LivingEntity target = nearby.get(level.random.nextInt(nearby.size()));
+        target.hurt(player.damageSources().magic(), 2.0F);
+        player.heal(1.0F);
+
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 0.3F, 1.5F);
+
+        damageBow(stack, player, player.getUsedItemHand());
     }
 
     @Override
@@ -165,7 +173,7 @@ public class CrimsonNexusBow extends BowItem {
 
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> stack.getItem() instanceof ArrowItem;
+        return s -> s.getItem() instanceof ArrowItem;
     }
 
     @Override
@@ -175,7 +183,6 @@ public class CrimsonNexusBow extends BowItem {
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.health_cost", "2.0").withStyle(ChatFormatting.RED));
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.legend").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
-            // Base message prompting to hold Shift
             tooltip.add(Component.translatable("item.too_many_bows.shulker_blast_bow.hold_shift"));
         }
     }

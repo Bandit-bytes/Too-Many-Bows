@@ -69,13 +69,13 @@ public class ModLootModifiers {
         for (String id : itemIds) {
             ResourceLocation rl = ResourceLocation.tryParse(id);
             if (rl == null) {
-                System.err.println("[too_many_bows] Invalid item id in loot config: " + id);
+                System.err.println("[too_many_bows] Invalid items id in loot config: " + id);
                 continue;
             }
 
             Item item = BuiltInRegistries.ITEM.get(rl);
             if (item == Items.AIR) {
-                System.err.println("[too_many_bows] Unknown item in loot config (not registered): " + id);
+                System.err.println("[too_many_bows] Unknown items in loot config (not registered): " + id);
                 continue;
             }
 

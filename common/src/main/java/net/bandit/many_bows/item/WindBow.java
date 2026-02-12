@@ -13,17 +13,21 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
-public class WindBow extends BowItem {
+public class WindBow extends ModBowItem {
 
     private static final int MOVEMENT_SPEED_DURATION = 0;
     private static final int MOVEMENT_SPEED_LEVEL = 15;
+    private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
 
     public WindBow(Properties properties) {
         super(properties);
@@ -48,10 +52,18 @@ public class WindBow extends BowItem {
             int charge = this.getUseDuration(stack) - timeCharged;
             float power = getPowerForTime((int) (charge * 3F));
 
-            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, stack) > 0;
-            ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
+            boolean isCreative = player.getAbilities().instabuild;
+            boolean hasInfinity = hasInfinity(stack, player);
+            boolean canFireNoArrows = canFireWithoutArrows(stack, player);
 
-            if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
+            ItemStack arrowStack = player.getProjectile(stack);
+            boolean hasArrows = !arrowStack.isEmpty() || isCreative || canFireNoArrows;
+
+            if (power >= 0.1F && hasArrows) {
+                if (arrowStack.isEmpty() && canFireNoArrows) {
+                    arrowStack = new ItemStack(Items.ARROW);
+                }
+
                 WindProjectile windProjectile = new WindProjectile(level, player);
                 windProjectile.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
@@ -60,19 +72,22 @@ public class WindBow extends BowItem {
                     windProjectile.setKnockback(punchLevel);
                 }
 
+                applyBowDamageAttribute(windProjectile, player);
+                tryApplyBowCrit(windProjectile, player, DEFAULT_CRIT_MULTIPLIER);
+
                 windProjectile.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
                 level.addFreshEntity(windProjectile);
 
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.PLAYER_BREATH, SoundSource.PLAYERS, 1.0F, 1.2F);
 
-                if (!hasInfinity && !arrowStack.isEmpty()) {
+                if (!isCreative && !hasInfinity && !arrowStack.isEmpty()) {
                     arrowStack.shrink(1);
                     if (arrowStack.isEmpty()) {
                         player.getInventory().removeItem(arrowStack);
                     }
                 }
 
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
+                damageBow(stack, player, player.getUsedItemHand());
             }
             player.awardStat(Stats.ITEM_USED.get(this));
         }
@@ -81,14 +96,15 @@ public class WindBow extends BowItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-        tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip").withStyle(ChatFormatting.AQUA));
-        tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.ability").withStyle(ChatFormatting.LIGHT_PURPLE));
-        tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.effect").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.legend").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
-    }else {
+            tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip").withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.ability").withStyle(ChatFormatting.LIGHT_PURPLE));
+            tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.effect").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("item.too_many_bows.wind_bow.tooltip.legend").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.ITALIC));
+        } else {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
     }
+
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return repair.is(ItemRegistry.POWER_CRYSTAL.get());

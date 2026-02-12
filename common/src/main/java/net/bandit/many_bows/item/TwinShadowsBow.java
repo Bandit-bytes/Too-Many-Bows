@@ -12,57 +12,65 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
 
-public class TwinShadowsBow extends BowItem {
+public class TwinShadowsBow extends ModBowItem {
+
+    private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
 
     public TwinShadowsBow(Properties properties) {
         super(properties);
     }
+
     @Override
     public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int i) {
-        if (livingEntity instanceof Player player) {
-            boolean hasInfinity = player.getAbilities().instabuild || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, itemStack) > 0;
-            ItemStack arrowStack = player.getProjectile(itemStack);
+        if (!(livingEntity instanceof Player player)) return;
 
-            // Ensure an arrow exists, or default to a normal arrow
-            if (!arrowStack.isEmpty() || hasInfinity) {
-                if (arrowStack.isEmpty()) {
-                    arrowStack = new ItemStack(Items.ARROW);
-                }
+        ItemStack arrowStack = player.getProjectile(itemStack);
+        boolean isCreative = player.getAbilities().instabuild;
+        boolean hasInfinity = hasInfinity(itemStack, player);
+        boolean canFireNoArrows = canFireWithoutArrows(itemStack, player);
 
-                int charge = this.getUseDuration(itemStack) - i;
-                float power = getPowerForTime(charge);
-                if (charge < 20 || power < 1.0F) {
-                    return; // Prevent early firing
-                }
+        if (arrowStack.isEmpty() && !isCreative && !canFireNoArrows) return;
 
-                boolean isCreativeArrow = hasInfinity && arrowStack.is(Items.ARROW);
+        int charge = this.getUseDuration(itemStack) - i;
+        float power = getPowerForTime(charge);
+        if (charge < 20 || power < 1.0F) return;
 
-                if (!level.isClientSide) {
-                    fireTwinArrows(level, player, hasInfinity, itemStack, arrowStack);
-                    itemStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-                }
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS,
-                        1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+        ItemStack usedArrowStack = arrowStack;
+        if (usedArrowStack.isEmpty() && canFireNoArrows) {
+            usedArrowStack = new ItemStack(Items.ARROW);
+        }
 
-                if (!isCreativeArrow && !hasInfinity && !player.getAbilities().instabuild) {
-                    arrowStack.shrink(2);
-                    if (arrowStack.isEmpty()) {
-                        player.getInventory().removeItem(arrowStack);
-                    }
-                }
-                player.awardStat(Stats.ITEM_USED.get(this));
+        if (!level.isClientSide) {
+            fireTwinArrows(level, player, hasInfinity, itemStack, usedArrowStack);
+            damageBow(itemStack, player, player.getUsedItemHand());
+        }
+
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS,
+                1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + power * 0.5F);
+
+        boolean isInfinityArrowStack = hasInfinity && usedArrowStack.is(Items.ARROW);
+
+        if (!isCreative && !isInfinityArrowStack && !hasInfinity && !arrowStack.isEmpty()) {
+            arrowStack.shrink(2);
+            if (arrowStack.isEmpty()) {
+                player.getInventory().removeItem(arrowStack);
             }
         }
+
+        player.awardStat(Stats.ITEM_USED.get(this));
     }
 
     public static float getPowerForTime(int charge) {
@@ -75,20 +83,23 @@ public class TwinShadowsBow extends BowItem {
         return Math.min(f, 1.0F);
     }
 
-
     @Override
     public int getUseDuration(ItemStack itemStack) {
         return 72000;
     }
+
     @Override
     public UseAnim getUseAnimation(ItemStack itemStack) {
         return UseAnim.BOW;
     }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        boolean bl = !player.getProjectile(itemStack).isEmpty();
-        if (!player.getAbilities().instabuild && !bl) {
+        boolean hasProjectile = !player.getProjectile(itemStack).isEmpty();
+        boolean canFireNoArrows = canFireWithoutArrows(itemStack, player);
+
+        if (!player.getAbilities().instabuild && !hasProjectile && !canFireNoArrows) {
             return InteractionResultHolder.fail(itemStack);
         } else {
             player.startUsingItem(interactionHand);
@@ -107,29 +118,28 @@ public class TwinShadowsBow extends BowItem {
     private void fireTwinArrows(Level level, Player player, boolean hasInfinity, ItemStack bowStack, ItemStack arrowStack) {
         ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
 
-        // Fire Light Arrow
         AbstractArrow lightArrow = arrowItem.createArrow(level, arrowStack, player);
         lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 1.0F);
         lightArrow.setBaseDamage(4.0);
         lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
         applyEnchantments(lightArrow, bowStack);
+        applyBowDamageAttribute(lightArrow, player);
+        tryApplyBowCrit(lightArrow, player, DEFAULT_CRIT_MULTIPLIER);
         lightArrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
         level.addFreshEntity(lightArrow);
 
-        // Fire Dark Arrow
         AbstractArrow darkArrow = arrowItem.createArrow(level, arrowStack, player);
         darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 3.0F, 0.0F, 3.0F, 1.0F);
         darkArrow.setBaseDamage(6.0);
         darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
         applyEnchantments(darkArrow, bowStack);
-        darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED; // Dark Arrow is not pickable
+        applyBowDamageAttribute(darkArrow, player);
+        tryApplyBowCrit(darkArrow, player, DEFAULT_CRIT_MULTIPLIER);
+        darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
         level.addFreshEntity(darkArrow);
 
-        // Play sound
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
     }
-
-
 
     private void applyEnchantments(AbstractArrow arrow, ItemStack stack) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
@@ -146,6 +156,7 @@ public class TwinShadowsBow extends BowItem {
             arrow.setSecondsOnFire(100);
         }
     }
+
     @Override
     public boolean isEnchantable(ItemStack stack) {
         return true;
@@ -164,10 +175,10 @@ public class TwinShadowsBow extends BowItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-        tooltip.add(Component.translatable("item.many_bows.twin_shadows.tooltip").withStyle(ChatFormatting.AQUA));
-        tooltip.add(Component.translatable("item.many_bows.twin_shadows.tooltip.ability").withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.translatable("item.many_bows.twin_shadows.tooltip.legend").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
-    }else {
+            tooltip.add(Component.translatable("item.many_bows.twin_shadows.tooltip").withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.translatable("item.many_bows.twin_shadows.tooltip.ability").withStyle(ChatFormatting.GOLD));
+            tooltip.add(Component.translatable("item.many_bows.twin_shadows.tooltip.legend").withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+        } else {
             tooltip.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
     }

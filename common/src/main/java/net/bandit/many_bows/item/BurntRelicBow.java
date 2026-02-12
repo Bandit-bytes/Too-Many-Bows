@@ -10,7 +10,10 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -18,7 +21,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BurntRelicBow extends BowItem {
+public class BurntRelicBow extends ModBowItem {
+
+    private static final double CRIT_MULTIPLIER = 1.5D;
 
     public BurntRelicBow(Properties properties) {
         super(properties);
@@ -26,65 +31,58 @@ public class BurntRelicBow extends BowItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
-        if (entity instanceof Player player && !level.isClientSide()) {
-            int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
+        if (!(entity instanceof Player player)) return;
+        if (level.isClientSide) return;
 
-            if (power >= 0.1F) {
-                // Find any arrow in the player's inventory
-                ItemStack arrowStack = player.getProjectile(stack);
+        int charge = this.getUseDuration(stack) - timeCharged;
+        float power = getPowerForTime(charge);
 
-                // Use a default arrow if none are found (Infinite arrows)
-                ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+        if (power >= 0.1F) {
+            ItemStack arrowStack = player.getProjectile(stack);
+            ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
 
-                AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+            AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
+            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-                // Apply enchantments
-                applyEnchantments(stack, arrow);
+            applyEnchantments(stack, arrow);
 
-                // Set arrow to non-pickup (Infinity behavior)
-                arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+            applyBowDamageAttribute(arrow, player);
+            tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
 
-                // Add arrow entity to the world
-                level.addFreshEntity(arrow);
+            arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 
-                // Play custom shooting sound
-                level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.2F);
+            level.addFreshEntity(arrow);
 
-                // Damage the bow
-                stack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(player.getUsedItemHand()));
-            }
-            player.awardStat(Stats.ITEM_USED.get(this));
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.2F);
+
+            damageBow(stack, player, player.getUsedItemHand());
         }
+
+        player.awardStat(Stats.ITEM_USED.get(this));
     }
 
     private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
-        // Apply Power enchantment
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5) + 1.5);
+            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
         }
 
-        // Apply Punch enchantment (knockback)
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
         if (punchLevel > 0) {
             arrow.setKnockback(punchLevel);
         }
 
-        // Apply Flame enchantment
         if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
             arrow.setSecondsOnFire(100);
         }
     }
 
-
     @Override
     public ItemStack getDefaultInstance() {
-        ItemStack stack = new ItemStack(this);
-        stack.enchant(Enchantments.INFINITY_ARROWS, 1); // Default Infinity enchantment
-        return stack;
+        ItemStack s = new ItemStack(this);
+        s.enchant(Enchantments.INFINITY_ARROWS, 1);
+        return s;
     }
 
     @Override
