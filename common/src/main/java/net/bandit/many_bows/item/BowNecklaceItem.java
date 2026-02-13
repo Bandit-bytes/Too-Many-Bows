@@ -13,25 +13,17 @@ import java.util.List;
 public class BowNecklaceItem extends Item {
 
     public enum Tier {
-        FLETCHER(
-                "A worn talisman wrapped in waxed cord.",
-                "It doesn’t make the bow stronger—only steadier in the hands.",
-                "Reduces bow durability loss."
-        ),
-        DEAD_EYE(
-                "A cold pendant that never warms against the skin.",
-                "Some say it \"finds\" the gap in armor before you do.",
-                "Grants a chance for bow shots to critically strike."
-        );
+        FLETCHER("fletcher"),
+        DEAD_EYE("dead_eye");
 
-        private final String line1;
-        private final String line2;
-        private final String effectHint;
+        private final String name;
 
-        Tier(String line1, String line2, String effectHint) {
-            this.line1 = line1;
-            this.line2 = line2;
-            this.effectHint = effectHint;
+        Tier(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 
@@ -48,12 +40,16 @@ public class BowNecklaceItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.literal(tier.line1).withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.literal(tier.line2).withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(Component.translatable("item.many_bows.bow_necklace." + tier.getName() + ".line1")
+                .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.many_bows.bow_necklace." + tier.getName() + ".line2")
+                .withStyle(ChatFormatting.DARK_GRAY));
         tooltip.add(Component.empty());
 
-        tooltip.add(Component.literal(tier.effectHint).withStyle(ChatFormatting.BLUE));
-        tooltip.add(Component.literal("Equip in a necklace slot.").withStyle(ChatFormatting.DARK_GRAY));
+        tooltip.add(Component.translatable("item.many_bows.bow_necklace." + tier.getName() + ".effect")
+                .withStyle(ChatFormatting.BLUE));
+        tooltip.add(Component.translatable("item.many_bows.bow_necklace.equip_hint")
+                .withStyle(ChatFormatting.DARK_GRAY));
 
         super.appendHoverText(stack, level, tooltip, flag);
     }

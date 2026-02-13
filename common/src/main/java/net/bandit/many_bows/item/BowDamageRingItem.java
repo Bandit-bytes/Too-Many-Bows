@@ -13,13 +13,19 @@ import java.util.List;
 public class BowDamageRingItem extends Item {
 
     public enum Tier {
-        SHARPSHOT(0.15D),
-        STORMBOUND(0.30D);
+        SHARPSHOT("sharpshot", 0.15D),
+        STORMBOUND("stormbound", 0.30D);
 
+        private final String name;
         private final double bonus;
 
-        Tier(double bonus) {
+        Tier(String name, double bonus) {
+            this.name = name;
             this.bonus = bonus;
+        }
+
+        public String getName() {
+            return name;
         }
 
         public double bonus() {
@@ -44,29 +50,18 @@ public class BowDamageRingItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-
-        switch (tier) {
-            case SHARPSHOT -> {
-                tooltip.add(Component.literal("A quiet vow, etched in silver.")
-                        .withStyle(ChatFormatting.GRAY));
-                tooltip.add(Component.literal("The bowstring remembers who holds it steady.")
-                        .withStyle(ChatFormatting.DARK_GRAY));
-            }
-            case STORMBOUND -> {
-                tooltip.add(Component.literal("A signet stolen from the stormcourt.")
-                        .withStyle(ChatFormatting.GRAY));
-                tooltip.add(Component.literal("When the wind turns, so does your fate.")
-                        .withStyle(ChatFormatting.DARK_GRAY));
-            }
-        }
+        tooltip.add(Component.translatable("item.many_bows.bow_damage_ring." + tier.getName() + ".line1")
+                .withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("item.many_bows.bow_damage_ring." + tier.getName() + ".line2")
+                .withStyle(ChatFormatting.DARK_GRAY));
 
         tooltip.add(Component.empty());
 
         int percent = (int) Math.round(getBonus() * 100.0);
-        tooltip.add(Component.literal("Increases bow damage by +" + percent + "%")
+        tooltip.add(Component.translatable("item.many_bows.bow_damage_ring.effect", percent)
                 .withStyle(ChatFormatting.BLUE));
 
-        tooltip.add(Component.literal("Equip in a ring slot.")
+        tooltip.add(Component.translatable("item.many_bows.bow_damage_ring.equip_hint")
                 .withStyle(ChatFormatting.DARK_GRAY));
 
         super.appendHoverText(stack, level, tooltip, flag);
