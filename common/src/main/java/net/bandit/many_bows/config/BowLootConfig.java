@@ -7,6 +7,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +23,12 @@ public class BowLootConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File("config/too_many_bows.json");
+
+    // Bump when you add new fields/defaults and want to migrate.
+    public static final int CURRENT_VERSION = 2;
+
+    // Stored in JSON so we can migrate safely.
+    public Integer configVersion = 1;
 
     public Boolean easyLootEnabled = true;
     public Float easyLootDropChance = 0.5F;
@@ -30,6 +43,13 @@ public class BowLootConfig {
     public Float endgameLootDropChance = 0.2F;
 
     public Float globalBowPullSpeed = 16.0F;
+
+    // Flame Arrow AoE
+    public Float flameAoERadius = 6.0F;
+    public Float flameAoEDamage = 4.0F;
+    public Boolean flameAoEIgniteBlocks = true;
+    public Boolean flameAoEBlockDamage = false;
+    public Integer flameAoEFireDuration = 100;
 
     public Integer emeraldSageXpAmount = 10;
     public List<String> emeraldSageXpBlacklist = List.of(
@@ -123,12 +143,15 @@ public class BowLootConfig {
     public static BowLootConfig loadConfig() {
         BowLootConfig config;
 
+        // First run: write defaults (no backup needed)
         if (!CONFIG_FILE.exists()) {
             config = new BowLootConfig();
+            config.configVersion = CURRENT_VERSION;
             config.saveConfig();
             return config;
         }
 
+        // Read existing config
         try (FileReader reader = new FileReader(CONFIG_FILE)) {
             config = GSON.fromJson(reader, BowLootConfig.class);
             if (config == null) config = new BowLootConfig();
@@ -137,8 +160,25 @@ public class BowLootConfig {
             config = new BowLootConfig();
         }
 
-        boolean changed = config.validateAndFillDefaults();
-        if (changed) config.saveConfig();
+        boolean changed = false;
+
+        // Fill missing NEW FIELDS (null checks) + clamp values
+        changed |= config.validateAndFillDefaults();
+
+        // Version bump (no list merging -> respects user edits)
+        changed |= config.migrateIfNeeded();
+
+        // Ensure version matches current
+        if (config.configVersion == null || config.configVersion != CURRENT_VERSION) {
+            config.configVersion = CURRENT_VERSION;
+            changed = true;
+        }
+
+        // Only write if we changed anything; backup first.
+        if (changed) {
+            backupConfigFile();
+            config.saveConfig();
+        }
 
         return config;
     }
@@ -154,9 +194,43 @@ public class BowLootConfig {
         }
     }
 
+    private static void backupConfigFile() {
+        if (!CONFIG_FILE.exists()) return;
+
+        try {
+            File parent = CONFIG_FILE.getParentFile();
+            if (parent != null && !parent.exists()) parent.mkdirs();
+
+            String ts = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"));
+            File backup = new File(parent, CONFIG_FILE.getName() + ".bak-" + ts);
+
+            Files.copy(CONFIG_FILE.toPath(), backup.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean migrateIfNeeded() {
+        if (configVersion == null) configVersion = 1;
+
+        boolean changed = false;
+
+        // Put structural migrations here (renames/type changes),
+        // but do NOT auto-append defaults to lists if you want to respect user removals.
+
+        if (configVersion < CURRENT_VERSION) {
+            configVersion = CURRENT_VERSION;
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public boolean validateAndFillDefaults() {
         boolean changed = false;
         BowLootConfig defaults = new BowLootConfig();
+
+        if (configVersion == null) { configVersion = defaults.configVersion; changed = true; }
 
         if (easyLootEnabled == null) { easyLootEnabled = defaults.easyLootEnabled; changed = true; }
         if (easyLootDropChance == null) { easyLootDropChance = defaults.easyLootDropChance; changed = true; }
@@ -172,6 +246,13 @@ public class BowLootConfig {
 
         if (globalBowPullSpeed == null) { globalBowPullSpeed = defaults.globalBowPullSpeed; changed = true; }
 
+        // Flame AoE defaults
+        if (flameAoERadius == null) { flameAoERadius = defaults.flameAoERadius; changed = true; }
+        if (flameAoEDamage == null) { flameAoEDamage = defaults.flameAoEDamage; changed = true; }
+        if (flameAoEIgniteBlocks == null) { flameAoEIgniteBlocks = defaults.flameAoEIgniteBlocks; changed = true; }
+        if (flameAoEBlockDamage == null) { flameAoEBlockDamage = defaults.flameAoEBlockDamage; changed = true; }
+        if (flameAoEFireDuration == null) { flameAoEFireDuration = defaults.flameAoEFireDuration; changed = true; }
+
         if (emeraldSageXpAmount == null) { emeraldSageXpAmount = defaults.emeraldSageXpAmount; changed = true; }
         if (emeraldSageXpBlacklist == null) { emeraldSageXpBlacklist = new ArrayList<>(defaults.emeraldSageXpBlacklist); changed = true; }
 
@@ -186,6 +267,7 @@ public class BowLootConfig {
         if (endgameLootItems == null) { endgameLootItems = new ArrayList<>(defaults.endgameLootItems); changed = true; }
 
         changed |= clampChanceFields();
+        changed |= clampFlameAoEFields();
         return changed;
     }
 
@@ -207,6 +289,27 @@ public class BowLootConfig {
         if (endgameLootDropChance != null) {
             float c = clamp01(endgameLootDropChance);
             if (c != endgameLootDropChance) { endgameLootDropChance = c; changed = true; }
+        }
+
+        return changed;
+    }
+
+    private boolean clampFlameAoEFields() {
+        boolean changed = false;
+
+        if (flameAoERadius != null) {
+            float clamped = Math.max(1.0F, Math.min(20.0F, flameAoERadius));
+            if (clamped != flameAoERadius) { flameAoERadius = clamped; changed = true; }
+        }
+
+        if (flameAoEDamage != null) {
+            float clamped = Math.max(0.5F, Math.min(50.0F, flameAoEDamage));
+            if (clamped != flameAoEDamage) { flameAoEDamage = clamped; changed = true; }
+        }
+
+        if (flameAoEFireDuration != null) {
+            int clamped = Math.max(20, Math.min(600, flameAoEFireDuration));
+            if (clamped != flameAoEFireDuration) { flameAoEFireDuration = clamped; changed = true; }
         }
 
         return changed;
