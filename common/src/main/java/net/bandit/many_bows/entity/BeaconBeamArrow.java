@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -124,6 +125,21 @@ public class BeaconBeamArrow extends AbstractArrow {
             other.hurt(this.damageSources().magic(), linkDamage);
             if (++links >= MAX_LINKS) break;
         }
+    }
+    @Override
+    protected void onHitBlock(BlockHitResult hit) {
+        super.onHitBlock(hit);
+
+        if (this.level().isClientSide()) return;
+        this.level().playSound(
+                null,
+                this.getX(), this.getY(), this.getZ(),
+                SoundEvents.BEACON_POWER_SELECT,
+                SoundSource.PLAYERS,
+                0.6F, 1.2F
+        );
+
+        this.discard();
     }
 
     @Override
