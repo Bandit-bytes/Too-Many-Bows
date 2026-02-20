@@ -1,9 +1,9 @@
 package net.bandit.many_bows.neoforge;
 
 import net.bandit.many_bows.client.renderer.*;
-//import net.bandit.many_bows.neoforge.curio.*;
+import net.bandit.many_bows.neoforge.curio.*;
 import net.bandit.many_bows.registry.EntityRegistry;
-//import net.bandit.many_bows.registry.ItemRegistry;
+import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -15,7 +15,7 @@ import net.bandit.many_bows.ManyBowsMod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-//import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(ManyBowsMod.MOD_ID)
 @EventBusSubscriber(modid = ManyBowsMod.MOD_ID, value = Dist.CLIENT)
@@ -28,11 +28,11 @@ public final class ManyBowsModNeoForge {
     }
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-//            CuriosApi.registerCurio(ItemRegistry.WIND_GLOVE.get(), new DrawSpeedGloveCurio());
-//            CuriosApi.registerCurio(ItemRegistry.SHARPSHOT_RING.get(), new SharpshotRingCurio());
-//            CuriosApi.registerCurio(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetCurio());
-//            CuriosApi.registerCurio(ItemRegistry.FLETCHERS_TALISMAN.get(), new FletchersTalismanCurio());
-//            CuriosApi.registerCurio(ItemRegistry.DEAD_EYES_PENDANT.get(), new DeadEyesPendantCurio());
+            CuriosApi.registerCurio(ItemRegistry.WIND_GLOVE.get(), new DrawSpeedGloveCurio());
+            CuriosApi.registerCurio(ItemRegistry.SHARPSHOT_RING.get(), new SharpshotRingCurio());
+            CuriosApi.registerCurio(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetCurio());
+            CuriosApi.registerCurio(ItemRegistry.FLETCHERS_TALISMAN.get(), new FletchersTalismanCurio());
+            CuriosApi.registerCurio(ItemRegistry.DEAD_EYES_PENDANT.get(), new DeadEyesPendantCurio());
         });
     }
     private void onClientSetup(final FMLClientSetupEvent event) {
