@@ -22,6 +22,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -117,7 +118,7 @@ tryApplyBowCrit(arrow, player, 1.5D);
         Holder<Enchantment> punch = getEnchantmentHolder(level, Enchantments.PUNCH);
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(punch, bow);
         if (punchLevel > 0) {
-            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
+            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             net.minecraft.world.phys.Vec3 knockbackVec = arrow.getDeltaMovement().normalize().scale(punchLevel * 0.6 * resistance);
             arrow.push(knockbackVec.x, 0.1, knockbackVec.z);
         }
@@ -202,7 +203,6 @@ tryApplyBowCrit(arrow, player, 1.5D);
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if (Screen.hasShiftDown()) {
-            // Display list of passive mobs the bow is effective against
             tooltipComponents.add(Component.translatable("item.too_many_bows.hunter_bow.shift_title").withStyle(ChatFormatting.YELLOW));
             tooltipComponents.add(Component.translatable("item.too_many_bows.hunter_bow.mob1").withStyle(ChatFormatting.GREEN));
             tooltipComponents.add(Component.translatable("item.too_many_bows.hunter_bow.mob2").withStyle(ChatFormatting.GREEN));

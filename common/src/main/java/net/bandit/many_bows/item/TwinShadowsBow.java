@@ -44,7 +44,6 @@ public class TwinShadowsBow extends ModBowItem {
                         fireTwinArrows(serverLevel, player, bowStack, projectiles, power);
                     }
 
-                    // Play shooting sound & apply durability loss
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
                     player.awardStat(Stats.ITEM_USED.get(this));
@@ -73,7 +72,7 @@ public class TwinShadowsBow extends ModBowItem {
             }
         }
 
-        // ---------- Light Arrow ----------
+        //Light Arrow
         AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
         lightArrow.setBaseDamage((rangedDamage / 3.0f));
         applyBowDamageAttribute(lightArrow, player);
@@ -84,7 +83,7 @@ public class TwinShadowsBow extends ModBowItem {
         lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
         serverLevel.addFreshEntity(lightArrow);
 
-        // ---------- Dark Arrow ----------
+        //Dark Arrow
         AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
         darkArrow.setBaseDamage((rangedDamage / 2.0f));
         applyBowDamageAttribute(darkArrow, player);

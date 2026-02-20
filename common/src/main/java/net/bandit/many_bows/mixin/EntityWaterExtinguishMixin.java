@@ -31,7 +31,6 @@ public abstract class EntityWaterExtinguishMixin {
         return false;
     }
 
-    // water current path
     @Inject(method = "updateInWaterStateAndDoWaterCurrentPushing", at = @At("TAIL"))
     private void tmb$afterWaterCurrentPushing(CallbackInfo ci) {
         Entity e = (Entity)(Object)this;
@@ -41,7 +40,6 @@ public abstract class EntityWaterExtinguishMixin {
         }
     }
 
-    // non-vanilla/extinguishing fluids path
     @Inject(method = "updateInWaterStateAndDoFluidPushing", at = @At("TAIL"))
     private void tmb$afterFluidPushing(CallbackInfoReturnable<Boolean> cir) {
         Entity e = (Entity)(Object)this;

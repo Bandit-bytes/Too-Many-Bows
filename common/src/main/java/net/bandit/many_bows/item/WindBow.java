@@ -1,7 +1,6 @@
 package net.bandit.many_bows.item;
 
-import net.bandit.many_bows.entity.AncientSageArrow;
-import net.bandit.many_bows.entity.VitalityArrow;
+
 import net.bandit.many_bows.entity.WindProjectile;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -19,7 +18,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;

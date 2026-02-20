@@ -18,11 +18,9 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -36,46 +34,16 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 public class VerdantVigorBow extends ModBowItem {
 
-    private static final int HEALTH_BOOST_LEVEL = 1;
     private static final int REGENERATION_DURATION = 40;
-    private static final int HEALTH_BOOST_DURATION = 100;
-    private static final int BUFFER_DURATION = 100;
-    private static final int HEALTH_BOOST_HEARTS = 4;
-    private static final UUID BONUS_HEALTH_UUID = UUID.fromString("d4c9e510-70a4-4a27-b4e1-7f54e882e58a");
-    private int bufferTimer = 0;
 
     public VerdantVigorBow(Properties properties) {
         super(properties);
     }
-//    @Override
-//    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-//        if (entity instanceof Player player && !world.isClientSide) {
-//            boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
-//            var attribute = Attributes.MAX_HEALTH;
-//
-//            ResourceLocation BONUS_HEALTH_ID = ResourceLocation.fromNamespaceAndPath("many_bows", "verdant_vigor_bonus_health");
-//
-//            AttributeInstance attr = player.getAttribute(attribute);
-//            if (attr == null) return;
-//
-//            if (isHoldingBow) {
-//                if (attr.getModifier(BONUS_HEALTH_ID) == null) {
-//                    attr.addPermanentModifier(new AttributeModifier(
-//                            BONUS_HEALTH_ID,
-//                            HEALTH_BOOST_HEARTS * 2.0,
-//                            AttributeModifier.Operation.ADD_VALUE
-//                    ));
-//                }
-//            } else {
-//                if (attr.getModifier(BONUS_HEALTH_ID) != null) {
-//                    attr.removeModifier(BONUS_HEALTH_ID);
-//                }
-//            }
+
 @Override
 public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
     if (entity instanceof Player player && !world.isClientSide) {
@@ -114,7 +82,6 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
             }
         }
     }
-
 
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
@@ -192,7 +159,7 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
         Holder<Enchantment> punch = getEnchantmentHolder(level, Enchantments.PUNCH);
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(punch, bow);
         if (punchLevel > 0) {
-            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
+            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             net.minecraft.world.phys.Vec3 knockbackVec = arrow.getDeltaMovement().normalize().scale(punchLevel * 0.6 * resistance);
             arrow.push(knockbackVec.x, 0.1, knockbackVec.z);
         }

@@ -9,6 +9,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import org.joml.Vector3f;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -69,7 +70,7 @@ public class CursedFlameBow extends ModBowItem {
                             } else {
                                 arrow = new CursedFlameArrow(serverLevel, player, bowStack, projectileStack);
                                 if (arrow instanceof CursedFlameArrow cursedArrow) {
-                                    Holder<net.minecraft.world.entity.ai.attributes.Attribute> rangedDamageAttr = level.registryAccess()
+                                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
                                             .registryOrThrow(Registries.ATTRIBUTE)
                                             .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
                                             .orElse(null);
