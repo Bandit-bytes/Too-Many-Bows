@@ -1,26 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     " O ",
     "EBE",
     " D "
   ],
   "key": {
-    "O": {
-      "item": "minecraft:obsidian"
-    },
-    "E": {
-      "item": "minecraft:ender_pearl"
-    },
-    "B": {
-      "item": "minecraft:bow"
-    },
-    "D": {
-      "item": "minecraft:black_dye"
-    }
+    "O": "minecraft:obsidian",
+    "E": "minecraft:ender_pearl",
+    "B": "minecraft:bow",
+    "D": "minecraft:black_dye"
   },
   "result": {
-    "id": "too_many_bows:twin_shadows",
-    "count": 1
+    "count": 1,
+    "id": "too_many_bows:twin_shadows"
   }
 }

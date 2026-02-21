@@ -1,26 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     " A ",
     "CRC",
     " B "
   ],
   "key": {
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "C": {
-      "item": "too_many_bows:power_crystal"
-    },
-    "R": {
-      "item": "minecraft:blaze_powder"
-    },
-    "B": {
-      "item": "minecraft:bow"
-    }
+    "A": "minecraft:amethyst_shard",
+    "C": "too_many_bows:power_crystal",
+    "R": "minecraft:blaze_powder",
+    "B": "minecraft:bow"
   },
   "result": {
-    "id": "too_many_bows:ethereal_hunter",
-    "count": 1
+    "count": 1,
+    "id": "too_many_bows:ethereal_hunter"
   }
 }

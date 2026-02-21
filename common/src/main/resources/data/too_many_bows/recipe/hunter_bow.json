@@ -1,19 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     " L ",
     " B ",
     " L "
   ],
   "key": {
-    "L": {
-      "item": "minecraft:leather"
-    },
-    "B": {
-      "item": "minecraft:bow"
-    }
+    "L": "minecraft:leather",
+    "B": "minecraft:bow"
   },
   "result": {
+    "count": 1,
     "id": "too_many_bows:hunter_bow"
   }
 }

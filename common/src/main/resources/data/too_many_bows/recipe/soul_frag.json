@@ -1,20 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     "ASA",
     "S S",
     "ASA"
   ],
   "key": {
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "S": {
-      "item": "minecraft:soul_sand"
-    }
+    "A": "minecraft:amethyst_shard",
+    "S": "minecraft:soul_sand"
   },
   "result": {
-    "id": "too_many_bows:soul_fragment",
-    "count": 4
+    "count": 4,
+    "id": "too_many_bows:soul_fragment"
   }
 }

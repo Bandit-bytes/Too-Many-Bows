@@ -1,26 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     " XS",
     "YZY",
     " XS"
   ],
   "key": {
-    "X": {
-      "item": "minecraft:diamond"
-    },
-    "S": {
-      "item": "minecraft:shulker_shell"
-    },
-    "Y": {
-      "item": "minecraft:ender_pearl"
-    },
-    "Z": {
-      "item": "minecraft:bow"
-    }
+    "X": "minecraft:diamond",
+    "S": "minecraft:shulker_shell",
+    "Y": "minecraft:ender_pearl",
+    "Z": "minecraft:bow"
   },
   "result": {
-    "id": "too_many_bows:shulker_blast",
-    "count": 1
+    "count": 1,
+    "id": "too_many_bows:shulker_blast"
   }
 }

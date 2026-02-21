@@ -1,26 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     " C ",
     "MBM",
     " P "
   ],
   "key": {
-    "C": {
-      "item": "minecraft:crimson_planks"
-    },
-    "M": {
-      "item": "minecraft:magma_cream"
-    },
-    "B": {
-      "item": "minecraft:bow"
-    },
-    "P": {
-      "item": "minecraft:nether_brick"
-    }
+    "C": "minecraft:crimson_planks",
+    "M": "minecraft:magma_cream",
+    "B": "minecraft:bow",
+    "P": "minecraft:nether_brick"
   },
   "result": {
-    "id": "too_many_bows:crimson_nexus",
-    "count": 1
+    "count": 1,
+    "id": "too_many_bows:crimson_nexus"
   }
 }

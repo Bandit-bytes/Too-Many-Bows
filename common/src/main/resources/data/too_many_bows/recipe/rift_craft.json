@@ -1,15 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
+  "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:quartz"
-    },
-    {
-      "item": "minecraft:ender_pearl"
-    }
+    "minecraft:quartz",
+    "minecraft:ender_pearl"
   ],
   "result": {
-    "id": "too_many_bows:rift_shard",
-    "count": 2
+    "count": 2,
+    "id": "too_many_bows:rift_shard"
   }
 }

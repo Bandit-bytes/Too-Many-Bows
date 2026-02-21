@@ -1,26 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     " E ",
     "VLV",
     " B "
   ],
   "key": {
-    "E": {
-      "item": "minecraft:emerald"
-    },
-    "V": {
-      "item": "minecraft:vine"
-    },
-    "L": {
-      "item": "minecraft:oak_log"
-    },
-    "B": {
-      "item": "minecraft:bow"
-    }
+    "E": "minecraft:emerald",
+    "V": "minecraft:vine",
+    "L": "minecraft:oak_log",
+    "B": "minecraft:bow"
   },
   "result": {
-    "id": "too_many_bows:verdant_vigor",
-    "count": 1
+    "count": 1,
+    "id": "too_many_bows:verdant_vigor"
   }
 }

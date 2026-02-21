@@ -1,26 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     "SI ",
     " B ",
     " ES"
   ],
   "key": {
-    "S": {
-      "item": "minecraft:stick"
-    },
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "B": {
-      "item": "minecraft:bow"
-    },
-    "E": {
-      "item": "minecraft:emerald"
-    }
+    "S": "minecraft:stick",
+    "I": "minecraft:iron_ingot",
+    "B": "minecraft:bow",
+    "E": "minecraft:emerald"
   },
   "result": {
-    "id": "too_many_bows:sentinels_wrath",
-    "count": 1
+    "count": 1,
+    "id": "too_many_bows:sentinels_wrath"
   }
 }
