@@ -2,7 +2,6 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.item.TorchbearerBow;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;

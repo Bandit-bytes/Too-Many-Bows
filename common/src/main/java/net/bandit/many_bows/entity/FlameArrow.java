@@ -1,11 +1,13 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.bows.FlameBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -19,60 +21,119 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class FlameArrow extends AbstractArrow {
+
     private float powerMultiplier = 1.0F;
+    private boolean hasHit = false;
+    private int hitTimer = 0;
+    private int lifetime = 0;
+
+    public FlameArrow(EntityType<? extends FlameArrow> entityType, Level level) {
+        super(entityType, level);
+        applyConfigValues();
+    }
+
+    public FlameArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
+        super(EntityRegistry.FLAME_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfigValues();
+    }
+
+    private FlameBowConfig config() {
+        return FlameBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        FlameBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+    }
 
     public void setPowerMultiplier(float power) {
         this.powerMultiplier = power;
     }
-    private boolean hasHit = false;
-    private int hitTimer = 0;
-    private final int maxHitDuration = 40;
 
-    public FlameArrow(EntityType<? extends FlameArrow> entityType, Level level) {
-        super(entityType, level);
-    }
-    public FlameArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.FLAME_ARROW.get(), shooter, level, bowStack, arrowStack);
-    }
     @Override
     public void tick() {
         super.tick();
 
+        FlameBowConfig config = config();
+
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
         if (hasHit) {
             hitTimer++;
-            if (hitTimer >= maxHitDuration) {
+            if (hitTimer >= config.post_hit_linger_ticks) {
                 this.discard();
                 return;
             }
         }
-        if (this.level().isClientSide()) {
+
+        if (this.level().isClientSide() && config.trail_particles_enabled) {
             double speedFactor = 0.1D;
             Vec3 motion = this.getDeltaMovement();
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < config.flame_trail_particles; i++) {
                 double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
                 double yOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
                 double zOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
 
-                this.level().addParticle(ParticleTypes.FLAME, this.getX() + motion.x * i * speedFactor, this.getY() + motion.y * i * speedFactor, this.getZ() + motion.z * i * speedFactor, xOffset, yOffset, zOffset);
-                this.level().addParticle(ParticleTypes.SMOKE, this.getX(), this.getY(), this.getZ(), 0.0D, 0.0D, 0.0D);
+                this.level().addParticle(
+                        ParticleTypes.FLAME,
+                        this.getX() + motion.x * i * speedFactor,
+                        this.getY() + motion.y * i * speedFactor,
+                        this.getZ() + motion.z * i * speedFactor,
+                        xOffset,
+                        yOffset,
+                        zOffset
+                );
+            }
+
+            if (config.smoke_trail_enabled) {
+                this.level().addParticle(
+                        ParticleTypes.SMOKE,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        0.0D,
+                        0.0D,
+                        0.0D
+                );
             }
         }
     }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
+        FlameBowConfig config = config();
+
         if (!this.level().isClientSide()) {
             if (result.getEntity() instanceof LivingEntity hitEntity) {
-                hitEntity.setRemainingFireTicks(80);
-                hitEntity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 200, 1));
+                if (config.direct_hit_fire_ticks > 0) {
+                    hitEntity.setRemainingFireTicks(config.direct_hit_fire_ticks);
+                }
+
+                if (config.apply_direct_hit_slowness) {
+                    hitEntity.addEffect(new MobEffectInstance(
+                            MobEffects.SLOWNESS,
+                            config.direct_hit_slowness_duration_ticks,
+                            config.direct_hit_slowness_amplifier
+                    ));
+                }
+
                 createFireExplosion(result.getLocation(), hitEntity);
             }
+
             this.hasHit = true;
         }
     }
@@ -88,60 +149,102 @@ public class FlameArrow extends AbstractArrow {
     }
 
     private void createFireExplosion(Vec3 position, @Nullable LivingEntity entityHit) {
-        int radius = 5;
-        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
-        float fireDamage = 2.0F;
-        if (this.getOwner() instanceof LivingEntity shooter) {
+        FlameBowConfig config = config();
 
+        List<LivingEntity> entities = level().getEntitiesOfClass(
+                LivingEntity.class,
+                this.getBoundingBox().inflate(config.fire_burst_radius)
+        );
+
+        float fireDamage = config.aoe_fire_damage_fallback;
+
+        if (config.use_ranged_damage_attribute_for_aoe_damage && this.getOwner() instanceof LivingEntity shooter) {
             var lookup = this.level().registryAccess().lookupOrThrow(Registries.ATTRIBUTE);
 
-            ResourceKey<Attribute> RANGED_DAMAGE_KEY =
+            ResourceKey<Attribute> rangedDamageKey =
                     ResourceKey.create(Registries.ATTRIBUTE, Identifier.fromNamespaceAndPath("ranged_weapon", "damage"));
 
-            Holder<Attribute> rangedAttr = lookup.get(RANGED_DAMAGE_KEY).orElse(null);
+            Holder<Attribute> rangedAttr = lookup.get(rangedDamageKey).orElse(null);
 
-            if (rangedAttr != null) {
+            if (rangedAttr != null && config.ranged_damage_to_aoe_divisor > 0.0F) {
                 var attrInstance = shooter.getAttribute(rangedAttr);
                 if (attrInstance != null) {
-                    fireDamage = (float) attrInstance.getValue() / 3F;
+                    fireDamage = (float) attrInstance.getValue() / config.ranged_damage_to_aoe_divisor;
                 }
             }
         }
 
+        fireDamage *= this.powerMultiplier;
+
         for (LivingEntity entity : entities) {
             if (entity != this.getOwner() && entity != entityHit) {
-                entity.setRemainingFireTicks(80);
-                entity.hurt(entity.damageSources().onFire(), fireDamage * this.powerMultiplier);
+                if (config.aoe_fire_ticks > 0) {
+                    entity.setRemainingFireTicks(config.aoe_fire_ticks);
+                }
 
+                if (fireDamage > 0.0F) {
+                    entity.hurt(entity.damageSources().onFire(), fireDamage);
+                }
             }
         }
 
-        for (int i = 0; i < 50; i++) {
-            double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            double yOffset = random.nextDouble();
-            double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            this.level().addParticle(ParticleTypes.FLAME, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0.1D, 0);
+        if (this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(
+                    ParticleTypes.FLAME,
+                    position.x,
+                    position.y,
+                    position.z,
+                    config.burst_flame_particle_count,
+                    1.0D,
+                    0.5D,
+                    1.0D,
+                    0.1D
+            );
+
+            serverLevel.sendParticles(
+                    ParticleTypes.EXPLOSION,
+                    position.x,
+                    position.y,
+                    position.z,
+                    config.burst_explosion_particle_count,
+                    1.0D,
+                    0.25D,
+                    1.0D,
+                    0.01D
+            );
+
+            serverLevel.sendParticles(
+                    ParticleTypes.LARGE_SMOKE,
+                    position.x,
+                    position.y,
+                    position.z,
+                    config.burst_smoke_particle_count,
+                    1.0D,
+                    0.25D,
+                    1.0D,
+                    0.01D
+            );
         }
 
-        for (int i = 0; i < 30; i++) {
-            double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            double yOffset = random.nextDouble() * 0.5D;
-            double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            this.level().addParticle(ParticleTypes.EXPLOSION, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0, 0);
-            this.level().addParticle(ParticleTypes.LARGE_SMOKE, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0, 0);
-        }
-
-        this.level().playSound(null, position.x, position.y, position.z, SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), 1.0F, 1.2F);
+        this.level().playSound(
+                null,
+                position.x,
+                position.y,
+                position.z,
+                SoundEvents.GENERIC_EXPLODE,
+                this.getSoundSource(),
+                config.impact_sound_volume,
+                config.impact_sound_pitch
+        );
     }
 
     @Override
-    protected ItemStack getPickupItem() {
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
     @Override
-    protected ItemStack getDefaultPickupItem() {
-        return null;
+    protected @NotNull ItemStack getDefaultPickupItem() {
+        return new ItemStack(Items.ARROW);
     }
-
 }

@@ -1,6 +1,6 @@
 package net.bandit.many_bows.entity;
 
-import net.bandit.many_bows.mixin.AbstractArrowAccessor;
+import net.bandit.many_bows.config.bows.WindBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -15,62 +15,101 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class WindProjectile extends AbstractArrow {
 
-    private static final float BASE_DAMAGE = 3.0f;
-
-    private static final double GUST_RADIUS = 4.0D;
-    private static final double KNOCKBACK_STRENGTH = 1.1D;
-
-    private static final int SHOOTER_SPEED_DURATION = 60;
-    private static final int SHOOTER_SLOW_FALL_DURATION = 60;
+    private int lifetime = 0;
 
     public WindProjectile(EntityType<? extends WindProjectile> entityType, Level level) {
         super(entityType, level);
-        this.setBaseDamage(BASE_DAMAGE);
+        applyConfigValues();
     }
 
     public WindProjectile(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.WIND_PROJECTILE.get(), shooter, level, bowStack, arrowStack);
-        this.setBaseDamage(BASE_DAMAGE);
+        applyConfigValues();
+    }
+
+    private WindBowConfig config() {
+        return WindBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        WindBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        WindBowConfig config = config();
+
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
+        if (level().isClientSide() && config.trail_particles_enabled) {
+            for (int i = 0; i < config.trail_particle_count; i++) {
+                level().addParticle(
+                        ParticleTypes.CLOUD,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        0.0D,
+                        0.05D,
+                        0.0D
+                );
+            }
+        }
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        super.onHitEntity(result);
+        if (level().isClientSide()) {
+            return;
+        }
 
-        if (level().isClientSide()) return;
-        if (!(result.getEntity() instanceof LivingEntity target)) return;
+        if (!(result.getEntity() instanceof LivingEntity target)) {
+            this.discard();
+            return;
+        }
 
-        double base =
-                ((AbstractArrowAccessor) this)
-                        .manybows$getBaseDamage();
-
-        target.hurt(damageSources().magic(), (float) base);
+        float directDamage = (float) config().base_damage;
+        if (directDamage > 0.0F) {
+            target.hurt(this.damageSources().arrow(this, this.getOwner()), directDamage);
+        }
 
         spawnGust(this.getX(), this.getY(), this.getZ());
-
-        discard();
+        this.discard();
     }
 
     private void spawnGust(double x, double y, double z) {
         Level level = this.level();
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            return;
+        }
 
-        // Area to affect
+        WindBowConfig config = config();
+
         AABB area = new AABB(
-                x - GUST_RADIUS, y - GUST_RADIUS, z - GUST_RADIUS,
-                x + GUST_RADIUS, y + GUST_RADIUS, z + GUST_RADIUS
+                x - config.gust_radius, y - config.gust_radius, z - config.gust_radius,
+                x + config.gust_radius, y + config.gust_radius, z + config.gust_radius
         );
 
         List<Entity> entities = level.getEntities(this, area, e -> e instanceof LivingEntity);
         Entity owner = this.getOwner();
 
         for (Entity entity : entities) {
-            if (!(entity instanceof LivingEntity living)) continue;
+            if (!(entity instanceof LivingEntity living)) {
+                continue;
+            }
 
             if (owner != null && entity.getUUID().equals(owner.getUUID())) {
                 continue;
@@ -83,44 +122,57 @@ public class WindProjectile extends AbstractArrow {
             );
 
             if (dir.lengthSqr() > 0.0001D) {
-                dir = dir.normalize().scale(KNOCKBACK_STRENGTH);
+                dir = dir.normalize().scale(config.knockback_strength);
                 entity.push(dir.x, 0.25D, dir.z);
-                entity.hurt(this.damageSources().magic(), 1.5f);
+
+                if (config.gust_bonus_damage > 0.0F) {
+                    entity.hurt(this.damageSources().magic(), config.gust_bonus_damage);
+                }
             }
         }
 
-        if (owner instanceof LivingEntity livingOwner) {
+        if (config.buff_owner_if_in_radius && owner instanceof LivingEntity livingOwner) {
             double distSqr = livingOwner.position().distanceToSqr(x, y, z);
-            if (distSqr <= (GUST_RADIUS * GUST_RADIUS)) {
-            livingOwner.addEffect(new MobEffectInstance(MobEffects.SPEED, SHOOTER_SPEED_DURATION, 1));
-                livingOwner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, SHOOTER_SLOW_FALL_DURATION, 0));
+            if (distSqr <= (config.gust_radius * config.gust_radius)) {
+                livingOwner.addEffect(new MobEffectInstance(
+                        MobEffects.SPEED,
+                        config.owner_speed_duration_ticks,
+                        config.owner_speed_amplifier
+                ));
+                livingOwner.addEffect(new MobEffectInstance(
+                        MobEffects.SLOW_FALLING,
+                        config.owner_slow_falling_duration_ticks,
+                        config.owner_slow_falling_amplifier
+                ));
             }
         }
 
-        for (int i = 0; i < 30; i++) {
-            double dx = x + (level.random.nextDouble() - 0.5D) * (GUST_RADIUS * 1.5D);
-            double dy = y + level.random.nextDouble() * 1.5D;
-            double dz = z + (level.random.nextDouble() - 0.5D) * (GUST_RADIUS * 1.5D);
-            level.addParticle(ParticleTypes.CLOUD, dx, dy, dz, 0.0D, 0.05D, 0.0D);
+        if (config.gust_particles_enabled) {
+            for (int i = 0; i < config.gust_particle_count; i++) {
+                double dx = x + (level.random.nextDouble() - 0.5D) * (config.gust_radius * 1.5D);
+                double dy = y + level.random.nextDouble() * 1.5D;
+                double dz = z + (level.random.nextDouble() - 0.5D) * (config.gust_radius * 1.5D);
+
+                level.addParticle(
+                        ParticleTypes.CLOUD,
+                        dx,
+                        dy,
+                        dz,
+                        0.0D,
+                        0.05D,
+                        0.0D
+                );
+            }
         }
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-        if (level().isClientSide()) {
-            level().addParticle(ParticleTypes.CLOUD, this.getX(), this.getY(), this.getZ(), 0, 0.05, 0);
-        }
-    }
-
-    @Override
-    protected ItemStack getPickupItem() {
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 }

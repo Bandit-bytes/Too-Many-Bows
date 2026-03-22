@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.bows.IroncladBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -9,60 +10,119 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class IronCladArrow extends AbstractArrow {
+
     private boolean hasLanded = false;
-    private int vacuumDuration = 80;
+    private int vacuumTicksRemaining = 0;
+    private int lifetime = 0;
 
     public IronCladArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfigValues();
     }
 
     public IronCladArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.IRONCLAD_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfigValues();
     }
 
-    @Override
-    protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+    private IroncladBowConfig config() {
+        return IroncladBowConfig.get();
     }
 
-    @Override
-    protected ItemStack getDefaultPickupItem() {
-        return new ItemStack(Items.ARROW);
+    private void applyConfigValues() {
+        IroncladBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+        this.vacuumTicksRemaining = config.vacuum_duration_ticks;
+    }
+
+    private void startVacuum() {
+        if (hasLanded) {
+            return;
+        }
+
+        this.hasLanded = true;
+        this.vacuumTicksRemaining = config().vacuum_duration_ticks;
+        this.setDeltaMovement(Vec3.ZERO);
+        this.setNoGravity(true);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (hasLanded && vacuumDuration > 0) {
-            AABB pullArea = new AABB(this.getX() - 5, this.getY() - 5, this.getZ() - 5,
-                    this.getX() + 5, this.getY() + 5, this.getZ() + 5);
+        IroncladBowConfig config = config();
 
-            List<Entity> nearbyEntities = this.level().getEntities(this, pullArea, e -> e instanceof LivingEntity);
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
+        if (hasLanded && vacuumTicksRemaining > 0) {
+            double radius = config.vacuum_radius;
+            AABB pullArea = new AABB(
+                    this.getX() - radius, this.getY() - radius, this.getZ() - radius,
+                    this.getX() + radius, this.getY() + radius, this.getZ() + radius
+            );
+
+            List<Entity> nearbyEntities = this.level().getEntities(
+                    this,
+                    pullArea,
+                    e -> e instanceof LivingEntity && (config.affect_owner || e != this.getOwner())
+            );
 
             for (Entity entity : nearbyEntities) {
                 if (entity instanceof LivingEntity livingEntity) {
-                    Vec3 arrowPos = this.position();
-                    Vec3 entityPos = livingEntity.position();
-                    Vec3 pullVector = arrowPos.subtract(entityPos).normalize().scale(0.2);
+                    Vec3 pullVector = this.position()
+                            .subtract(livingEntity.position())
+                            .normalize()
+                            .scale(config.pull_strength);
+
                     livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(pullVector));
                 }
             }
-            vacuumDuration--;
-            if (vacuumDuration <= 0) {
+
+            vacuumTicksRemaining--;
+            if (vacuumTicksRemaining <= 0 && config.discard_when_vacuum_ends) {
                 this.discard();
             }
         }
     }
 
     @Override
-    protected void onHit(net.minecraft.world.phys.HitResult result) {
-        super.onHit(result);
-        hasLanded = true;
+    protected void onHitEntity(EntityHitResult result) {
+        super.onHitEntity(result);
+
+        if (!level().isClientSide() && config().activate_vacuum_on_entity_hit) {
+            startVacuum();
+        }
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        super.onHitBlock(result);
+
+        if (!level().isClientSide() && config().activate_vacuum_on_block_hit) {
+            startVacuum();
+        }
+    }
+
+    @Override
+    protected @NotNull ItemStack getPickupItem() {
+        return new ItemStack(Items.ARROW);
+    }
+
+    @Override
+    protected @NotNull ItemStack getDefaultPickupItem() {
+        return new ItemStack(Items.ARROW);
     }
 }

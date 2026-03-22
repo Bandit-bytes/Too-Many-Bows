@@ -1,39 +1,60 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.bows.EtherealHunterBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class EtherealArrow extends AbstractArrow {
+
     private boolean hasHit = false;
     private int hitTimer = 0;
-    private final int maxHitDuration = 40;
+    private int lifetime = 0;
 
     public EtherealArrow(EntityType<? extends EtherealArrow> entityType, Level level) {
         super(entityType, level);
-        this.setNoGravity(false);
+        applyConfigValues();
     }
 
     public EtherealArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.ETHEREAL_ARROW.get(), shooter, level, bowStack, arrowStack);
-        this.setNoGravity(false);
+        applyConfigValues();
+    }
+
+    private EtherealHunterBowConfig config() {
+        return EtherealHunterBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        EtherealHunterBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+        this.setNoGravity(!config.use_gravity);
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        EtherealHunterBowConfig config = config();
+
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
         if (hasHit) {
             hitTimer++;
-            if (hitTimer >= maxHitDuration) {
+            if (hitTimer >= config.post_hit_linger_ticks) {
                 this.discard();
-                return;
             }
         }
     }
@@ -41,12 +62,12 @@ public class EtherealArrow extends AbstractArrow {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
         if (!this.level().isClientSide()) {
-            if (result.getEntity() instanceof LivingEntity hitEntity) {
-            }
             this.hasHit = true;
         }
     }
+
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
@@ -58,16 +79,16 @@ public class EtherealArrow extends AbstractArrow {
 
     @Override
     protected boolean tryPickup(Player player) {
-        return false;
+        return config().allow_pickup && super.tryPickup(player);
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return ItemStack.EMPTY;
+        return new ItemStack(Items.ARROW);
     }
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return ItemStack.EMPTY;
+        return new ItemStack(Items.ARROW);
     }
 }

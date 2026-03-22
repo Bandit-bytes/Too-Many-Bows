@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.bows.VitalityWeaverBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -10,24 +11,47 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 public class VitalityArrow extends AbstractArrow {
 
     private Consumer<LivingEntity> onHitCallback;
+    private int lifetime = 0;
 
     public VitalityArrow(EntityType<? extends VitalityArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfigValues();
     }
 
     public VitalityArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.VITALITY_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfigValues();
     }
 
+    private VitalityWeaverBowConfig config() {
+        return VitalityWeaverBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        VitalityWeaverBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+    }
 
     public void setOnHitCallback(Consumer<LivingEntity> callback) {
         this.onHitCallback = callback;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        lifetime++;
+        if (lifetime > config().max_lifetime_ticks) {
+            this.discard();
+        }
     }
 
     @Override
@@ -55,24 +79,35 @@ public class VitalityArrow extends AbstractArrow {
                 onHitCallback.accept(target);
             }
 
-            float healAmount = damageDealt * 0.5F;
-            shooter.heal(healAmount);
+            float healAmount = damageDealt * config().lifesteal_percent;
+            if (healAmount > 0.0F) {
+                shooter.heal(healAmount);
+            }
 
-            level().playSound(null, target.getX(), target.getY(), target.getZ(),
-                    SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0F, 1.0F);
+            if (config().play_heal_sound) {
+                level().playSound(
+                        null,
+                        target.getX(),
+                        target.getY(),
+                        target.getZ(),
+                        SoundEvents.EXPERIENCE_ORB_PICKUP,
+                        SoundSource.PLAYERS,
+                        config().heal_sound_volume,
+                        config().heal_sound_pitch
+                );
+            }
         }
 
         this.discard();
     }
 
     @Override
-    protected ItemStack getPickupItem() {
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
-
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 }

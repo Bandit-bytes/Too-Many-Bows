@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.bows.AncientSageBowConfig;
 import net.bandit.many_bows.mixin.AbstractArrowAccessor;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
@@ -17,19 +18,32 @@ import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.NotNull;
 
 public class AncientSageArrow extends AbstractArrow {
-    private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.33f;
-    private static final int PARTICLE_LIFESPAN = 60;
 
     private float powerMultiplier = 1.0F;
-    private float armorPenetration = DEFAULT_ARMOR_PENETRATION_FACTOR;
-    private int particleTicksRemaining = PARTICLE_LIFESPAN;
+    private float armorPenetration = 0.33F;
+    private int particleTicksRemaining = 60;
+    private int lifetime = 0;
 
     public AncientSageArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfigValues();
     }
 
     public AncientSageArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.ANCIENT_SAGE_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfigValues();
+    }
+
+    private AncientSageBowConfig config() {
+        return AncientSageBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        AncientSageBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+        this.armorPenetration = config.default_armor_penetration_factor;
+        this.particleTicksRemaining = config.trail_particle_lifespan_ticks;
     }
 
     public void setPowerMultiplier(float power) {
@@ -44,60 +58,95 @@ public class AncientSageArrow extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        if (particleTicksRemaining > 0) {
-            createTrailParticles();
+        AncientSageBowConfig config = config();
+
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
+        if (config.trail_particles_enabled && particleTicksRemaining > 0) {
+            createTrailParticles(config.trail_particles_per_tick);
             particleTicksRemaining--;
         }
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        super.onHitEntity(result);
+        AncientSageBowConfig config = config();
 
-        if (this.level().isClientSide()) return;
         if (!(result.getEntity() instanceof LivingEntity target)) {
             this.discard();
             return;
         }
 
-        float baseDamage = (float) ((AbstractArrowAccessor) this).manybows$getBaseDamage();
+        if (config.hit_particles_enabled) {
+            createHitParticles(config.hit_particle_count);
+        }
 
-        if (this.getOwner() instanceof Player player) {
+        if (this.level().isClientSide()) {
+            return;
+        }
+
+        float baseDamage = (float) ((AbstractArrowAccessor) this).manybows$getBaseDamage();
+        float calculatedPenetration = this.armorPenetration;
+
+        if (config.use_ranged_damage_attribute_for_penetration && this.getOwner() instanceof Player player) {
             var lookup = this.level().registryAccess().lookupOrThrow(Registries.ATTRIBUTE);
             var holderOpt = lookup.get(Identifier.fromNamespaceAndPath("ranged_weapon", "damage"));
 
-            if (holderOpt.isPresent()) {
+            if (holderOpt.isPresent() && config.ranged_damage_to_penetration_divisor > 0.0F) {
                 AttributeInstance inst = player.getAttribute(holderOpt.get());
                 if (inst != null) {
-                    armorPenetration = (float) (inst.getValue() / 14.5F);
+                    calculatedPenetration = (float) (inst.getValue() / config.ranged_damage_to_penetration_divisor);
                 }
             }
         }
 
-        armorPenetration = Math.min(Math.max(armorPenetration, 0F), 1F);
+        float minPen = Math.min(config.min_armor_penetration_factor, config.max_armor_penetration_factor);
+        float maxPen = Math.max(config.min_armor_penetration_factor, config.max_armor_penetration_factor);
+        calculatedPenetration = Math.min(Math.max(calculatedPenetration, minPen), maxPen);
 
-        float dmg = baseDamage * armorPenetration * this.powerMultiplier;
+        float damage = baseDamage * calculatedPenetration * this.powerMultiplier * config.final_damage_multiplier;
+        if (damage < 0.0F) {
+            damage = 0.0F;
+        }
 
-        target.hurt(this.level().damageSources().arrow(this, this.getOwner()), dmg);
-
-        createHitParticles();
+        target.hurt(this.level().damageSources().arrow(this, this.getOwner()), damage);
         this.discard();
     }
 
+    private void createHitParticles(int count) {
+        for (int i = 0; i < count; i++) {
+            double ox = (this.random.nextDouble() - 0.5D) * 0.5D;
+            double oy = this.random.nextDouble() * 0.5D;
+            double oz = (this.random.nextDouble() - 0.5D) * 0.5D;
 
-    private void createHitParticles() {
-        for (int i = 0; i < 15; i++) {
-            double ox = (this.random.nextDouble() - 0.5) * 0.5;
-            double oy = this.random.nextDouble() * 0.5;
-            double oz = (this.random.nextDouble() - 0.5) * 0.5;
-            level().addParticle(ParticleTypes.ENCHANTED_HIT,
-                    this.getX() + ox, this.getY() + oy, this.getZ() + oz,
-                    0, 0.1, 0);
+            level().addParticle(
+                    ParticleTypes.ENCHANTED_HIT,
+                    this.getX() + ox,
+                    this.getY() + oy,
+                    this.getZ() + oz,
+                    0.0D,
+                    0.1D,
+                    0.0D
+            );
         }
     }
 
-    private void createTrailParticles() {
-        level().addParticle(ParticleTypes.GLOW, this.getX(), this.getY(), this.getZ(), 0, 0.05, 0);
+    private void createTrailParticles(int count) {
+        for (int i = 0; i < count; i++) {
+            level().addParticle(
+                    ParticleTypes.GLOW,
+                    this.getX(),
+                    this.getY(),
+                    this.getZ(),
+                    0.0D,
+                    0.05D,
+                    0.0D
+            );
+        }
     }
 
     @Override
@@ -107,6 +156,6 @@ public class AncientSageArrow extends AbstractArrow {
 
     @Override
     protected @NotNull ItemStack getDefaultPickupItem() {
-        return null;
+        return new ItemStack(Items.ARROW);
     }
 }

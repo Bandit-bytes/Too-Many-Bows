@@ -1,6 +1,6 @@
 package net.bandit.many_bows.entity;
 
-
+import net.bandit.many_bows.config.bows.AstralBoundBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,34 +13,56 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class AstralArrow extends AbstractArrow {
-    private int ricochetCount = 3;
+
+    private int ricochetCount = 0;
+    private int lifetime = 0;
 
     public AstralArrow(EntityType<? extends AstralArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfigValues();
     }
 
     public AstralArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.ASTRAL_ARROW.get(), shooter, level, bowStack, arrowStack);
-        this.setBaseDamage(7.0);
+        applyConfigValues();
+    }
 
+    private AstralBoundBowConfig config() {
+        return AstralBoundBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        AstralBoundBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
-        if (!level().isClientSide()) {
+
+        if (!level().isClientSide() && config().discard_on_entity_hit) {
             this.discard();
         }
     }
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
-        if (level().isClientSide()) return;
+        if (level().isClientSide()) {
+            return;
+        }
 
-        int maxRicochets = 6;
-        if (ricochetCount >= maxRicochets) {
+        AstralBoundBowConfig config = config();
+
+        if (!config.ricochet_on_block_hit) {
+            this.discard();
+            return;
+        }
+
+        if (ricochetCount >= config.max_ricochets) {
             this.discard();
             return;
         }
@@ -48,43 +70,63 @@ public class AstralArrow extends AbstractArrow {
         ricochetCount++;
 
         Vec3 velocity = this.getDeltaMovement();
-
         var face = result.getDirection();
         Vec3 normal = new Vec3(face.getStepX(), face.getStepY(), face.getStepZ());
 
         Vec3 reflected = velocity.subtract(normal.scale(2.0D * velocity.dot(normal)));
+        Vec3 newVelocity = reflected.scale(config.ricochet_velocity_multiplier);
 
-        this.setDeltaMovement(reflected.scale(0.7D));
+        this.setDeltaMovement(newVelocity);
 
-        Vec3 nudgeDir = reflected.lengthSqr() < 1.0E-6 ? normal : reflected.normalize();
+        Vec3 nudgeDir = newVelocity.lengthSqr() < 1.0E-6D ? normal : newVelocity.normalize();
         Vec3 positionOffset = nudgeDir.scale(0.1D);
 
-        this.setPos(this.getX() + positionOffset.x, this.getY() + positionOffset.y, this.getZ() + positionOffset.z);
+        this.setPos(
+                this.getX() + positionOffset.x,
+                this.getY() + positionOffset.y,
+                this.getZ() + positionOffset.z
+        );
 
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+        this.level().playSound(
+                null,
+                this.getX(),
+                this.getY(),
+                this.getZ(),
                 SoundEvents.METAL_HIT,
                 SoundSource.PLAYERS,
-                1.0F,
-                1.0F);
-    }
+                config.ricochet_sound_volume,
+                config.ricochet_sound_pitch
+        );
 
-    @Override
-    public void tick() {
-        super.tick();
-        Vec3 movement = this.getDeltaMovement();
-        if (movement.lengthSqr() < 0.01) {
+        if (newVelocity.lengthSqr() < config.min_velocity_sqr_before_discard) {
             this.discard();
         }
     }
 
     @Override
-    protected ItemStack getPickupItem() {
+    public void tick() {
+        super.tick();
+
+        AstralBoundBowConfig config = config();
+
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
+        if (this.getDeltaMovement().lengthSqr() < config.min_velocity_sqr_before_discard) {
+            this.discard();
+        }
+    }
+
+    @Override
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
-
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 }

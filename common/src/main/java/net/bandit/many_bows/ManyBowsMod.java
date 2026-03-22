@@ -4,6 +4,7 @@ import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.config.BowLootConfig;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
+import net.bandit.many_bows.config.bows.*;
 import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -18,9 +19,43 @@ public final class ManyBowsMod {
         EffectRegistry.register();
         AttributesRegistry.register();
         ModLootModifiers.registerLootModifiers();
+        preloadBowConfigs();
         ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
 
     }
+
+    private static void preloadBowConfigs() {
+        AethersCallBowConfig.get();
+        AncientSageBowConfig.get();
+        ArcaneBowConfig.get();
+        AstralBoundBowConfig.get();
+        AurorasGraceBowConfig.get();
+        BeaconBeamBowConfig.get();
+        NecroFlameBowConfig.get();
+        DragonsBreathBowConfig.get();
+        DuskReaperBowConfig.get();
+        EtherealHunterBowConfig.get();
+        FlameBowConfig.get();
+        FrostbiteBowConfig.get();
+        HunterBowConfig.get();
+        HunterXpBowConfig.get();
+        IcicleJavelinBowConfig.get();
+        IroncladBowConfig.get();
+        LightningBowConfig.get();
+        RadiantBowConfig.get();
+        SentinelWrathBowConfig.get();
+        ShulkerBlastBowConfig.get();
+        SolarBowConfig.get();
+        SonicBoomBowConfig.get();
+        SpectralWhisperBowConfig.get();
+        TidalBowConfig.get();
+        TorchbearerBowConfig.get();
+        VenomBowConfig.get();
+        VitalityWeaverBowConfig.get();
+        WebstringBowConfig.get();
+        WindBowConfig.get();
+    }
+
     public static void initClient() {
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);

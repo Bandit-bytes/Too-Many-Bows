@@ -1,7 +1,9 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.bows.VenomBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -23,48 +26,96 @@ public class VenomArrow extends AbstractArrow {
 
     private boolean hasHit = false;
     private int hitTimer = 0;
-    private final int maxHitDuration = 40;
+    private int lifetime = 0;
 
     public VenomArrow(EntityType<? extends VenomArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfigValues();
     }
 
     public VenomArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.VENOM_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfigValues();
+    }
+
+    private VenomBowConfig config() {
+        return VenomBowConfig.get();
+    }
+
+    private void applyConfigValues() {
+        VenomBowConfig config = config();
+        this.setBaseDamage(config.base_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     public void tick() {
         super.tick();
+
+        VenomBowConfig config = config();
+
+        lifetime++;
+        if (lifetime > config.max_lifetime_ticks) {
+            this.discard();
+            return;
+        }
+
         if (hasHit) {
             hitTimer++;
-            if (hitTimer >= maxHitDuration) {
+            if (hitTimer >= config.post_hit_linger_ticks) {
                 this.discard();
                 return;
             }
         }
-        if (this.level().isClientSide()) {
+
+        if (this.level().isClientSide() && config.trail_particles_enabled) {
             double speedFactor = 0.1D;
             Vec3 motion = this.getDeltaMovement();
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < config.spore_trail_particle_count; i++) {
                 double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
                 double yOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
                 double zOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
 
-                this.level().addParticle(ParticleTypes.SPORE_BLOSSOM_AIR, this.getX() + motion.x * i * speedFactor, this.getY() + motion.y * i * speedFactor, this.getZ() + motion.z * i * speedFactor, xOffset, yOffset, zOffset);
+                this.level().addParticle(
+                        ParticleTypes.SPORE_BLOSSOM_AIR,
+                        this.getX() + motion.x * i * speedFactor,
+                        this.getY() + motion.y * i * speedFactor,
+                        this.getZ() + motion.z * i * speedFactor,
+                        xOffset, yOffset, zOffset
+                );
             }
-            this.level().addParticle(ParticleTypes.GLOW, this.getX(), this.getY(), this.getZ(), 0.0D, 0.0D, 0.0D);
+
+            if (config.glow_trail_enabled) {
+                this.level().addParticle(
+                        ParticleTypes.GLOW,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        0.0D, 0.0D, 0.0D
+                );
+            }
         }
     }
+
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
         if (!this.level().isClientSide()) {
             Entity entity = result.getEntity();
-            if (entity instanceof LivingEntity) {
-                LivingEntity hitEntity = (LivingEntity) entity;
-                hitEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 1));
+
+            if (entity instanceof LivingEntity hitEntity) {
+                VenomBowConfig config = config();
+
+                if (config.apply_direct_hit_poison) {
+                    hitEntity.addEffect(new MobEffectInstance(
+                            MobEffects.POISON,
+                            config.direct_hit_poison_duration_ticks,
+                            config.direct_hit_poison_amplifier
+                    ));
+                }
+
                 createPoisonExplosion(result.getLocation(), hitEntity);
                 this.hasHit = true;
             }
@@ -74,43 +125,76 @@ public class VenomArrow extends AbstractArrow {
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
+
         if (!this.level().isClientSide()) {
             createPoisonExplosion(result.getLocation(), null);
             this.hasHit = true;
         }
     }
+
     private void createPoisonExplosion(Vec3 position, @Nullable LivingEntity entityHit) {
-        int radius = 4;
-        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius));
+        VenomBowConfig config = config();
+
+        List<LivingEntity> entities = level().getEntitiesOfClass(
+                LivingEntity.class,
+                this.getBoundingBox().inflate(config.poison_burst_radius)
+        );
 
         for (LivingEntity entity : entities) {
-            if (entity != this.getOwner() && entity != entityHit) {
-                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 1));
+            if (entity != this.getOwner() && entity != entityHit && config.apply_aoe_poison) {
+                entity.addEffect(new MobEffectInstance(
+                        MobEffects.POISON,
+                        config.aoe_poison_duration_ticks,
+                        config.aoe_poison_amplifier
+                ));
             }
         }
-        for (int i = 0; i < 100; i++) {
-            double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            double yOffset = random.nextDouble();
-            double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            this.level().addParticle(ParticleTypes.WITCH, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0.1D, 0);
+
+        if (this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(
+                    ParticleTypes.WITCH,
+                    position.x,
+                    position.y,
+                    position.z,
+                    config.witch_particle_count,
+                    1.0D,
+                    0.5D,
+                    1.0D,
+                    0.1D
+            );
+
+            serverLevel.sendParticles(
+                    ParticleTypes.SCULK_SOUL,
+                    position.x,
+                    position.y,
+                    position.z,
+                    config.sculk_soul_particle_count,
+                    1.0D,
+                    0.25D,
+                    1.0D,
+                    0.01D
+            );
         }
-        for (int i = 0; i < 30; i++) {
-            double xOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            double yOffset = random.nextDouble() * 0.5D;
-            double zOffset = (random.nextDouble() - 0.5D) * 2.0D;
-            this.level().addParticle(ParticleTypes.SCULK_SOUL, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0, 0);
-        }
-        this.level().playSound(null, position.x, position.y, position.z, SoundEvents.SLIME_SQUISH, this.getSoundSource(), 1.0F, 0.8F);
+
+        this.level().playSound(
+                null,
+                position.x,
+                position.y,
+                position.z,
+                SoundEvents.SLIME_SQUISH,
+                this.getSoundSource(),
+                config.impact_sound_volume,
+                config.impact_sound_pitch
+        );
     }
 
     @Override
-    protected ItemStack getPickupItem() {
+    protected @NotNull ItemStack getPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 
     @Override
-    protected ItemStack getDefaultPickupItem() {
+    protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
 }
-

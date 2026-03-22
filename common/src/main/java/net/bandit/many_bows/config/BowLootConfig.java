@@ -31,11 +31,6 @@ public class BowLootConfig {
 
     public Float globalBowPullSpeed = 16.0F;
 
-    public Integer emeraldSageXpAmount = 10;
-    public List<String> emeraldSageXpBlacklist = List.of(
-            "minecraft:armor_stand",
-            "minecraft:wandering_trader"
-    );
 
     public List<String> easyLootTables = List.of(
             "minecraft:chests/simple_dungeon",
@@ -171,9 +166,6 @@ public class BowLootConfig {
         if (endgameLootDropChance == null) { endgameLootDropChance = defaults.endgameLootDropChance; changed = true; }
 
         if (globalBowPullSpeed == null) { globalBowPullSpeed = defaults.globalBowPullSpeed; changed = true; }
-
-        if (emeraldSageXpAmount == null) { emeraldSageXpAmount = defaults.emeraldSageXpAmount; changed = true; }
-        if (emeraldSageXpBlacklist == null) { emeraldSageXpBlacklist = new ArrayList<>(defaults.emeraldSageXpBlacklist); changed = true; }
 
         if (easyLootTables == null) { easyLootTables = new ArrayList<>(defaults.easyLootTables); changed = true; }
         if (mediumLootTables == null) { mediumLootTables = new ArrayList<>(defaults.mediumLootTables); changed = true; }
