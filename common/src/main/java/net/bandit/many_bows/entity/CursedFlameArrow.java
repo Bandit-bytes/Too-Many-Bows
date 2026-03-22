@@ -1,13 +1,16 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.NecroFlameBowConfig;
 import net.bandit.many_bows.registry.EffectRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,43 +21,73 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.effect.MobEffectInstance;
 
 public class CursedFlameArrow extends AbstractArrow {
-    private float powerMultiplier = 1.0F;
 
-    public void setPowerMultiplier(float power) {
-        this.powerMultiplier = power;
-    }
+    private static final String CONFIG_NAME = "necro_flame";
+
+    private float powerMultiplier = 1.0F;
     private int particleTimer = 0;
-    private static final int MAX_PARTICLE_DURATION = 100;
 
     public CursedFlameArrow(EntityType<? extends CursedFlameArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues();
     }
 
     public CursedFlameArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.CURSED_FLAME_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfiguredValues();
+    }
+
+    private static NecroFlameBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, NecroFlameBowConfig.class, NecroFlameBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        NecroFlameBowConfig config = config();
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+
+        if (config.direct_hit_damage_override >= 0.0D) {
+            this.setBaseDamage(config.direct_hit_damage_override);
+        }
+    }
+
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        NecroFlameBowConfig config = config();
+
         if (this.inGround) {
             particleTimer++;
         }
-        if (particleTimer < MAX_PARTICLE_DURATION && this.level().isClientSide()) {
+
+        if (config.trail_particles_enabled
+                && particleTimer < config.max_trail_particle_duration_ticks
+                && this.level().isClientSide()) {
             Vec3 motion = this.getDeltaMovement();
-            for (int i = 0; i < 5; i++) {
-                double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
-                double yOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
-                double zOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
-                this.level().addParticle(ParticleTypes.SOUL_FIRE_FLAME,
-                        this.getX() + motion.x * i * 0.1,
-                        this.getY() + motion.y * i * 0.1,
-                        this.getZ() + motion.z * i * 0.1,
-                        xOffset, yOffset, zOffset);
+            int count = Math.max(0, config.trail_particle_count);
+
+            for (int i = 0; i < count; i++) {
+                double randomScale = config.trail_random_offset_scale;
+                double xOffset = (this.random.nextDouble() - 0.5D) * randomScale;
+                double yOffset = (this.random.nextDouble() - 0.5D) * randomScale;
+                double zOffset = (this.random.nextDouble() - 0.5D) * randomScale;
+                double step = config.trail_position_step_multiplier;
+
+                this.level().addParticle(
+                        ParticleTypes.SOUL_FIRE_FLAME,
+                        this.getX() + motion.x * i * step,
+                        this.getY() + motion.y * i * step,
+                        this.getZ() + motion.z * i * step,
+                        xOffset,
+                        yOffset,
+                        zOffset
+                );
             }
         }
     }
@@ -64,79 +97,135 @@ public class CursedFlameArrow extends AbstractArrow {
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity hit) {
-            hit.setRemainingFireTicks(200);
+            NecroFlameBowConfig config = config();
 
-            float fireDamage = 4.0F;
+            if (config.set_target_on_fire) {
+                hit.setRemainingFireTicks(config.fire_ticks_on_hit);
+            }
 
-            if (getOwner() instanceof LivingEntity shooter) {
-                var attrRegistry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-                var rangedKey = net.minecraft.resources.ResourceKey.create(
-                        Registries.ATTRIBUTE,
-                        ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")
-                );
-                var rangedHolder = attrRegistry.getHolder(rangedKey).orElse(null);
-                if (rangedHolder != null) {
-                    var inst = shooter.getAttribute(rangedHolder);
-                    if (inst != null) {
-                        fireDamage = (float) inst.getValue() / 1.5F;
-                    }
+            if (config.bonus_fire_damage_enabled) {
+                float fireDamage = resolveFireDamage(config);
+                if (config.bonus_fire_damage_scales_with_power_multiplier) {
+                    fireDamage *= this.powerMultiplier;
+                }
+
+                if (fireDamage > 0.0F) {
+                    hit.hurt(hit.damageSources().onFire(), fireDamage);
                 }
             }
 
-            hit.hurt(hit.damageSources().onFire(), fireDamage * this.powerMultiplier);
+            if (config.remove_regeneration_on_hit) {
+                hit.removeEffect(MobEffects.REGENERATION);
+            }
 
-            hit.removeEffect(MobEffects.REGENERATION);
-            hit.removeEffect(MobEffects.HEAL);
+            if (config.remove_heal_on_hit) {
+                hit.removeEffect(MobEffects.HEAL);
+            }
 
-            var mobEffectRegistry = level().registryAccess().registryOrThrow(Registries.MOB_EFFECT);
-            var cursedFlameHolder = mobEffectRegistry
-                    .getHolderOrThrow(EffectRegistry.CURSED_FLAME.getKey());
+            if (config.apply_cursed_flame_effect) {
+                var mobEffectRegistry = level().registryAccess().registryOrThrow(Registries.MOB_EFFECT);
+                var cursedFlameHolder = mobEffectRegistry.getHolderOrThrow(EffectRegistry.CURSED_FLAME.getKey());
 
-            hit.addEffect(new MobEffectInstance(
-                    cursedFlameHolder,
-                    20 * 8,
-                    0,
-                    false,
-                    true
-            ));
+                hit.addEffect(new MobEffectInstance(
+                        cursedFlameHolder,
+                        config.cursed_flame_duration_ticks,
+                        config.cursed_flame_amplifier,
+                        false,
+                        config.cursed_flame_show_particles,
+                        config.cursed_flame_show_icon
+                ));
+            }
 
-            if (level() instanceof ServerLevel sl) {
-                sl.sendParticles(ParticleTypes.SOUL, hit.getX(), hit.getY(0.5), hit.getZ(),
-                        30, 1.0, 0.5, 1.0, 0.1);
+            if (config.entity_hit_particles_enabled && level() instanceof ServerLevel sl) {
+                sl.sendParticles(
+                        ParticleTypes.SOUL,
+                        hit.getX(),
+                        hit.getY(0.5),
+                        hit.getZ(),
+                        Math.max(0, config.entity_hit_particle_count),
+                        config.entity_hit_particle_offset_x,
+                        config.entity_hit_particle_offset_y,
+                        config.entity_hit_particle_offset_z,
+                        config.entity_hit_particle_speed
+                );
             }
         }
+    }
+
+    private float resolveFireDamage(NecroFlameBowConfig config) {
+        float fireDamage = (float) config.base_fire_damage;
+
+        if (config.use_ranged_damage_attribute_for_fire_damage && getOwner() instanceof LivingEntity shooter) {
+            var attrRegistry = level().registryAccess().registryOrThrow(Registries.ATTRIBUTE);
+            var rangedKey = ResourceKey.create(
+                    Registries.ATTRIBUTE,
+                    ResourceLocation.fromNamespaceAndPath(
+                            config.ranged_damage_attribute_namespace,
+                            config.ranged_damage_attribute_path
+                    )
+            );
+            var rangedHolder = attrRegistry.getHolder(rangedKey).orElse(null);
+
+            if (rangedHolder != null) {
+                var inst = shooter.getAttribute(rangedHolder);
+                if (inst != null && config.ranged_damage_attribute_divisor != 0.0D) {
+                    fireDamage = (float) (inst.getValue() / config.ranged_damage_attribute_divisor);
+                }
+            }
+        }
+
+        return fireDamage;
     }
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
+
+        NecroFlameBowConfig config = config();
+
         if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
             Vec3 position = result.getLocation();
-            BlockPos hitPos = new BlockPos((int) position.x, (int) position.y, (int) position.z);
 
-            serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, position.x, position.y, position.z, 30, 0.5, 0.5, 0.5, 0.01);
-            serverLevel.playSound(null, position.x, position.y, position.z, SoundEvents.SOUL_ESCAPE, this.getSoundSource(), 1.0F, 1.0F);
+            if (config.block_hit_particles_enabled) {
+                serverLevel.sendParticles(
+                        ParticleTypes.SOUL_FIRE_FLAME,
+                        position.x,
+                        position.y,
+                        position.z,
+                        Math.max(0, config.block_hit_particle_count),
+                        config.block_hit_particle_offset_x,
+                        config.block_hit_particle_offset_y,
+                        config.block_hit_particle_offset_z,
+                        config.block_hit_particle_speed
+                );
+            }
 
-            particleTimer = MAX_PARTICLE_DURATION;
-        }
-    }
+            if (config.block_hit_sound_enabled) {
+                serverLevel.playSound(
+                        null,
+                        position.x,
+                        position.y,
+                        position.z,
+                        SoundEvents.SOUL_ESCAPE,
+                        this.getSoundSource(),
+                        config.block_hit_sound_volume,
+                        config.block_hit_sound_pitch
+                );
+            }
 
-    private void createCursedSoulFireParticles(Vec3 position) {
-        for (int i = 0; i < 30; i++) {
-            double xOffset = (this.random.nextDouble() - 0.5D) * 2.0D;
-            double yOffset = this.random.nextDouble() * 0.5D;
-            double zOffset = (this.random.nextDouble() - 0.5D) * 2.0D;
-            this.level().addParticle(ParticleTypes.SOUL, position.x + xOffset, position.y + yOffset, position.z + zOffset, 0, 0.1D, 0);
+            if (config.stop_trail_particles_after_block_hit) {
+                particleTimer = config.max_trail_particle_duration_ticks;
+            }
         }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }

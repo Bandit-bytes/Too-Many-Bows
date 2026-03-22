@@ -1,7 +1,10 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.AethersCallBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -20,38 +23,54 @@ import java.util.List;
 
 public class AethersCallArrow extends AbstractArrow {
 
-    private static final int MAX_LIFETIME = 80;
+    private static final String CONFIG_NAME = "aethers_call";
+
     private int lifetime = 0;
 
     public AethersCallArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues();
     }
 
     public AethersCallArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.AETHERS_CALL_ARROW.get(), shooter, level, bowStack, arrowStack);
-        this.setBaseDamage(6.0D);
+        applyConfiguredValues();
+    }
+
+    private static AethersCallBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, AethersCallBowConfig.class, AethersCallBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        AethersCallBowConfig config = config();
+        this.setBaseDamage(config.direct_hit_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        AethersCallBowConfig config = config();
+
         lifetime++;
-        if (lifetime > MAX_LIFETIME) {
+        if (config.max_lifetime_ticks > 0 && lifetime > config.max_lifetime_ticks) {
             this.discard();
             return;
         }
 
-        if (level().isClientSide) {
-            level().addParticle(
-                    ParticleTypes.END_ROD,
-                    this.getX(),
-                    this.getY() + 0.1D,
-                    this.getZ(),
-                    0.0D,
-                    0.02D,
-                    0.0D
-            );
+        if (level().isClientSide && config.trail_particles_enabled) {
+            for (int i = 0; i < Math.max(0, config.trail_particles_per_tick); i++) {
+                level().addParticle(
+                        ParticleTypes.END_ROD,
+                        this.getX(),
+                        this.getY() + config.trail_particle_offset_y,
+                        this.getZ(),
+                        config.trail_particle_velocity_x,
+                        config.trail_particle_velocity_y,
+                        config.trail_particle_velocity_z
+                );
+            }
         }
     }
 
@@ -68,64 +87,73 @@ public class AethersCallArrow extends AbstractArrow {
     }
 
     private void triggerAetherBurst() {
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide) {
+            return;
+        }
 
+        AethersCallBowConfig config = config();
         Level level = this.level();
+
         double x = this.getX();
         double y = this.getY();
         double z = this.getZ();
-        double radius = 4.0D;
 
-        // Sound
         level.playSound(
                 null,
                 x, y, z,
                 SoundEvents.AMETHYST_CLUSTER_BREAK,
                 SoundSource.PLAYERS,
-                1.0F,
-                1.5F
+                config.burst_sound_volume,
+                config.burst_sound_pitch
         );
 
-        List<LivingEntity> entities = level.getEntitiesOfClass(
-                LivingEntity.class,
-                new AABB(x - radius, y - radius, z - radius, x + radius, y + radius, z + radius)
-        );
+        double radius = Math.max(0.0D, config.burst_radius);
 
-        LivingEntity owner = (this.getOwner() instanceof LivingEntity living) ? living : null;
+        if (radius > 0.0D) {
+            List<LivingEntity> entities = level.getEntitiesOfClass(
+                    LivingEntity.class,
+                    new AABB(x - radius, y - radius, z - radius, x + radius, y + radius, z + radius)
+            );
 
-        for (LivingEntity target : entities) {
-            if (owner != null && target == owner) {
-                target.addEffect(new MobEffectInstance(
-                        MobEffects.SLOW_FALLING,
-                        100,
-                        0,
-                        false,
-                        true
-                ));
-                continue;
+            LivingEntity owner = this.getOwner() instanceof LivingEntity living ? living : null;
+
+            for (LivingEntity target : entities) {
+                if (owner != null && target == owner) {
+                    if (config.owner_slow_falling_enabled) {
+                        target.addEffect(new MobEffectInstance(
+                                MobEffects.SLOW_FALLING,
+                                config.owner_slow_falling_duration_ticks,
+                                config.owner_slow_falling_amplifier,
+                                false,
+                                true
+                        ));
+                    }
+                    continue;
+                }
+
+                if (config.target_levitation_enabled) {
+                    target.addEffect(new MobEffectInstance(
+                            MobEffects.LEVITATION,
+                            config.target_levitation_duration_ticks,
+                            config.target_levitation_amplifier,
+                            false,
+                            true
+                    ));
+                }
             }
-
-            target.addEffect(new MobEffectInstance(
-                    MobEffects.LEVITATION,
-                    40,
-                    0,
-                    false,
-                    true
-            ));
         }
 
-        for (int i = 0; i < 20; i++) {
-            double dx = (random.nextDouble() - 0.5D) * 1.5D;
-            double dy = random.nextDouble() * 1.5D;
-            double dz = (random.nextDouble() - 0.5D) * 1.5D;
-            level.addParticle(
+        if (config.burst_particles_enabled && level instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(
                     ParticleTypes.END_ROD,
-                    x + dx,
-                    y + dy,
-                    z + dz,
-                    0.0D,
-                    0.02D,
-                    0.0D
+                    x,
+                    y,
+                    z,
+                    Math.max(0, config.burst_particle_count),
+                    config.burst_particle_offset_x,
+                    config.burst_particle_offset_y,
+                    config.burst_particle_offset_z,
+                    config.burst_particle_speed
             );
         }
 
@@ -134,11 +162,11 @@ public class AethersCallArrow extends AbstractArrow {
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return null;
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }

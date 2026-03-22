@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.ArcaneBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -13,89 +15,152 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.entity.ai.attributes.Attribute;
+
 import java.util.List;
 import java.util.function.Predicate;
 
 public class ArcaneBow extends ModBowItem {
 
+    private static final String CONFIG_NAME = "arcane_bow";
+
     public ArcaneBow(Properties properties) {
         super(properties);
     }
 
+    private static ArcaneBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, ArcaneBowConfig.class, ArcaneBowConfig::new);
+    }
+
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
-        if (entity instanceof Player player) {
-            List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
-
-            if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
-                int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
-
-                if (power >= 0.1F) {
-                    if (level instanceof ServerLevel serverLevel) {
-                        fireTripleArrows(serverLevel, player, bowStack, projectiles, power);
-                    }
-
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                    player.awardStat(Stats.ITEM_USED.get(this));
-
-                    if (!player.getAbilities().instabuild) {
-            damageBow(bowStack, player, InteractionHand.MAIN_HAND);
+        if (!(entity instanceof Player player)) {
+            return;
         }
+
+        ArcaneBowConfig config = config();
+        List<ItemStack> projectiles = draw(bowStack, player.getProjectile(bowStack), player);
+
+        if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
+            int charge = this.getUseDuration(bowStack, entity) - chargeTime;
+            float power = getPowerForTime(charge);
+
+            if (power >= config.minimum_pull_power) {
+                if (level instanceof ServerLevel serverLevel) {
+                    fireConfiguredArrows(serverLevel, player, bowStack, projectiles, power, config);
+                }
+
+                if (config.shoot_sound_enabled) {
+                    level.playSound(
+                            null,
+                            player.getX(),
+                            player.getY(),
+                            player.getZ(),
+                            SoundEvents.ARROW_SHOOT,
+                            SoundSource.PLAYERS,
+                            config.shoot_sound_volume,
+                            config.shoot_sound_pitch
+                    );
+                }
+
+                player.awardStat(Stats.ITEM_USED.get(this));
+
+                if (!player.getAbilities().instabuild && config.damage_bow_on_release) {
+                    damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                 }
             }
         }
     }
 
-    private void fireTripleArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power) {
-        float basePitch = player.getXRot();
-        float baseYaw = player.getYRot();
-        float spreadAngle = 5.0F;
-
+    private void fireConfiguredArrows(ServerLevel serverLevel, Player player, ItemStack bowStack, List<ItemStack> projectileStacks, float power, ArcaneBowConfig config) {
         if (projectileStacks.isEmpty() && !player.getAbilities().instabuild) {
             return;
         }
 
-        ItemStack projectileStack = projectileStacks.get(0);
-        boolean arrowConsumed = false;
+        ItemStack projectileStack = projectileStacks.isEmpty() ? new ItemStack(Items.ARROW) : projectileStacks.get(0);
+        if (!(projectileStack.getItem() instanceof ArrowItem arrowItem)) {
+            return;
+        }
 
-        for (int i = -1; i <= 1; i++) {
-            AbstractArrow arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
+        int arrowCount = Math.max(1, config.arrow_count);
+        int centerIndex = arrowCount / 2;
+        float basePitch = player.getXRot();
+        float baseYaw = player.getYRot();
 
-            Holder<Attribute> rangedDamageAttr = serverLevel.registryAccess()
-                    .registryOrThrow(Registries.ATTRIBUTE)
-                    .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
-                    .orElse(null);
+        for (int i = 0; i < arrowCount; i++) {
+            AbstractArrow arrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
 
-            if (rangedDamageAttr != null) {
-                AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
-                if (attrInstance != null) {
-                    float damage = (float) attrInstance.getValue();
-                    arrow.setBaseDamage(damage / 2.5);
+            double damage = arrow.getBaseDamage();
+
+            if (config.direct_hit_damage_override >= 0.0D) {
+                damage = config.direct_hit_damage_override;
+            } else if (config.use_ranged_damage_attribute_for_damage) {
+                Holder<Attribute> rangedDamageAttr = serverLevel.registryAccess()
+                        .registryOrThrow(Registries.ATTRIBUTE)
+                        .getHolder(ResourceLocation.fromNamespaceAndPath(
+                                config.ranged_damage_attribute_namespace,
+                                config.ranged_damage_attribute_path
+                        ))
+                        .orElse(null);
+
+                if (rangedDamageAttr != null) {
+                    AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                    if (attrInstance != null && config.ranged_damage_attribute_divisor != 0.0D) {
+                        damage = attrInstance.getValue() / config.ranged_damage_attribute_divisor;
+                    }
                 }
             }
-            applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, 1.5D);
 
-            float spreadOffset = i * spreadAngle;
-            arrow.shootFromRotation(player, basePitch, baseYaw + spreadOffset, 0.0F, power * 2.5F, 1.0F);
-            arrow.pickup = (i == 0) ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
+            damage = (damage * config.direct_hit_damage_multiplier) + config.direct_hit_damage_bonus;
+            arrow.setBaseDamage(damage);
+
+            if (config.apply_bow_damage_attribute) {
+                applyBowDamageAttribute(arrow, player);
+            }
+
+            if (config.apply_bow_crit) {
+                tryApplyBowCrit(arrow, player, config.bow_crit_multiplier);
+            }
+
+            float offsetIndex = i - centerIndex;
+            float spreadOffset = offsetIndex * config.spread_angle_degrees;
+
+            arrow.shootFromRotation(
+                    player,
+                    basePitch,
+                    baseYaw + spreadOffset,
+                    0.0F,
+                    power * config.velocity_multiplier,
+                    config.inaccuracy
+            );
+
+            boolean isCenterArrow = i == centerIndex;
+            arrow.pickup = parsePickupMode(isCenterArrow ? config.center_arrow_pickup : config.side_arrow_pickup);
 
             serverLevel.addFreshEntity(arrow);
         }
 
-        if (!player.getAbilities().instabuild) {
+        if (!player.getAbilities().instabuild && config.consume_one_arrow_per_shot) {
             projectileStack.shrink(1);
         }
+    }
+
+    private AbstractArrow.Pickup parsePickupMode(String value) {
+        if (value == null) {
+            return AbstractArrow.Pickup.CREATIVE_ONLY;
+        }
+
+        return switch (value.toLowerCase()) {
+            case "allowed" -> AbstractArrow.Pickup.ALLOWED;
+            case "disallowed" -> AbstractArrow.Pickup.DISALLOWED;
+            default -> AbstractArrow.Pickup.CREATIVE_ONLY;
+        };
     }
 
     public static float getPowerForTime(int pCharge) {
@@ -133,7 +198,8 @@ public class ArcaneBow extends ModBowItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack bowStack = player.getItemInHand(hand);
         boolean hasArrows = !player.getProjectile(bowStack).isEmpty();
-        if (!hasArrows) {
+
+        if (!hasArrows && !player.getAbilities().instabuild) {
             return InteractionResultHolder.fail(bowStack);
         } else {
             player.startUsingItem(hand);

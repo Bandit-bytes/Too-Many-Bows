@@ -1,9 +1,8 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.VitalityWeaverBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,59 +18,93 @@ import java.util.function.Consumer;
 
 public class VitalityArrow extends AbstractArrow {
 
+    private static final String CONFIG_NAME = "vitality_weaver";
+
     private Consumer<LivingEntity> onHitCallback;
 
     public VitalityArrow(EntityType<? extends VitalityArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues();
     }
 
     public VitalityArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.VITALITY_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfiguredValues();
     }
 
-    /**
-     * Sets a callback to be executed when the arrow hits a living entity.
-     */
+    private static VitalityWeaverBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, VitalityWeaverBowConfig.class, VitalityWeaverBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        VitalityWeaverBowConfig config = config();
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+
+        if (config.direct_hit_damage_override >= 0.0D) {
+            this.setBaseDamage(config.direct_hit_damage_override);
+        }
+    }
+
     public void setOnHitCallback(Consumer<LivingEntity> callback) {
         this.onHitCallback = callback;
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        super.onHitEntity(result);
-
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            LivingEntity shooter = this.getOwner() instanceof LivingEntity ? (LivingEntity) this.getOwner() : null;
+            VitalityWeaverBowConfig config = config();
+            LivingEntity shooter = this.getOwner() instanceof LivingEntity living ? living : null;
 
             if (shooter != null) {
                 DamageSource damageSource = this.level().damageSources().arrow(this, shooter);
                 float damageDealt = (float) this.getBaseDamage();
                 boolean didDamage = target.hurt(damageSource, damageDealt);
 
-                if (didDamage && damageDealt > 0) {
-                    if (onHitCallback != null) {
+                if (didDamage && damageDealt > 0.0F) {
+                    if (config.run_on_hit_callback && onHitCallback != null) {
                         onHitCallback.accept(target);
                     }
 
-                    float healAmount = Math.min(damageDealt * 0.5F, target.getHealth());
-                    shooter.heal(healAmount);
-                    level().playSound(null, target.getX(), target.getY(), target.getZ(),
-                            SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    if (config.heal_shooter_on_hit) {
+                        float healAmount = (float) (damageDealt * config.heal_percent_of_damage_dealt);
+
+                        if (config.cap_heal_to_target_current_health) {
+                            healAmount = Math.min(healAmount, target.getHealth());
+                        }
+
+                        if (healAmount > 0.0F) {
+                            shooter.heal(healAmount);
+                        }
+                    }
+
+                    if (config.heal_sound_enabled) {
+                        level().playSound(
+                                null,
+                                target.getX(),
+                                target.getY(),
+                                target.getZ(),
+                                SoundEvents.PLAYER_LEVELUP,
+                                SoundSource.PLAYERS,
+                                config.heal_sound_volume,
+                                config.heal_sound_pitch
+                        );
+                    }
                 }
             }
         }
 
-        this.discard();
+        if (config().discard_after_entity_hit) {
+            this.discard();
+        }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
-
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }

@@ -1,8 +1,5 @@
 package net.bandit.many_bows.item;
 
-import net.bandit.many_bows.entity.AncientSageArrow;
-import net.bandit.many_bows.entity.DuskReaperArrow;
-import net.bandit.many_bows.entity.HunterXPArrow;
 import net.bandit.many_bows.entity.HunterXPArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -18,7 +15,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;

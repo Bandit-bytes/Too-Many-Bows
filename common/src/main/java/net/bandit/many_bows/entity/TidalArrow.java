@@ -1,11 +1,9 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.TidalBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,101 +20,176 @@ import net.minecraft.world.phys.Vec3;
 
 public class TidalArrow extends AbstractArrow {
 
+    private static final String CONFIG_NAME = "tidal_bow";
+
     public TidalArrow(EntityType<? extends TidalArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues();
     }
 
     public TidalArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.TIDAL_ARROW.get(), shooter, level, bowStack, arrowStack);
+        applyConfiguredValues();
+    }
+
+    private static TidalBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, TidalBowConfig.class, TidalBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        TidalBowConfig config = config();
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+
+        if (config.direct_hit_damage_override >= 0.0D) {
+            this.setBaseDamage(config.direct_hit_damage_override);
+        }
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (this.level().isClientSide() && this.isInWater()) {
+        TidalBowConfig config = config();
+
+        if (this.level().isClientSide() && this.isInWater() && config.underwater_trail_particles_enabled) {
             Vec3 motion = this.getDeltaMovement();
-            for (int i = 0; i < 5; i++) {
-                double xOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
-                double yOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
-                double zOffset = (this.random.nextDouble() - 0.5D) * 0.3D;
-                this.level().addParticle(ParticleTypes.BUBBLE,
-                        this.getX() + motion.x * i * 0.1,
-                        this.getY() + motion.y * i * 0.1,
-                        this.getZ() + motion.z * i * 0.1,
-                        xOffset, yOffset, zOffset);
+
+            for (int i = 0; i < Math.max(0, config.underwater_trail_particle_count); i++) {
+                double xOffset = (this.random.nextDouble() - 0.5D) * config.underwater_trail_offset_scale;
+                double yOffset = (this.random.nextDouble() - 0.5D) * config.underwater_trail_offset_scale;
+                double zOffset = (this.random.nextDouble() - 0.5D) * config.underwater_trail_offset_scale;
+
+                this.level().addParticle(
+                        ParticleTypes.BUBBLE,
+                        this.getX() + motion.x * i * config.underwater_trail_spacing,
+                        this.getY() + motion.y * i * config.underwater_trail_spacing,
+                        this.getZ() + motion.z * i * config.underwater_trail_spacing,
+                        xOffset,
+                        yOffset,
+                        zOffset
+                );
             }
         }
     }
 
     @Override
     protected float getWaterInertia() {
-        return 1.0F;
+        return config().water_inertia;
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
+
         if (!this.level().isClientSide() && result.getEntity() instanceof LivingEntity hitEntity) {
-            hitEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 2));
-            createWaterBindingEffect(hitEntity);
+            TidalBowConfig config = config();
+
+            if (config.entity_hit_slowness_enabled) {
+                hitEntity.addEffect(new MobEffectInstance(
+                        MobEffects.MOVEMENT_SLOWDOWN,
+                        config.entity_hit_slowness_duration_ticks,
+                        config.entity_hit_slowness_amplifier
+                ));
+            }
+
+            createWaterBindingEffect(hitEntity, config);
         }
     }
 
-    private void createWaterBindingEffect(LivingEntity entity) {
-        if (entity.level() instanceof ServerLevel serverLevel) {
-            BlockPos entityPos = entity.blockPosition();
-            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 4, false, false));
-            for (int i = 0; i < 30; i++) {
-                double angle = i * Math.PI / 15;
-                double xOffset = Math.cos(angle) * 0.5;
-                double zOffset = Math.sin(angle) * 0.5;
-                double yOffset = 0.3 * i;
+    private void createWaterBindingEffect(LivingEntity entity, TidalBowConfig config) {
+        if (!(entity.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        if (config.binding_slowness_enabled) {
+            entity.addEffect(new MobEffectInstance(
+                    MobEffects.MOVEMENT_SLOWDOWN,
+                    config.binding_slowness_duration_ticks,
+                    config.binding_slowness_amplifier,
+                    false,
+                    false
+            ));
+        }
+
+        if (config.binding_particles_enabled) {
+            for (int i = 0; i < Math.max(0, config.binding_particle_count); i++) {
+                double angle = i * Math.PI / 15.0D;
+                double xOffset = Math.cos(angle) * config.binding_ring_radius;
+                double zOffset = Math.sin(angle) * config.binding_ring_radius;
+                double yOffset = config.binding_y_step * i;
 
                 serverLevel.sendParticles(
                         ParticleTypes.SPLASH,
-                        entityPos.getX() + xOffset,
-                        entityPos.getY() + yOffset,
-                        entityPos.getZ() + zOffset,
-                        1, 0.0, 0.0, 0.0, 0.0
+                        entity.getX() + xOffset,
+                        entity.getY() + yOffset,
+                        entity.getZ() + zOffset,
+                        1,
+                        0.0D, 0.0D, 0.0D,
+                        0.0D
                 );
             }
-            this.level().playSound(null, entityPos, SoundEvents.GENERIC_SPLASH, this.getSoundSource(), 0.5F, 0.8F);
+        }
+
+        if (config.binding_sound_enabled) {
+            this.level().playSound(
+                    null,
+                    entity.getX(),
+                    entity.getY(),
+                    entity.getZ(),
+                    SoundEvents.GENERIC_SPLASH,
+                    this.getSoundSource(),
+                    config.binding_sound_volume,
+                    config.binding_sound_pitch
+            );
         }
     }
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
-        createWaterSplash(result.getLocation());
+        createWaterSplash(result.getLocation(), config());
     }
 
-    private void createWaterSplash(Vec3 position) {
-        if (!this.level().isClientSide()) {
-            for (int i = 0; i < 20; i++) {
-                double xOffset = (this.random.nextDouble() - 0.5D) * 2.0D;
-                double yOffset = this.random.nextDouble();
-                double zOffset = (this.random.nextDouble() - 0.5D) * 2.0D;
+    private void createWaterSplash(Vec3 position, TidalBowConfig config) {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
 
-                this.level().addParticle(ParticleTypes.SPLASH,
-                        position.x + xOffset,
-                        position.y + yOffset,
-                        position.z + zOffset,
-                        0, 0.1D, 0);
-            }
+        if (config.block_splash_particles_enabled) {
+            serverLevel.sendParticles(
+                    ParticleTypes.SPLASH,
+                    position.x,
+                    position.y,
+                    position.z,
+                    Math.max(0, config.block_splash_particle_count),
+                    config.block_splash_offset_xz,
+                    config.block_splash_offset_y,
+                    config.block_splash_offset_xz,
+                    config.block_splash_speed_y
+            );
+        }
 
-            this.level().playSound(null, position.x, position.y, position.z, SoundEvents.SPLASH_POTION_BREAK, this.getSoundSource(), 1.0F, 1.0F);
+        if (config.block_splash_sound_enabled) {
+            this.level().playSound(
+                    null,
+                    position.x,
+                    position.y,
+                    position.z,
+                    SoundEvents.SPLASH_POTION_BREAK,
+                    this.getSoundSource(),
+                    config.block_splash_sound_volume,
+                    config.block_splash_sound_pitch
+            );
         }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
-
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }

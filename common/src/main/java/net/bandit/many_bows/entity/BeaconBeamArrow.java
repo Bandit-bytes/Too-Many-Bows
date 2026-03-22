@@ -1,5 +1,7 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.BeaconBeamBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -9,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -17,57 +20,69 @@ import java.util.List;
 
 public class BeaconBeamArrow extends AbstractArrow {
 
-    private static final double LINK_RADIUS = 6.0D;
-    private static final int MAX_LINKS = 4;
-    private static final float LINK_DAMAGE_MULT = 0.45F;
-
-    private static final int TRAIL_SAMPLES = 6;
-    private static final float TRAIL_SPREAD = 0.01F;
-    private static final float SPEED_ALPHA_BOOST = 0.015F;
+    private static final String CONFIG_NAME = "beacon_beam_bow";
 
     private Vec3 lastPos = null;
 
     public BeaconBeamArrow(EntityType<? extends AbstractArrow> type, Level level) {
         super(type, level);
-        this.pickup = Pickup.DISALLOWED;
+        applyConfiguredValues();
     }
 
     public BeaconBeamArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.BEACON_BEAM_ARROW.get(), shooter, level, bowStack, arrowStack);
-        this.pickup = Pickup.DISALLOWED;
+        applyConfiguredValues();
+    }
+
+    private static BeaconBeamBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, BeaconBeamBowConfig.class, BeaconBeamBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        BeaconBeamBowConfig config = config();
+        this.setBaseDamage(config.direct_hit_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        BeaconBeamBowConfig config = config();
+
         if (this.level().isClientSide) {
-            if (lastPos == null) lastPos = this.position();
+            if (lastPos == null) {
+                lastPos = this.position();
+            }
 
             Vec3 now = this.position();
             Vec3 delta = now.subtract(lastPos);
-
             double len = delta.length();
-            if (len > 0.0001) {
-                Vec3 step = delta.scale(1.0 / TRAIL_SAMPLES);
 
-                int extra = (int) Math.min(6, len / 0.75);
-                int samples = TRAIL_SAMPLES + extra;
+            if (config.trail_particles_enabled && len > 0.0001D) {
+                int baseSamples = Math.max(1, config.base_trail_samples);
+                int maxExtra = Math.max(0, config.max_extra_trail_samples);
 
-                spawnBeamTrail(lastPos, now, samples, ParticleTypes.ELECTRIC_SPARK);
-                // you can swap END_ROD -> ELECTRIC_SPARK, SOUL_FIRE_FLAME, GLOW, etc.
+                int extra = 0;
+                if (config.extra_samples_distance_divisor > 0.0D) {
+                    extra = (int) Math.min(maxExtra, len / config.extra_samples_distance_divisor);
+                }
+
+                int samples = baseSamples + extra;
+                spawnBeamTrail(lastPos, now, samples, ParticleTypes.ELECTRIC_SPARK, config);
             }
 
             lastPos = now;
             return;
         }
-        if (lastPos == null) lastPos = this.position();
-        else lastPos = this.position();
+
+        lastPos = this.position();
     }
 
-    private void spawnBeamTrail(Vec3 from, Vec3 to, int samples, ParticleOptions particle) {
+    private void spawnBeamTrail(Vec3 from, Vec3 to, int samples, ParticleOptions particle, BeaconBeamBowConfig config) {
         Level level = this.level();
         Vec3 diff = to.subtract(from);
+        double spread = config.trail_spread;
 
         for (int i = 0; i <= samples; i++) {
             double t = (double) i / (double) samples;
@@ -75,63 +90,86 @@ public class BeaconBeamArrow extends AbstractArrow {
             double y = from.y + diff.y * t;
             double z = from.z + diff.z * t;
 
-            double ox = (this.random.nextDouble() - 0.5) * TRAIL_SPREAD;
-            double oy = (this.random.nextDouble() - 0.5) * TRAIL_SPREAD;
-            double oz = (this.random.nextDouble() - 0.5) * TRAIL_SPREAD;
+            double ox = (this.random.nextDouble() - 0.5D) * spread;
+            double oy = (this.random.nextDouble() - 0.5D) * spread;
+            double oz = (this.random.nextDouble() - 0.5D) * spread;
 
-            level.addParticle(particle, x + ox, y + oy, z + oz, 0, 0, 0);
+            level.addParticle(particle, x + ox, y + oy, z + oz, 0.0D, 0.0D, 0.0D);
         }
     }
 
     @Override
     protected void onHitEntity(EntityHitResult hit) {
-        super.onHitEntity(hit);
+        if (this.level().isClientSide) {
+            return;
+        }
 
-        if (this.level().isClientSide) return;
+        BeaconBeamBowConfig config = config();
 
         if (hit.getEntity() instanceof LivingEntity target) {
-            float base = (float) this.getBaseDamage();
+            float baseDamage = (float) this.getBaseDamage();
 
-            target.hurt(this.damageSources().arrow(this, this.getOwner()), base);
-            doLinkDamage(target, base);
+            target.hurt(this.damageSources().arrow(this, this.getOwner()), baseDamage);
+
+            if (config.link_damage_enabled) {
+                doLinkDamage(target, baseDamage, config);
+            }
 
             this.level().playSound(
                     null,
-                    target.getX(), target.getY(), target.getZ(),
+                    target.getX(),
+                    target.getY(),
+                    target.getZ(),
                     SoundEvents.BEACON_POWER_SELECT,
                     SoundSource.PLAYERS,
-                    1.0F, 1.35F
+                    config.hit_sound_volume,
+                    config.hit_sound_pitch
             );
         }
-        this.discard();
+
+        if (config.discard_after_entity_hit) {
+            this.discard();
+        }
     }
 
-    private void doLinkDamage(LivingEntity primary, float baseDamage) {
-        LivingEntity owner = (this.getOwner() instanceof LivingEntity le) ? le : null;
+    private void doLinkDamage(LivingEntity primary, float baseDamage, BeaconBeamBowConfig config) {
+        LivingEntity owner = this.getOwner() instanceof LivingEntity le ? le : null;
 
-        var box = primary.getBoundingBox().inflate(LINK_RADIUS);
+        double radius = Math.max(0.0D, config.link_radius);
+        if (radius <= 0.0D) {
+            return;
+        }
+
         List<LivingEntity> nearby = this.level().getEntitiesOfClass(
                 LivingEntity.class,
-                box,
+                primary.getBoundingBox().inflate(radius),
                 le -> le != primary && le != owner && le.isAlive()
         );
 
-        int links = 0;
-        float linkDamage = Math.max(1.0F, baseDamage * LINK_DAMAGE_MULT);
+        int maxLinks = Math.max(0, config.max_links);
+        if (maxLinks <= 0) {
+            return;
+        }
 
+        float linkDamage = (float) Math.max(config.minimum_link_damage, baseDamage * config.link_damage_multiplier);
+
+        int links = 0;
         for (LivingEntity other : nearby) {
             other.hurt(this.damageSources().magic(), linkDamage);
-            if (++links >= MAX_LINKS) break;
+            links++;
+            if (links >= maxLinks) {
+                break;
+            }
         }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return ItemStack.EMPTY;
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return null;
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }

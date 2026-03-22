@@ -1,5 +1,7 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.WindBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -7,7 +9,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -20,73 +21,73 @@ import java.util.List;
 
 public class WindProjectile extends AbstractArrow {
 
-    private static final float BASE_DAMAGE = 3.0f;
-
-    // How big the gust radius is
-    private static final double GUST_RADIUS = 4.0D;
-    // How strongly entities are pushed
-    private static final double KNOCKBACK_STRENGTH = 1.1D;
-
-    // Duration of buffs on the shooter
-    private static final int SHOOTER_SPEED_DURATION = 60;      // 3 seconds
-    private static final int SHOOTER_SLOW_FALL_DURATION = 60;  // 3 seconds
+    private static final String CONFIG_NAME = "wind_bow";
 
     public WindProjectile(EntityType<? extends WindProjectile> entityType, Level level) {
         super(entityType, level);
-        this.setBaseDamage(BASE_DAMAGE);
+        applyConfiguredValues();
     }
 
     public WindProjectile(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.WIND_PROJECTILE.get(), shooter, level, bowStack, arrowStack);
-        this.setBaseDamage(BASE_DAMAGE);
+        applyConfiguredValues();
+    }
+
+    private static WindBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, WindBowConfig.class, WindBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        WindBowConfig config = config();
+        this.setBaseDamage(config.direct_hit_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
+        WindBowConfig config = config();
+
         if (!level().isClientSide()) {
             Entity hit = result.getEntity();
-            if (hit instanceof LivingEntity target) {
-                // Direct hit damage
+            if (config.bonus_magic_damage_on_direct_hit && hit instanceof LivingEntity target) {
                 target.hurt(damageSources().magic(), (float) this.getBaseDamage());
             }
 
-            // Trigger the gust at the hit position
-            spawnGust(this.getX(), this.getY(), this.getZ());
+            spawnGust(this.getX(), this.getY(), this.getZ(), config);
         }
 
-        this.discard();
+        if (config.discard_after_entity_hit) {
+            this.discard();
+        }
     }
 
-    /**
-     * Creates an outward gust that:
-     * - Pushes nearby entities away
-     * - Lightly damages them
-     * - Buffs the shooter if they are near the blast
-     */
-    private void spawnGust(double x, double y, double z) {
+    private void spawnGust(double x, double y, double z, WindBowConfig config) {
         Level level = this.level();
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            return;
+        }
 
-        // Area to affect
+        double radius = Math.max(0.0D, config.gust_radius);
+
         AABB area = new AABB(
-                x - GUST_RADIUS, y - GUST_RADIUS, z - GUST_RADIUS,
-                x + GUST_RADIUS, y + GUST_RADIUS, z + GUST_RADIUS
+                x - radius, y - radius, z - radius,
+                x + radius, y + radius, z + radius
         );
 
         List<Entity> entities = level.getEntities(this, area, e -> e instanceof LivingEntity);
         Entity owner = this.getOwner();
 
         for (Entity entity : entities) {
-            if (!(entity instanceof LivingEntity living)) continue;
-
-            // Optional: don't push the owner, we'll handle them separately
-            if (owner != null && entity.getUUID().equals(owner.getUUID())) {
+            if (!(entity instanceof LivingEntity living)) {
                 continue;
             }
 
-            // Vector from center to entity
+            if (!config.gust_affects_owner && owner != null && entity.getUUID().equals(owner.getUUID())) {
+                continue;
+            }
+
             Vec3 dir = new Vec3(
                     entity.getX() - x,
                     0.0D,
@@ -94,27 +95,45 @@ public class WindProjectile extends AbstractArrow {
             );
 
             if (dir.lengthSqr() > 0.0001D) {
-                dir = dir.normalize().scale(KNOCKBACK_STRENGTH);
-                entity.push(dir.x, 0.25D, dir.z);
-                entity.hurt(this.damageSources().magic(), 1.5f);
+                if (config.gust_knockback_enabled) {
+                    dir = dir.normalize().scale(config.gust_knockback_strength);
+                    entity.push(dir.x, config.gust_vertical_push, dir.z);
+                }
+
+                if (config.gust_damage_enabled) {
+                    entity.hurt(this.damageSources().magic(), (float) config.gust_damage);
+                }
             }
         }
 
-        // If the shooter is close to the gust, give them a mobility buff
-        if (owner instanceof LivingEntity livingOwner) {
+        if (config.owner_buff_enabled && owner instanceof LivingEntity livingOwner) {
             double distSqr = livingOwner.position().distanceToSqr(x, y, z);
-            if (distSqr <= (GUST_RADIUS * GUST_RADIUS)) {
-                livingOwner.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, SHOOTER_SPEED_DURATION, 1));
-                livingOwner.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, SHOOTER_SLOW_FALL_DURATION, 0));
+            if (!config.owner_buff_requires_being_in_radius || distSqr <= (radius * radius)) {
+                livingOwner.addEffect(new MobEffectInstance(
+                        MobEffects.MOVEMENT_SPEED,
+                        config.owner_speed_duration_ticks,
+                        config.owner_speed_amplifier
+                ));
+                livingOwner.addEffect(new MobEffectInstance(
+                        MobEffects.SLOW_FALLING,
+                        config.owner_slow_fall_duration_ticks,
+                        config.owner_slow_fall_amplifier
+                ));
             }
         }
 
-        // Extra gust particles (server-side spawn, clients see them)
-        for (int i = 0; i < 30; i++) {
-            double dx = x + (level.random.nextDouble() - 0.5D) * (GUST_RADIUS * 1.5D);
-            double dy = y + level.random.nextDouble() * 1.5D;
-            double dz = z + (level.random.nextDouble() - 0.5D) * (GUST_RADIUS * 1.5D);
-            level.addParticle(ParticleTypes.CLOUD, dx, dy, dz, 0.0D, 0.05D, 0.0D);
+        if (config.gust_particles_enabled) {
+            for (int i = 0; i < Math.max(0, config.gust_particle_count); i++) {
+                double dx = x + (level.random.nextDouble() - 0.5D) * (radius * config.gust_particle_radius_multiplier);
+                double dy = y + level.random.nextDouble() * config.gust_particle_height;
+                double dz = z + (level.random.nextDouble() - 0.5D) * (radius * config.gust_particle_radius_multiplier);
+
+                level.addParticle(
+                        ParticleTypes.CLOUD,
+                        dx, dy, dz,
+                        0.0D, config.gust_particle_speed_y, 0.0D
+                );
+            }
         }
     }
 
@@ -122,19 +141,28 @@ public class WindProjectile extends AbstractArrow {
     public void tick() {
         super.tick();
 
-        if (level().isClientSide()) {
-            // Simple wind trail
-            level().addParticle(ParticleTypes.CLOUD, this.getX(), this.getY(), this.getZ(), 0, 0.05, 0);
+        WindBowConfig config = config();
+
+        if (level().isClientSide() && config.trail_particles_enabled) {
+            for (int i = 0; i < Math.max(0, config.trail_particle_count); i++) {
+                level().addParticle(
+                        ParticleTypes.CLOUD,
+                        this.getX(),
+                        this.getY(),
+                        this.getZ(),
+                        0.0D, config.trail_particle_speed_y, 0.0D
+                );
+            }
         }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }
