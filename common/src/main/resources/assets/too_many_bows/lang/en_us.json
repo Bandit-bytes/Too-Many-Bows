@@ -278,7 +278,6 @@
   "item.many_bows.bow_damage_ring.stormbound.line1": "A signet stolen from the stormcourt.",
   "item.many_bows.bow_damage_ring.stormbound.line2": "When the wind turns, so does your fate.",
 
-  "item.many_bows.bow_damage_ring.effect": "Increases bow damage by +%s%%",
   "item.many_bows.bow_damage_ring.equip_hint": "Equip in a ring slot.",
   "curios.modifiers.glove": "glove",
 

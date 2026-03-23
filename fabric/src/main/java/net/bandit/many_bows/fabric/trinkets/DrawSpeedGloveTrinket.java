@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -42,7 +43,7 @@ public class DrawSpeedGloveTrinket implements Trinket {
 
         map.put(holder, new AttributeModifier(
                 uniqueId,
-                0.75D,
+                FabricCompatConfigHolder.get().drawSpeedGloveBonus,
                 AttributeModifier.Operation.ADD_VALUE
         ));
 

@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.joml.Vector3f;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -137,7 +138,7 @@ public class CursedFlameBow extends ModBowItem {
         Holder<Enchantment> punch = getEnchantmentHolder(level, Enchantments.PUNCH);
         int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(punch, bow);
         if (punchLevel > 0) {
-            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.KNOCKBACK_RESISTANCE));
+            double resistance = Math.max(0.0, 1.0 - shooter.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
             net.minecraft.world.phys.Vec3 knockbackVec = arrow.getDeltaMovement().normalize().scale(punchLevel * 0.6 * resistance);
             arrow.push(knockbackVec.x, 0.1, knockbackVec.z);
         }
@@ -216,7 +217,7 @@ public class CursedFlameBow extends ModBowItem {
         super.onUseTick(level, user, stack, remainingUseDuration);
 
         if (!level.isClientSide) return;
-        if (!(level instanceof net.minecraft.client.multiplayer.ClientLevel clientLevel)) return;
+        if (!(level instanceof ClientLevel clientLevel)) return;
         if (!(user instanceof Player player)) return;
 
         if (player.getUseItem() != stack) return;
@@ -544,6 +545,9 @@ public class CursedFlameBow extends ModBowItem {
                     .translatable("item.too_many_bows.cursed_flame_bow.tooltip.legend")
                     .withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
 
+        }
+        else {
+            tooltipComponents.add(Component.translatable("item.too_many_bows.hold_shift"));
         }
     }
 }

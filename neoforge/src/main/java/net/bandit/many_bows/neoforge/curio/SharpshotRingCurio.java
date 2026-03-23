@@ -3,6 +3,7 @@ package net.bandit.many_bows.neoforge.curio;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,8 +18,6 @@ public class SharpshotRingCurio implements ICurioItem {
 
     private static final ResourceLocation MODIFIER_ID =
             ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "sharpshot_ring_bow_damage");
-
-    private static final double BONUS = 0.15D;
 
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(
@@ -36,7 +35,12 @@ public class SharpshotRingCurio implements ICurioItem {
                 MODIFIER_ID.getPath() + "/" + id.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(uniqueId, BONUS, AttributeModifier.Operation.ADD_VALUE));
+        map.put(holder, new AttributeModifier(
+                uniqueId,
+                NeoForgeCompatConfigHolder.get().sharpshotRingBonus,
+                AttributeModifier.Operation.ADD_VALUE
+        ));
+
         return map;
     }
 }

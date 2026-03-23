@@ -1,12 +1,13 @@
 package net.bandit.many_bows;
 
+import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.ClientInit;
 import net.bandit.many_bows.client.renderer.*;
-import net.bandit.many_bows.config.BowJsonConfigHelper;
-import net.bandit.many_bows.config.BowLootConfig;
+import net.bandit.many_bows.command.TmbCommands;
+import net.bandit.many_bows.config.BowConfigRegistry;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
-import net.bandit.many_bows.config.bows.*;
+import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
 import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -21,41 +22,14 @@ public final class ManyBowsMod {
         EffectRegistry.register();
         AttributesRegistry.register();
         ModLootModifiers.registerLootModifiers();
-        preloadBowConfigs();
-        ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
 
+        CommandRegistrationEvent.EVENT.register(TmbCommands::register);
+
+        BowConfigRegistry.preloadAll();
+        ManyBowsConfigHolder.reload();
+        PlatformCompatReloadRegistry.preloadAll();
     }
-    private static void preloadBowConfigs() {
-        BowJsonConfigHelper.getConfig("aethers_call", AethersCallBowConfig.class, AethersCallBowConfig::new);
-        BowJsonConfigHelper.getConfig("ancient_sage_bow", AncientSageBowConfig.class, AncientSageBowConfig::new);
-        BowJsonConfigHelper.getConfig("arcane_bow", ArcaneBowConfig.class, ArcaneBowConfig::new);
-        BowJsonConfigHelper.getConfig("astral_bound", AstralBoundBowConfig.class, AstralBoundBowConfig::new);
-        BowJsonConfigHelper.getConfig("auroras_grace", AurorasGraceBowConfig.class, AurorasGraceBowConfig::new);
-        BowJsonConfigHelper.getConfig("beacon_beam_bow", BeaconBeamBowConfig.class, BeaconBeamBowConfig::new);
-        BowJsonConfigHelper.getConfig("necro_flame", NecroFlameBowConfig.class, NecroFlameBowConfig::new);
-        BowJsonConfigHelper.getConfig("dragons_breath", DragonsBreathBowConfig.class, DragonsBreathBowConfig::new);
-        BowJsonConfigHelper.getConfig("dusk_reaper", DuskReaperBowConfig.class, DuskReaperBowConfig::new);
-        BowJsonConfigHelper.getConfig("ethereal_hunter", EtherealHunterBowConfig.class, EtherealHunterBowConfig::new);
-        BowJsonConfigHelper.getConfig("flame_bow", FlameBowConfig.class, FlameBowConfig::new);
-        BowJsonConfigHelper.getConfig("frostbite", FrostbiteBowConfig.class, FrostbiteBowConfig::new);
-        BowJsonConfigHelper.getConfig("hunter_bow", HunterBowConfig.class, HunterBowConfig::new);
-        BowJsonConfigHelper.getConfig("emerald_sage_bow", HunterXpBowConfig.class, HunterXpBowConfig::new);
-        BowJsonConfigHelper.getConfig("cyroheart_bow", IcicleJavelinBowConfig.class, IcicleJavelinBowConfig::new);
-        BowJsonConfigHelper.getConfig("ironclad", IroncladBowConfig.class, IroncladBowConfig::new);
-        BowJsonConfigHelper.getConfig("arc_heavens", LightningBowConfig.class, LightningBowConfig::new);
-        BowJsonConfigHelper.getConfig("radiant", RadiantBowConfig.class, RadiantBowConfig::new);
-        BowJsonConfigHelper.getConfig("sentinel_wrath", SentinelWrathBowConfig.class, SentinelWrathBowConfig::new);
-        BowJsonConfigHelper.getConfig("shulker_blast", ShulkerBlastBowConfig.class, ShulkerBlastBowConfig::new);
-        BowJsonConfigHelper.getConfig("solar_bow", SolarBowConfig.class, SolarBowConfig::new);
-        BowJsonConfigHelper.getConfig("dark_bow", SonicBoomBowConfig.class, SonicBoomBowConfig::new);
-        BowJsonConfigHelper.getConfig("spectral_whisper", SpectralWhisperBowConfig.class, SpectralWhisperBowConfig::new);
-        BowJsonConfigHelper.getConfig("tidal_bow", TidalBowConfig.class, TidalBowConfig::new);
-        BowJsonConfigHelper.getConfig("torchbearer", TorchbearerBowConfig.class, TorchbearerBowConfig::new);
-        BowJsonConfigHelper.getConfig("verdant_viper", VenomBowConfig.class, VenomBowConfig::new);
-        BowJsonConfigHelper.getConfig("vitality_weaver", VitalityWeaverBowConfig.class, VitalityWeaverBowConfig::new);
-        BowJsonConfigHelper.getConfig("webstring", WebstringBowConfig.class, WebstringBowConfig::new);
-        BowJsonConfigHelper.getConfig("wind_bow", WindBowConfig.class, WindBowConfig::new);
-    }
+
     public static void initClient() {
         ClientInit.registerClientProperties();
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
@@ -85,7 +59,7 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
-        EntityRendererRegistry.register(()  ->EntityRegistry.AETHERS_CALL_ARROW.get(),AethersCallArrowRenderer::new);
-        EntityRendererRegistry.register(()  ->EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.AETHERS_CALL_ARROW.get(), AethersCallArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
     }
 }

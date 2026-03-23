@@ -25,18 +25,36 @@ public final class BowJsonConfigHelper {
             .resolve("bows");
 
     private static final Map<String, Object> CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, ReloadEntry<?>> REGISTERED_CONFIGS = new ConcurrentHashMap<>();
 
     private BowJsonConfigHelper() {
     }
 
     public static <T> T getConfig(String fileName, Class<T> configClass, Supplier<T> defaultSupplier) {
+        REGISTERED_CONFIGS.putIfAbsent(fileName, new ReloadEntry<>(configClass, defaultSupplier));
         return configClass.cast(CACHE.computeIfAbsent(fileName, key -> loadConfig(key, configClass, defaultSupplier)));
     }
 
     public static <T> T reloadConfig(String fileName, Class<T> configClass, Supplier<T> defaultSupplier) {
+        REGISTERED_CONFIGS.putIfAbsent(fileName, new ReloadEntry<>(configClass, defaultSupplier));
         T config = loadConfig(fileName, configClass, defaultSupplier);
         CACHE.put(fileName, config);
         return config;
+    }
+
+    public static int reloadAllConfigs() {
+        int reloaded = 0;
+
+        for (Map.Entry<String, ReloadEntry<?>> entry : REGISTERED_CONFIGS.entrySet()) {
+            reloadRegistered(entry.getKey(), entry.getValue());
+            reloaded++;
+        }
+
+        return reloaded;
+    }
+
+    public static void clearCache() {
+        CACHE.clear();
     }
 
     public static <T> void saveConfig(String fileName, T config) {
@@ -52,6 +70,12 @@ public final class BowJsonConfigHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void reloadRegistered(String fileName, ReloadEntry<?> entry) {
+        Object config = loadConfig(fileName, (Class) entry.configClass(), (Supplier) entry.defaultSupplier());
+        CACHE.put(fileName, config);
     }
 
     private static <T> T loadConfig(String fileName, Class<T> configClass, Supplier<T> defaultSupplier) {
@@ -77,4 +101,8 @@ public final class BowJsonConfigHelper {
             return defaultSupplier.get();
         }
     }
+
+    private record ReloadEntry<T>(Class<T> configClass, Supplier<T> defaultSupplier) {
+    }
+
 }

@@ -1,6 +1,8 @@
 package net.bandit.many_bows.neoforge;
 
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
+import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.neoforge.curio.*;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
@@ -22,6 +24,10 @@ import top.theillusivec4.curios.api.CuriosApi;
 @EventBusSubscriber(modid = ManyBowsMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ManyBowsModNeoForge {
     public ManyBowsModNeoForge(IEventBus modEventBus) {
+        PlatformCompatReloadRegistry.register(
+                NeoForgeCompatConfigHolder::preload,
+                NeoForgeCompatConfigHolder::reload
+        );
         ManyBowsMod.init();
         modEventBus.addListener(this::onClientSetup);
         modEventBus.addListener(this::commonSetup);

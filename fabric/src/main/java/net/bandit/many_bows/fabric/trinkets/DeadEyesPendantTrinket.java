@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,8 +19,6 @@ public class DeadEyesPendantTrinket implements Trinket {
 
     private static final ResourceLocation MODIFIER_ID =
             ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "dead_eyes_pendant_crit");
-
-    private static final double BONUS = 0.08D;
 
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getModifiers(
@@ -38,7 +37,11 @@ public class DeadEyesPendantTrinket implements Trinket {
                 MODIFIER_ID.getPath() + "/" + slotIdentifier.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(uniqueId, BONUS, AttributeModifier.Operation.ADD_VALUE));
+        map.put(holder, new AttributeModifier(
+                uniqueId,
+                FabricCompatConfigHolder.get().deadEyesPendantCritBonus,
+                AttributeModifier.Operation.ADD_VALUE
+        ));
         return map;
     }
 }

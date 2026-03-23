@@ -56,8 +56,6 @@ public class BowDamageRingItem extends Item {
         tooltip.add(Component.empty());
 
         int percent = (int) Math.round(getBonus() * 100.0);
-        tooltip.add(Component.translatable("item.many_bows.bow_damage_ring.effect", percent)
-                .withStyle(ChatFormatting.BLUE));
 
         tooltip.add(Component.translatable("item.many_bows.bow_damage_ring.equip_hint")
                 .withStyle(ChatFormatting.DARK_GRAY));

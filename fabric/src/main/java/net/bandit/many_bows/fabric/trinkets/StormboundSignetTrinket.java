@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,12 +20,10 @@ public class StormboundSignetTrinket implements Trinket {
     private static final ResourceLocation MODIFIER_ID =
             ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "stormbound_signet_bow_damage");
 
-    private static final double BONUS = 0.30D;
-
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getModifiers(
             ItemStack stack,
-            dev.emi.trinkets.api.SlotReference slot,
+            SlotReference slot,
             LivingEntity entity,
             ResourceLocation slotIdentifier
     ) {
@@ -38,7 +37,12 @@ public class StormboundSignetTrinket implements Trinket {
                 MODIFIER_ID.getPath() + "/" + slotIdentifier.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(uniqueId, BONUS, AttributeModifier.Operation.ADD_VALUE));
+        map.put(holder, new AttributeModifier(
+                uniqueId,
+                FabricCompatConfigHolder.get().stormboundSignetBonus,
+                AttributeModifier.Operation.ADD_VALUE
+        ));
+
         return map;
     }
 }
