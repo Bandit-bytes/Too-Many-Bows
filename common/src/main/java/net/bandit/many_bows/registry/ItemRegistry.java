@@ -30,6 +30,12 @@ public class ItemRegistry {
             () -> new DragonsBreathBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
     public static final RegistrySupplier<Item> VERDANT_VIPER = ITEMS.register("verdant_viper",
             () -> new VerdantViperBow(new Properties().durability(750).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+    public static final RegistrySupplier<Item> GRAVEWIRE_BOW = ITEMS.register("gravewire_bow",
+            () -> new GravewireBow(new Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+    public static final RegistrySupplier<Item> VAULTPIERCER = ITEMS.register("vaultpiercer",
+            () -> new VaultpiercerBow(new Item.Properties().durability(950).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+    public static final RegistrySupplier<Item> SOULHOARD = ITEMS.register("soulhoard",
+            () -> new SoulhoardBow(new Properties().durability(500).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 
 //    //Flash Art Bows
     public static final RegistrySupplier<Item> SOLAR_BOW = ITEMS.register("solar_bow",
@@ -115,6 +121,10 @@ public class ItemRegistry {
             () -> new BowNecklaceItem(BowNecklaceItem.Tier.FLETCHER, new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
     public static final RegistrySupplier<Item> DEAD_EYES_PENDANT = ITEMS.register("dead_eyes_pendant",
             () -> new BowNecklaceItem(BowNecklaceItem.Tier.DEAD_EYE, new Item.Properties().stacksTo(1).rarity(Rarity.RARE).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> SOUL_LANTERN = ITEMS.register("soul_lantern",
+            () -> new SoulLanternItem(new Properties().rarity(Rarity.EPIC).stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
+    public static final RegistrySupplier<Item> CURSED_LANTERN = ITEMS.register("cursed_lantern",
+            () -> new CursedLanternItem(new Properties().rarity(Rarity.EPIC).stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC)));
 
     public static void register() {
         ITEMS.register();

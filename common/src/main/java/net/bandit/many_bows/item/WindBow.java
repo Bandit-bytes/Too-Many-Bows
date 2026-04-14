@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.WindProjectile;
 import net.bandit.many_bows.registry.ItemRegistry;
+import net.bandit.many_bows.registry.SoundRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
@@ -114,7 +115,7 @@ public class WindBow extends ModBowItem {
                         }
                     }
                     level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.BREEZE_WIND_CHARGE_BURST, SoundSource.PLAYERS, 1.0F, 1.0F);
+                            SoundRegistry.WINDBOW_FIRE, SoundSource.PLAYERS, 1.0F, 1.0F);
                     player.awardStat(Stats.ITEM_USED.get(this));
 
                     if (!player.getAbilities().instabuild) {

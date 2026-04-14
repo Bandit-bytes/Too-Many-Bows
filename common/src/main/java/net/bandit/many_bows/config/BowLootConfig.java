@@ -23,7 +23,7 @@ public class BowLootConfig {
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File("config/too_many_bows.json");
-    public static final int CURRENT_VERSION = 3;
+    public static final int CURRENT_VERSION = 4;
     public Integer configVersion = 1;
 
     public Boolean easyLootEnabled = true;
@@ -76,6 +76,8 @@ public class BowLootConfig {
             MOD_ID + ":emerald_sage_bow",
             MOD_ID + ":torchbearer",
             MOD_ID + ":demons_grasp",
+            MOD_ID + ":soul_lantern",
+            MOD_ID + ":soulhoard",
             MOD_ID + ":dead_eyes_pendant",
             MOD_ID + ":fletchers_talisman"
     );
@@ -88,8 +90,12 @@ public class BowLootConfig {
             MOD_ID + ":sharpshot_ring",
             MOD_ID + ":emerald_sage_bow",
             MOD_ID + ":demons_grasp",
+            MOD_ID + ":soulhoard",
+            MOD_ID + ":soul_lantern",
             MOD_ID + ":stormbound_signet",
             MOD_ID + ":dead_eyes_pendant",
+            MOD_ID + ":gravewire_bow",
+            MOD_ID + ":vaultpiercer",
             MOD_ID + ":fletchers_talisman"
     );
 
@@ -100,11 +106,16 @@ public class BowLootConfig {
             MOD_ID + ":arc_heavens",
             MOD_ID + ":stormbound_signet",
             MOD_ID + ":scatter_bow",
+            MOD_ID + ":soul_lantern",
+            MOD_ID + ":cursed_lantern",
             MOD_ID + ":sharpshot_ring",
             MOD_ID + ":wind_glove",
             MOD_ID + ":vitality_weaver",
             MOD_ID + ":spectral_whisper",
             MOD_ID + ":webstring",
+            MOD_ID + ":gravewire_bow",
+            MOD_ID + ":vaultpiercer",
+            MOD_ID + ":soulhoard",
             MOD_ID + ":dead_eyes_pendant",
             MOD_ID + ":fletchers_talisman"
     );
@@ -117,9 +128,11 @@ public class BowLootConfig {
             MOD_ID + ":stormbound_signet",
             MOD_ID + ":wind_glove",
             MOD_ID + ":sharpshot_ring",
+            MOD_ID + ":cursed_lantern",
             MOD_ID + ":shulker_blast",
             MOD_ID + ":astral_bound",
             MOD_ID + ":auroras_grace",
+            MOD_ID + ":soulhoard",
             MOD_ID + ":dead_eyes_pendant",
             MOD_ID + ":fletchers_talisman"
     );

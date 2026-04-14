@@ -21,6 +21,7 @@ public final class ManyBowsMod {
         EntityRegistry.register();
         EffectRegistry.register();
         AttributesRegistry.register();
+        SoundRegistry.register();
         ModLootModifiers.registerLootModifiers();
 
         CommandRegistrationEvent.EVENT.register(TmbCommands::register);
@@ -58,8 +59,14 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.TORCHBEARER_ARROW.get(), TorchbearerArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.ETHEREAL_ARROW.get(), EtherealArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.VAULT_PORTAL.get(), VaultPortalRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.AETHERS_CALL_ARROW.get(), AethersCallArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.GRAVEWIRE_ARROW.get(), GravewireArrowRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.GRAVEWIRE_MARK.get(), GravewireMarkRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.VAULTPIERCER_ARROW.get(), VaultpiercerArrowRenderer::new);
+        EntityRendererRegistry.register(() ->EntityRegistry.SOULHOARD_ARROW.get(), SoulhoardArrowRenderer::new);
+        EntityRendererRegistry.register(() ->EntityRegistry.HOARDED_SKULL.get(), HoardedSkullRenderer::new);
     }
 }

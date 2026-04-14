@@ -207,10 +207,40 @@
         "items": [{ "items": ["too_many_bows:radiance"] }]
       }
     },
+    "vaultpiercer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:vaultpiercer"] }]
+      }
+    },
+    "gravewire": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:gravewire_bow"] }]
+      }
+    },
+    "beacon_bow": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:beacon_beam_bow"] }]
+      }
+    },
     "crimson_nexus": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [{ "items": ["too_many_bows:crimson_nexus"] }]
+      }
+    },
+    "soulhoard": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:soulhoard"] }]
+      }
+    },
+    "webstring": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{ "items": ["too_many_bows:webstring"] }]
       }
     }
   },
@@ -247,7 +277,12 @@
     ["astral_bound"],
     ["spectral_whisper"],
     ["auroras_grace"],
-    ["torchbearer"]
+    ["beacon_bow"],
+    ["gravewire"],
+    ["soulhoard"],
+    ["vaultpiercer"],
+    ["torchbearer"],
+    ["webstring"]
   ],
   "rewards": {
     "experience": 1000,

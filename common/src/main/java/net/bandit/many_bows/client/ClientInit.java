@@ -4,6 +4,7 @@ import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.entity.SoulhoardArrow;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
@@ -59,7 +60,10 @@ public class ClientInit {
                 ItemRegistry.ETHEREAL_HUNTER.get(),
                 ItemRegistry.TORCHBEARER.get(),
                 ItemRegistry.WEBSTRING.get(),
-                ItemRegistry.BEACON_BEAM_BOW.get()
+                ItemRegistry.BEACON_BEAM_BOW.get(),
+                ItemRegistry.VAULTPIERCER.get(),
+                ItemRegistry.GRAVEWIRE_BOW.get(),
+                ItemRegistry.SOULHOARD.get()
         );
 
         bows.forEach(ClientInit::registerBowProperties);
@@ -139,6 +143,11 @@ public class ClientInit {
         EntityRendererRegistry.register(() -> EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         EntityRendererRegistry.register(()  ->EntityRegistry.AETHERS_CALL_ARROW.get(),AethersCallArrowRenderer::new);
         EntityRendererRegistry.register(()  ->EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
-
+        EntityRendererRegistry.register(()  ->EntityRegistry.GRAVEWIRE_ARROW.get(), GravewireArrowRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.GRAVEWIRE_MARK.get(), GravewireMarkRenderer::new);
+        EntityRendererRegistry.register(()  ->EntityRegistry.VAULTPIERCER_ARROW.get(), VaultpiercerArrowRenderer::new);
+        EntityRendererRegistry.register(() ->EntityRegistry.VAULT_PORTAL.get(), VaultPortalRenderer::new);
+        EntityRendererRegistry.register(() ->EntityRegistry.SOULHOARD_ARROW.get(), SoulhoardArrowRenderer::new);
+        EntityRendererRegistry.register(() ->EntityRegistry.HOARDED_SKULL.get(), HoardedSkullRenderer::new);
     }
 }

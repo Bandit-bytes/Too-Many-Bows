@@ -155,12 +155,51 @@ public class EntityRegistry {
                     .sized(0.5F, 0.5F)
                     .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "torchbearer_arrow").toString()));
 
+    public static final RegistrySupplier<EntityType<GravewireArrow>> GRAVEWIRE_ARROW = ENTITY_TYPES.register("gravewire_arrow",
+            () -> EntityType.Builder.<GravewireArrow>of(GravewireArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "gravewire_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<GravewireMarkEntity>> GRAVEWIRE_MARK =
+            ENTITY_TYPES.register("gravewire_mark", () ->
+                    EntityType.Builder.<GravewireMarkEntity>of(GravewireMarkEntity::new, MobCategory.MISC)
+                            .sized(0.1F, 0.1F)
+                            .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "gravewire_mark").toString()));
+
+    public static final RegistrySupplier<EntityType<VaultpiercerArrow>> VAULTPIERCER_ARROW = ENTITY_TYPES.register("vaultpiercer_arrow",
+            () -> EntityType.Builder.<VaultpiercerArrow>of(VaultpiercerArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "vaultpiercer_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<VaultPortalEntity>> VAULT_PORTAL = ENTITY_TYPES.register("vault_portal",
+            () -> EntityType.Builder.<VaultPortalEntity>of(VaultPortalEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .build(ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "vault_portal").toString()));
+
     public static final RegistrySupplier<EntityType<LightOrbEntity>> LIGHT_ORB = ENTITY_TYPES.register("light_orb",
             () -> EntityType.Builder.<LightOrbEntity>of(LightOrbEntity::new, MobCategory.MISC)
                     .sized(0.1F, 0.1F)
                     .clientTrackingRange(32)
                     .updateInterval(20)
                     .build(ResourceLocation.fromNamespaceAndPath(MOD_ID, "light_orb").toString()));
+
+    public static final RegistrySupplier<EntityType<SoulhoardArrow>> SOULHOARD_ARROW = ENTITY_TYPES.register(
+            "soulhoard_arrow",
+            () -> EntityType.Builder.<SoulhoardArrow>of(SoulhoardArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build("soulhoard_arrow")
+    );
+
+    public static final RegistrySupplier<EntityType<HoardedSkullEntity>> HOARDED_SKULL = ENTITY_TYPES.register(
+            "hoarded_skull",
+            () -> EntityType.Builder.<HoardedSkullEntity>of(HoardedSkullEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(8)
+                    .updateInterval(1)
+                    .build("hoarded_skull")
+    );
 
 
     public static void register() {

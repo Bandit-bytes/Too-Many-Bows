@@ -33,7 +33,21 @@ public class ModAttributesNeoForge {
                         Registries.ATTRIBUTE,
                         ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_crit_chance")
                 ));
+        Holder<Attribute> gravewireBowDamage = BuiltInRegistries.ATTRIBUTE.getHolderOrThrow(
+                ResourceKey.create(
+                        Registries.ATTRIBUTE,
+                        ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "gravewire_bow_damage")
+                )
+        );
+        Holder<Attribute> necroBowDamage = BuiltInRegistries.ATTRIBUTE.getHolderOrThrow(
+                ResourceKey.create(
+                        Registries.ATTRIBUTE,
+                        ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "necro_bow_damage")
+                )
+        );
 
+        event.add(EntityType.PLAYER, gravewireBowDamage);
+        event.add(EntityType.PLAYER, necroBowDamage);
         event.add(EntityType.PLAYER, bowDamage);
         event.add(EntityType.PLAYER, bowDrawSpeed);
         event.add(EntityType.PLAYER, bowCritChance);

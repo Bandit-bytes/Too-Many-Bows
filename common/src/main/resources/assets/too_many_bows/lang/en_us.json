@@ -244,6 +244,8 @@
   "item.too_many_bows.torchbearer": "Torchbearer",
   "attribute.too_many_bows.bow_draw_speed": "Bow Draw Speed",
   "attribute.too_many_bows.bow_damage": "Bow Damage",
+  "attribute.too_many_bows.gravewire_bow_damage": "Gravewire Bow Damage",
+  "attribute.too_many_bows.necro_bow_damage": "Necro Flame Bow Damage",
   "attribute.too_many_bows.bow_crit_chance": "Bow Crit Chance",
   "item.too_many_bows.torchbearer_bow.shift": "Ignites enemies and lights your path.",
   "item.too_many_bows.torchbearer_bow.effect": "Shoots fire arrows that place torches upon impact.",
@@ -251,6 +253,10 @@
   "item.many_bows.demon_bow.tooltip.extended": "The Demons Bow",
   "item.many_bows.demon_bow.tooltip": "No real power emits from this bow anymore....",
   "item.too_many_bows.wind_glove": "Windwoven Gloves",
+  "item.too_many_bows.soul_lantern": "Soul Lantern",
+  "item.too_many_bows.cursed_lantern": "Cursed Lantern",
+  "item.too_many_bows.soul_lantern_tooltip": "Equip for extra Gravewire Bow Damage (Stacks).",
+  "item.too_many_bows.cursed_lantern_tooltip": "Equip for extra Necro Flame Bow Damage (stacks)",
 
   "item.too_many_bows.draw_speed_glove.lore_1": "Lightweight leather reinforced with etched filaments.",
   "item.too_many_bows.draw_speed_glove.lore_2": "The string answers faster than the mind can react.",
@@ -281,6 +287,27 @@
   "item.many_bows.bow_damage_ring.equip_hint": "Equip in a ring slot.",
   "curios.modifiers.glove": "glove",
 
+  "item.many_bows.gravewire_bow.tooltip": "Gravewire Bow",
+  "item.too_many_bows.gravewire_bow": "Gravewire Bow",
+  "item.too_many_bows.vaultpiercer": "Vaultpiercer Bow",
+
+  "subtitle.many_bows.vault_portal_open": "Arcane vault opens",
+  "subtitle.many_bows.vault_portal_fire": "Vault arrow fires",
+  "subtitle.many_bows.vault_portal_impact": "Vault energy bursts",
+  "subtitle.many_bows.gravewire_fire": "Grave arrow flying",
+  "item.many_bows.gravewire_bow.tooltip.ability": "Marked enemies are cursed and nearby foes are lashed by necrotic chains.",
+  "item.many_bows.vaultpiercer.tooltip": "Vaultpiercer",
+  "item.many_bows.vaultpiercer.tooltip.ability": "Striking a target opens arcane vaults above them, unleashing follow-up arrows from the sky.",
   "item.many_bows.aether_bow.tooltip": "A bow attuned to the winds of the Aether.",
-  "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact"
+  "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact",
+  "item.too_many_bows.soulhoard": "Soulhoard",
+  "entity.too_many_bows.soulhoard_arrow": "Soulhoard Arrow",
+  "entity.too_many_bows.hoarded_skull": "Hoarded Skull",
+
+  "tooltip.too_many_bows.soulhoard.1": "Kills are stored within the bow.",
+  "tooltip.too_many_bows.soulhoard.2": "Fully charged shots unleash hoarded souls.",
+  "tooltip.too_many_bows.soulhoard.souls": "Souls: %s/%s",
+  "tooltip.too_many_bows.soulhoard.lore": "The maw remembers every life it takes.",
+  "item.too_many_bows.soul_lantern_tooltip.soulhoard": "While equipped, Soulhoard can store up to 10 souls and its unleashed hoard becomes far stronger.",
+  "tooltip.too_many_bows.soulhoard.lantern": "Soul Lantern: raises the hoard to 10 souls and greatly empowers the release."
 }

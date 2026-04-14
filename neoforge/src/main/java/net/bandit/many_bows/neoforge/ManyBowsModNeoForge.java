@@ -4,6 +4,7 @@ import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
 import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.neoforge.curio.*;
+import net.bandit.many_bows.neoforge.client.curio.LanternCurioRenderer;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -19,6 +20,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 @Mod(ManyBowsMod.MOD_ID)
 @EventBusSubscriber(modid = ManyBowsMod.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -39,6 +41,10 @@ public final class ManyBowsModNeoForge {
             CuriosApi.registerCurio(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetCurio());
             CuriosApi.registerCurio(ItemRegistry.FLETCHERS_TALISMAN.get(), new FletchersTalismanCurio());
             CuriosApi.registerCurio(ItemRegistry.DEAD_EYES_PENDANT.get(), new DeadEyesPendantCurio());
+            CuriosApi.registerCurio(ItemRegistry.SOUL_LANTERN.get(), new SoulLanternCurio());
+            CuriosApi.registerCurio(ItemRegistry.CURSED_LANTERN.get(), new CursedLanternCurio());
+            CuriosRendererRegistry.register(ItemRegistry.SOUL_LANTERN.get(), LanternCurioRenderer::new);
+            CuriosRendererRegistry.register(ItemRegistry.CURSED_LANTERN.get(), LanternCurioRenderer::new);
         });
     }
     private void onClientSetup(final FMLClientSetupEvent event) {
@@ -72,6 +78,7 @@ public final class ManyBowsModNeoForge {
         event.registerEntityRenderer(EntityRegistry.AURORA_ARROW.get(), AuroraArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.RIFT_ENTITY.get(), NoopRenderer::new);
         event.registerEntityRenderer(EntityRegistry.LIGHT_ORB.get(), NoopRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.VAULT_PORTAL.get(), VaultPortalRenderer::new);
         event.registerEntityRenderer(EntityRegistry.RADIANT_ARROW.get(), RadianceArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.DUSK_REAPER_ARROW.get(), DuskArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.WEBSTRING_ARROW.get(), WebstringArrowRenderer::new);
@@ -81,5 +88,10 @@ public final class ManyBowsModNeoForge {
         event.registerEntityRenderer(EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AETHERS_CALL_ARROW.get(), AethersCallArrowRenderer::new);
         event.registerEntityRenderer(EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.GRAVEWIRE_ARROW.get(), GravewireArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.GRAVEWIRE_MARK.get(), GravewireMarkRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.VAULTPIERCER_ARROW.get(), VaultpiercerArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SOULHOARD_ARROW.get(), SoulhoardArrowRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.HOARDED_SKULL.get(), HoardedSkullRenderer::new);
     }
 }

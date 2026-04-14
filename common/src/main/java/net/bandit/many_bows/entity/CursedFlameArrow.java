@@ -2,9 +2,12 @@ package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.config.BowJsonConfigHelper;
 import net.bandit.many_bows.config.bows.NecroFlameBowConfig;
+import net.bandit.many_bows.registry.AttributesRegistry;
 import net.bandit.many_bows.registry.EffectRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +17,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -21,6 +25,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class CursedFlameArrow extends AbstractArrow {
 
@@ -31,25 +36,37 @@ public class CursedFlameArrow extends AbstractArrow {
 
     public CursedFlameArrow(EntityType<? extends CursedFlameArrow> entityType, Level level) {
         super(entityType, level);
-        applyConfiguredValues();
+        applyConfiguredValues(null);
     }
 
     public CursedFlameArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
         super(EntityRegistry.CURSED_FLAME_ARROW.get(), shooter, level, bowStack, arrowStack);
-        applyConfiguredValues();
+        applyConfiguredValues(shooter);
     }
 
     private static NecroFlameBowConfig config() {
         return BowJsonConfigHelper.getConfig(CONFIG_NAME, NecroFlameBowConfig.class, NecroFlameBowConfig::new);
     }
 
-    private void applyConfiguredValues() {
+    private void applyConfiguredValues(@Nullable LivingEntity shooter) {
         NecroFlameBowConfig config = config();
+
         this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
 
+        double baseDamage = this.getBaseDamage();
+
         if (config.direct_hit_damage_override >= 0.0D) {
-            this.setBaseDamage(config.direct_hit_damage_override);
+            baseDamage = config.direct_hit_damage_override;
         }
+
+        if (shooter != null) {
+            Holder<Attribute> necroDamageHolder =
+                    BuiltInRegistries.ATTRIBUTE.wrapAsHolder(AttributesRegistry.NECRO_BOW_DAMAGE.get());
+
+            baseDamage += shooter.getAttributeValue(necroDamageHolder);
+        }
+
+        this.setBaseDamage(baseDamage);
     }
 
     public void setPowerMultiplier(float power) {
