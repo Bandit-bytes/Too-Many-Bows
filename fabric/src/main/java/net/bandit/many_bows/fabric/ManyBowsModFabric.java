@@ -23,7 +23,6 @@ public final class ManyBowsModFabric implements ModInitializer {
         ManyBowsMod.init();
         ModAttributesFabric.init();
         ManyBowsFabricRenderers.init();
-        ManyBowsFabricPredicates.init();
         LanternTrinketRenderer lanternRenderer = new LanternTrinketRenderer();
 
         TrinketRendererRegistry.registerRenderer(ItemRegistry.SOUL_LANTERN.get(), lanternRenderer);

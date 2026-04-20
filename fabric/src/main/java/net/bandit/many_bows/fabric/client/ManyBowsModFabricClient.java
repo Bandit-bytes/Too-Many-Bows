@@ -7,5 +7,6 @@ public final class ManyBowsModFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ManyBowsMod.initClient();
+        ManyBowsFabricPredicates.init();
     }
 }
