@@ -27,11 +27,12 @@ public class RadiantArrow extends AbstractArrow {
 
     public RadiantArrow(EntityType<? extends RadiantArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public RadiantArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.RADIANT_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.RADIANT_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -144,4 +145,15 @@ public class RadiantArrow extends AbstractArrow {
     protected ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
 import net.bandit.many_bows.config.bows.AurorasGraceBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.BlockPos;
@@ -16,19 +17,21 @@ import org.jetbrains.annotations.NotNull;
 public class AuroraArrowEntity extends AbstractArrow {
 
     private int lifetime = 0;
+    private static final String CONFIG_NAME = "auroras_grace";
 
     public AuroraArrowEntity(EntityType<? extends AuroraArrowEntity> entityType, Level world) {
         super(entityType, world);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public AuroraArrowEntity(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.AURORA_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.AURORA_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
-    private AurorasGraceBowConfig config() {
-        return AurorasGraceBowConfig.get();
+    private static AurorasGraceBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, AurorasGraceBowConfig.class, AurorasGraceBowConfig::new);
     }
 
     private void applyConfigValues() {
@@ -93,4 +96,15 @@ public class AuroraArrowEntity extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

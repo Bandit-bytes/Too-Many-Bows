@@ -32,11 +32,12 @@ public class SonicBoomProjectile extends AbstractArrow {
 
     public SonicBoomProjectile(EntityType<? extends SonicBoomProjectile> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public SonicBoomProjectile(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.SONIC_BOOM_PROJECTILE.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.SONIC_BOOM_PROJECTILE.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -187,4 +188,15 @@ public class SonicBoomProjectile extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

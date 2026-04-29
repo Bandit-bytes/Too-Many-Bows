@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
 import net.bandit.many_bows.config.bows.AethersCallBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.particles.ParticleTypes;
@@ -22,20 +23,22 @@ import java.util.List;
 
 public class AethersCallArrow extends AbstractArrow {
 
+    private static final String CONFIG_NAME = "aethers_call";
     private int lifetime = 0;
 
     public AethersCallArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public AethersCallArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.AETHERS_CALL_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.AETHERS_CALL_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
-    private AethersCallBowConfig config() {
-        return AethersCallBowConfig.get();
+    private static AethersCallBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, AethersCallBowConfig.class, AethersCallBowConfig::new);
     }
 
     private void applyConfigValues() {
@@ -171,4 +174,15 @@ public class AethersCallArrow extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

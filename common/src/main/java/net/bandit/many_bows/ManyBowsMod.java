@@ -1,9 +1,13 @@
 package net.bandit.many_bows;
 
+import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import net.bandit.many_bows.client.renderer.*;
+import net.bandit.many_bows.command.TmbCommands;
+import net.bandit.many_bows.config.BowConfigRegistry;
 import net.bandit.many_bows.config.BowLootConfig;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
+import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
 import net.bandit.many_bows.config.bows.*;
 import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
@@ -18,9 +22,16 @@ public final class ManyBowsMod {
         EntityRegistry.register();
         EffectRegistry.register();
         AttributesRegistry.register();
+        SoundRegistry.register();
         ModLootModifiers.registerLootModifiers();
         preloadBowConfigs();
         ManyBowsConfigHolder.CONFIG = BowLootConfig.loadConfig();
+
+        CommandRegistrationEvent.EVENT.register(TmbCommands::register);
+
+        BowConfigRegistry.preloadAll();
+        ManyBowsConfigHolder.reload();
+        PlatformCompatReloadRegistry.preloadAll();
 
     }
 
@@ -38,6 +49,7 @@ public final class ManyBowsMod {
         FlameBowConfig.get();
         FrostbiteBowConfig.get();
         HunterBowConfig.get();
+        GravewireBowConfig.get();
         HunterXpBowConfig.get();
         IcicleJavelinBowConfig.get();
         IroncladBowConfig.get();
@@ -48,8 +60,10 @@ public final class ManyBowsMod {
         SolarBowConfig.get();
         SonicBoomBowConfig.get();
         SpectralWhisperBowConfig.get();
+        SoulhoardBowConfig.get();
         TidalBowConfig.get();
         TorchbearerBowConfig.get();
+        VaultpiercerBowConfig.get();
         VenomBowConfig.get();
         VitalityWeaverBowConfig.get();
         WebstringBowConfig.get();
@@ -87,5 +101,11 @@ public final class ManyBowsMod {
         EntityRendererRegistry.register(() -> EntityRegistry.SOLAR_ARROW.get(), SolarArrowRenderer::new);
         EntityRendererRegistry.register(()  ->EntityRegistry.AETHERS_CALL_ARROW.get(),AethersCallArrowRenderer::new);
         EntityRendererRegistry.register(()  ->EntityRegistry.BEACON_BEAM_ARROW.get(), BeaconBeamArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.GRAVEWIRE_ARROW.get(), GravewireArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.GRAVEWIRE_MARK.get(), GravewireMarkRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.VAULTPIERCER_ARROW.get(), VaultpiercerArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.VAULT_PORTAL.get(), VaultPortalRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.SOULHOARD_ARROW.get(), SoulhoardArrowRenderer::new);
+        EntityRendererRegistry.register(() -> EntityRegistry.HOARDED_SKULL.get(), HoardedSkullRenderer::new);
     }
 }

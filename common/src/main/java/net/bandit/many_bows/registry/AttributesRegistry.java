@@ -38,6 +38,24 @@ public class AttributesRegistry {
                             1.0D
                     ).setSyncable(true));
 
+    public static final RegistrySupplier<Attribute> GRAVEWIRE_BOW_DAMAGE =
+            ATTRIBUTES.register("gravewire_bow_damage",
+                    () -> new RangedAttribute(
+                            "attribute.too_many_bows.gravewire_bow_damage",
+                            0.0D,
+                            -1024.0D,
+                            1024.0D
+                    ).setSyncable(true));
+
+    public static final RegistrySupplier<Attribute> NECRO_BOW_DAMAGE =
+            ATTRIBUTES.register("necro_bow_damage",
+                    () -> new RangedAttribute(
+                            "attribute.too_many_bows.necro_bow_damage",
+                            0.0D,
+                            -1024.0D,
+                            1024.0D
+                    ).setSyncable(true));
+
 
     public static void register() {
         ATTRIBUTES.register();

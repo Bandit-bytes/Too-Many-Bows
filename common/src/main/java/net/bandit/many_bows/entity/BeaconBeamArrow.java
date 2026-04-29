@@ -25,11 +25,12 @@ public class BeaconBeamArrow extends AbstractArrow {
 
     public BeaconBeamArrow(EntityType<? extends BeaconBeamArrow> type, Level level) {
         super(type, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public BeaconBeamArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.BEACON_BEAM_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.BEACON_BEAM_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -180,4 +181,15 @@ public class BeaconBeamArrow extends AbstractArrow {
     protected ItemStack getDefaultPickupItem() {
         return ItemStack.EMPTY;
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? ItemStack.EMPTY
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

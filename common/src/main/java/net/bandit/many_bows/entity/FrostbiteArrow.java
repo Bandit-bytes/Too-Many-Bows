@@ -28,11 +28,12 @@ public class FrostbiteArrow extends AbstractArrow {
 
     public FrostbiteArrow(EntityType<? extends FrostbiteArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(new ItemStack(Items.ARROW));
         applyConfigValues();
     }
 
     public FrostbiteArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.FROSTBITE_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.FROSTBITE_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -96,6 +97,8 @@ public class FrostbiteArrow extends AbstractArrow {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        if (hasHit) return;
+
         super.onHitEntity(result);
 
         FrostbiteBowConfig config = config();
@@ -116,6 +119,8 @@ public class FrostbiteArrow extends AbstractArrow {
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
+        if (hasHit) return;
+
         super.onHitBlock(result);
 
         if (!this.level().isClientSide()) {
@@ -188,5 +193,15 @@ public class FrostbiteArrow extends AbstractArrow {
     @Override
     protected ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
+    }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
     }
 }

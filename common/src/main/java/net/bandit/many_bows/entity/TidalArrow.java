@@ -25,11 +25,12 @@ public class TidalArrow extends AbstractArrow {
 
     public TidalArrow(EntityType<? extends TidalArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public TidalArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.TIDAL_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.TIDAL_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -188,4 +189,15 @@ public class TidalArrow extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

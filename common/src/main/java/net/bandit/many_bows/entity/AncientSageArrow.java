@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
 import net.bandit.many_bows.config.bows.AncientSageBowConfig;
 import net.bandit.many_bows.mixin.AbstractArrowAccessor;
 import net.bandit.many_bows.registry.EntityRegistry;
@@ -23,19 +24,21 @@ public class AncientSageArrow extends AbstractArrow {
     private float armorPenetration = 0.33F;
     private int particleTicksRemaining = 60;
     private int lifetime = 0;
+    private static final String CONFIG_NAME = "ancient_sage_bow";
 
     public AncientSageArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public AncientSageArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.ANCIENT_SAGE_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.ANCIENT_SAGE_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
-    private AncientSageBowConfig config() {
-        return AncientSageBowConfig.get();
+    private static AncientSageBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, AncientSageBowConfig.class, AncientSageBowConfig::new);
     }
 
     private void applyConfigValues() {
@@ -158,4 +161,15 @@ public class AncientSageArrow extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

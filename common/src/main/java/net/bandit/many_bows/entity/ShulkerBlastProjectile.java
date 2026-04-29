@@ -36,11 +36,12 @@ public class ShulkerBlastProjectile extends AbstractArrow {
 
     public ShulkerBlastProjectile(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public ShulkerBlastProjectile(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.SHULKER_BLAST_PROJECTILE.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.SHULKER_BLAST_PROJECTILE.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -190,4 +191,15 @@ public class ShulkerBlastProjectile extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

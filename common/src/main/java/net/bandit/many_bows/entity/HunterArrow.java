@@ -28,11 +28,12 @@ public class HunterArrow extends AbstractArrow {
 
     public HunterArrow(EntityType<? extends HunterArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public HunterArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.HUNTER_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.HUNTER_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
@@ -185,4 +186,15 @@ public class HunterArrow extends AbstractArrow {
             case BLACK -> Blocks.BLACK_WOOL;
         };
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }

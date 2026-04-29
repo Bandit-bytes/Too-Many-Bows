@@ -1,5 +1,6 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
 import net.bandit.many_bows.config.bows.AstralBoundBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.sounds.SoundEvents;
@@ -17,21 +18,24 @@ import org.jetbrains.annotations.NotNull;
 
 public class AstralArrow extends AbstractArrow {
 
+    private static final String CONFIG_NAME = "astral_bound";
+
     private int ricochetCount = 0;
     private int lifetime = 0;
 
     public AstralArrow(EntityType<? extends AstralArrow> entityType, Level level) {
         super(entityType, level);
+        this.setPickupItemStack(safeArrowStack(ItemStack.EMPTY));
         applyConfigValues();
     }
 
     public AstralArrow(Level level, LivingEntity shooter, ItemStack bowStack, ItemStack arrowStack) {
-        super(EntityRegistry.ASTRAL_ARROW.get(), shooter, level, bowStack, arrowStack);
+        super(EntityRegistry.ASTRAL_ARROW.get(), shooter, level, safeArrowStack(arrowStack), safeBowStack(bowStack));
         applyConfigValues();
     }
 
-    private AstralBoundBowConfig config() {
-        return AstralBoundBowConfig.get();
+    private static AstralBoundBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, AstralBoundBowConfig.class, AstralBoundBowConfig::new);
     }
 
     private void applyConfigValues() {
@@ -129,4 +133,15 @@ public class AstralArrow extends AbstractArrow {
     protected @NotNull ItemStack getDefaultPickupItem() {
         return new ItemStack(Items.ARROW);
     }
+
+    private static ItemStack safeArrowStack(ItemStack arrowStack) {
+        return arrowStack == null || arrowStack.isEmpty()
+                ? new ItemStack(Items.ARROW)
+                : arrowStack.copy();
+    }
+
+    private static ItemStack safeBowStack(ItemStack bowStack) {
+        return bowStack == null ? ItemStack.EMPTY : bowStack.copy();
+    }
+
 }
