@@ -31,7 +31,7 @@ public class HunterXPArrow extends AbstractArrow {
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
             String id = target.getType().builtInRegistryHolder().key().location().toString();
-            BowLootConfig config = ManyBowsConfigHolder.CONFIG;
+            BowLootConfig config = ManyBowsConfigHolder.getConfig();
 
             if (!config.emeraldSageCrimsonNexusBlacklist.contains(id)) {
                 spawnExperienceOrb(target, config.emeraldSageXpAmount);

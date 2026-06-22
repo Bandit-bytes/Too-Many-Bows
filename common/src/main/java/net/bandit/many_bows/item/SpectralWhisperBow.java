@@ -43,9 +43,6 @@ public class SpectralWhisperBow extends ModBowItem {
             SpectralArrow spectralArrow = new SpectralArrow(level, player, stack);
             spectralArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-            applyBowDamageAttribute(spectralArrow, player);
-            tryApplyBowCrit(spectralArrow, player, 1.5D);
-
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             if (powerLevel > 0) {
                 spectralArrow.setBaseDamage(spectralArrow.getBaseDamage() + (powerLevel * 0.5D) + 1.0D);
@@ -59,6 +56,9 @@ public class SpectralWhisperBow extends ModBowItem {
             if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
                 spectralArrow.setSecondsOnFire(100);
             }
+
+            applyBowDamageAttribute(spectralArrow, player);
+            tryApplyBowCrit(spectralArrow, player, 1.5D);
 
             if (!hasInfinity && !arrowStack.isEmpty()) {
                 arrowStack.shrink(1);

@@ -16,36 +16,54 @@ import net.minecraft.world.phys.EntityHitResult;
 
 public class SonicBoomProjectile extends AbstractArrow {
 
+    private static final double DEFAULT_DAMAGE = 20.0D;
     private int lifetime = 60;
-    private int tickCount = 0;
+    private int particleAge = 0;
+    private int enchantmentKnockback = 0;
 
     public SonicBoomProjectile(EntityType<? extends SonicBoomProjectile> entityType, Level level) {
         super(entityType, level);
         this.setNoGravity(true);
+        this.setBaseDamage(DEFAULT_DAMAGE);
     }
 
     public SonicBoomProjectile(Level level, LivingEntity shooter) {
         super(EntityRegistry.SONIC_BOOM_PROJECTILE.get(), shooter, level);
         this.setNoGravity(true);
+        this.setBaseDamage(DEFAULT_DAMAGE);
+    }
+
+
+    public void setEnchantmentKnockback(int level) {
+        this.enchantmentKnockback = Math.max(0, level);
+        this.setKnockback(this.enchantmentKnockback);
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        super.onHitEntity(result);
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            target.hurt(damageSources().sonicBoom(this), 20.0F); // Adjusted damage
-            target.knockback(2.0F, Math.sin(this.getYRot() * Math.PI / 180.0F), -Math.cos(this.getYRot() * Math.PI / 180.0F));
-            level().playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);
-            this.discard(); // Remove after hitting an entity
+            boolean damaged = target.hurt(damageSources().sonicBoom(this), (float) this.getBaseDamage());
+            if (damaged) {
+                if (this.isOnFire()) {
+                    target.setSecondsOnFire(5);
+                }
+
+                double knockbackStrength = 2.0D + (this.enchantmentKnockback * 0.6D);
+                target.knockback(knockbackStrength,
+                        Math.sin(this.getYRot() * Math.PI / 180.0F),
+                        -Math.cos(this.getYRot() * Math.PI / 180.0F));
+            }
+            level().playSound(null, target.getX(), target.getY(), target.getZ(),
+                    SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 0.5F, 1.0F);
         }
+        this.discard();
     }
 
     @Override
     public void tick() {
         super.tick();
-        tickCount++;
+        particleAge++;
 
-        // Server-side lifetime control
         if (!this.level().isClientSide && --this.lifetime <= 0) {
             this.discard();
         }
@@ -54,17 +72,17 @@ public class SonicBoomProjectile extends AbstractArrow {
             createSonicBoomSpiral();
         }
     }
-    // Enhanced particle effect for warden-like sonic boom
+
     private void createSonicBoomSpiral() {
         int particles = 25;
         double radius = 0.5;
         double spiralExpansionRate = 0.15;
 
         for (int i = 0; i < particles; i++) {
-            double angle = 2 * Math.PI * (i + tickCount * 0.1);
+            double angle = 2 * Math.PI * (i + particleAge * 0.1);
             double offsetX = radius * Math.cos(angle);
             double offsetZ = radius * Math.sin(angle);
-            double offsetY = tickCount * 0.05 - (i * 0.01);
+            double offsetY = particleAge * 0.05 - (i * 0.01);
 
             this.level().addParticle(ParticleTypes.ELECTRIC_SPARK,
                     this.getX() + offsetX,

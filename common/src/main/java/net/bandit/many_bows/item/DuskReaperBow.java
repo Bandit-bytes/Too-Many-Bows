@@ -45,9 +45,6 @@ public class DuskReaperBow extends ModBowItem {
             ItemStack arrowStack = player.getProjectile(stack);
             DuskReaperArrow arrow = new DuskReaperArrow(level, player);
 
-            if (!arrowStack.isEmpty() && arrowStack.getItem() instanceof ArrowItem) {
-                arrow.setBaseDamage(2.0D);
-            }
 
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
             arrow.setCritArrow(charge >= 20);

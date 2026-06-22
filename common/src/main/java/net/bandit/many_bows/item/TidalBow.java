@@ -44,9 +44,6 @@ public class TidalBow extends ModBowItem {
 
             tidalArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-            applyBowDamageAttribute(tidalArrow, player);
-            tryApplyBowCrit(tidalArrow, player, 1.5D);
-
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             if (powerLevel > 0) {
                 tidalArrow.setBaseDamage(tidalArrow.getBaseDamage() + (powerLevel * 0.5D) + 0.5D);
@@ -60,6 +57,9 @@ public class TidalBow extends ModBowItem {
             if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
                 tidalArrow.setSecondsOnFire(100);
             }
+
+            applyBowDamageAttribute(tidalArrow, player);
+            tryApplyBowCrit(tidalArrow, player, 1.5D);
 
             tidalArrow.pickup = hasInfinity ? AbstractArrow.Pickup.DISALLOWED : AbstractArrow.Pickup.ALLOWED;
 

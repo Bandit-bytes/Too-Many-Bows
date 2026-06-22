@@ -137,7 +137,7 @@ public class CrimsonNexusBow extends ModBowItem {
         List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, area,
                 e -> e != player && e.isAlive() && !(e instanceof Player));
 
-        BowLootConfig config = ManyBowsConfigHolder.CONFIG;
+        BowLootConfig config = ManyBowsConfigHolder.getConfig();
 
         nearby.removeIf(target -> {
             String id = target.getType().builtInRegistryHolder().key().location().toString();

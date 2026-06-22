@@ -50,12 +50,15 @@ public class SonicBoomBow extends ModBowItem {
 
             int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
             if (punchLevel > 0) {
-                sonicBoom.setKnockback(punchLevel);
+                sonicBoom.setEnchantmentKnockback(punchLevel);
             }
 
             if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
                 sonicBoom.setSecondsOnFire(100);
             }
+
+            applyBowDamageAttribute(sonicBoom, player);
+            tryApplyBowCrit(sonicBoom, player, 1.5D);
 
             sonicBoom.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 5.0F, 0.5F);
 

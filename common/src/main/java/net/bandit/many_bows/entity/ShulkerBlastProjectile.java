@@ -1,15 +1,12 @@
 package net.bandit.many_bows.entity;
 
 import net.bandit.many_bows.registry.EntityRegistry;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -34,11 +31,13 @@ public class ShulkerBlastProjectile extends AbstractArrow {
     public ShulkerBlastProjectile(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
         this.setNoGravity(true);
+        this.setBaseDamage(DAMAGE);
     }
 
     public ShulkerBlastProjectile(Level level, LivingEntity shooter) {
         super(EntityRegistry.SHULKER_BLAST_PROJECTILE.get(), shooter, level);
         this.setNoGravity(true);
+        this.setBaseDamage(DAMAGE);
     }
 
     @Override
@@ -92,12 +91,10 @@ public class ShulkerBlastProjectile extends AbstractArrow {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        // Let AbstractArrow apply the configured base damage, Power, Punch and Flame once.
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            // Apply damage and levitation effect
-            DamageSource damageSource = this.level().damageSources().arrow(this, this.getOwner());
-            target.hurt(damageSource, DAMAGE);
             target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, LEVITATION_DURATION, 1));
 
             // Play a sound and spawn particles on hit

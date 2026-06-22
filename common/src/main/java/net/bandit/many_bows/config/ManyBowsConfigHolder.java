@@ -1,5 +1,14 @@
 package net.bandit.many_bows.config;
 
-public class ManyBowsConfigHolder {
-    public static BowLootConfig CONFIG;
+public final class ManyBowsConfigHolder {
+
+    public static BowLootConfig CONFIG =
+            BowLootConfig.loadConfig();
+
+    private ManyBowsConfigHolder() {
+    }
+
+    public static BowLootConfig getConfig() {
+        return CONFIG;
+    }
 }
