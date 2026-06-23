@@ -1,7 +1,7 @@
 package net.bandit.many_bows.neoforge.curio;
 
 import net.bandit.many_bows.ManyBowsMod;
-import net.bandit.many_bows.config.AccessoryBalance;
+import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +17,6 @@ public class DrawSpeedGloveCurio implements ICurioItem {
     private static final Identifier DRAW_SPEED_MODIFIER_ID =
             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "glove_draw_speed");
 
-    private static final double BONUS = AccessoryBalance.DRAW_SPEED_GLOVE_BONUS;
 
     @Override
     public CurioAttributeModifiers getDefaultCurioAttributeModifiers(ItemStack stack) {
@@ -27,7 +26,7 @@ public class DrawSpeedGloveCurio implements ICurioItem {
         AttributeModifier modifier =
                 new AttributeModifier(
                         DRAW_SPEED_MODIFIER_ID,
-                        BONUS,
+                        NeoForgeCompatConfigHolder.get().drawSpeedGloveBonus,
                         AttributeModifier.Operation.ADD_VALUE
                 );
 

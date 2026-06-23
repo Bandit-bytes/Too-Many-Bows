@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.CrimsonNexusBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -47,22 +48,25 @@ public class CrimsonNexusBow extends ModBowItem {
         Long lastUsedTick = activeLifeDrain.get(player);
         if (lastUsedTick == null) return;
 
-        if (level.getGameTime() - lastUsedTick > 60) return;
+        CrimsonNexusBowConfig config = CrimsonNexusBowConfig.get();
+        if (level.getGameTime() - lastUsedTick > config.life_drain_duration_ticks) return;
 
-        if (level.getGameTime() % 20 != 0) return;
+        int interval = Math.max(1, config.life_drain_interval_ticks);
+        if (level.getGameTime() % interval != 0) return;
 
-        float drainDamage = (float) (1.0D * getBowDamageMultiplier(player));
+        float drainDamage = (float) (config.life_drain_damage * getBowDamageMultiplier(player));
+        double radius = Math.max(0.0D, config.life_drain_radius);
 
         AABB area = new AABB(
-                player.getX() - 10, player.getY() - 10, player.getZ() - 10,
-                player.getX() + 10, player.getY() + 10, player.getZ() + 10
+                player.getX() - radius, player.getY() - radius, player.getZ() - radius,
+                player.getX() + radius, player.getY() + radius, player.getZ() + radius
         );
 
         level.getEntities(player, area, e -> e instanceof LivingEntity && e != player)
                 .forEach(target -> {
                     if (target instanceof LivingEntity living) {
                         living.hurt(player.damageSources().magic(), drainDamage);
-                        player.heal(0.25F);
+                        player.heal(config.heal_per_target);
                     }
                 });
     }
@@ -85,7 +89,8 @@ public class CrimsonNexusBow extends ModBowItem {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-            float healthCost = player.getHealth() > 4.0F ? 2.0F : 0.0F;
+            CrimsonNexusBowConfig config = CrimsonNexusBowConfig.get();
+            float healthCost = player.getHealth() > config.health_cost * 2.0F ? config.health_cost : 0.0F;
             if (healthCost <= 0.0F) return false;
             player.hurt(player.damageSources().magic(), healthCost);
         }
@@ -100,7 +105,7 @@ public class CrimsonNexusBow extends ModBowItem {
                     player.getUsedItemHand(),
                     bowStack,
                     projectiles,
-                    power * 3.0F,
+                    power * CrimsonNexusBowConfig.get().projectile_velocity,
                     1.0F,
                     power == 1.0F,
                     null
@@ -132,7 +137,7 @@ public class CrimsonNexusBow extends ModBowItem {
 
             arrow = ((ArrowItem) Items.ARROW).createArrow(level, new ItemStack(Items.ARROW), shooter, weaponStack);
 
-            setArrowDamage(arrow, 3.0D);
+            setArrowDamage(arrow, CrimsonNexusBowConfig.get().base_damage);
         }
 
         if (shooter instanceof Player p && p.getHealth() >= p.getMaxHealth()) {
@@ -147,7 +152,7 @@ public class CrimsonNexusBow extends ModBowItem {
 
         if (shooter instanceof Player player) {
             applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, 1.5D);
+            tryApplyBowCrit(arrow, player, CrimsonNexusBowConfig.get().crit_bonus_multiplier);
         }
 
         arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;

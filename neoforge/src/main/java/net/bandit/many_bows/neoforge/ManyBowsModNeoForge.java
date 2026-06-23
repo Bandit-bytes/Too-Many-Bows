@@ -1,6 +1,8 @@
 package net.bandit.many_bows.neoforge;
 
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
+import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.neoforge.curio.CursedLanternCurio;
 import net.bandit.many_bows.neoforge.curio.DeadEyesPendantCurio;
 import net.bandit.many_bows.neoforge.curio.DrawSpeedGloveCurio;
@@ -18,6 +20,11 @@ import top.theillusivec4.curios.api.CuriosApi;
 public final class ManyBowsModNeoForge {
 
     public ManyBowsModNeoForge(IEventBus modEventBus) {
+        PlatformCompatReloadRegistry.register(
+                NeoForgeCompatConfigHolder::preload,
+                NeoForgeCompatConfigHolder::reload
+        );
+
         ManyBowsMod.init();
 
         modEventBus.addListener(this::commonSetup);

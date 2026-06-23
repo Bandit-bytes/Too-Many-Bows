@@ -8,17 +8,17 @@ public class IroncladBowConfig {
 
     // Core
     public double base_damage = 6.0D;
-    public int max_lifetime_ticks = 200;
-    public boolean allow_pickup = true;
+    public transient int max_lifetime_ticks = 200;
+    public transient boolean allow_pickup = true;
 
     // Vacuum
-    public boolean activate_vacuum_on_block_hit = true;
-    public boolean activate_vacuum_on_entity_hit = false;
+    public transient boolean activate_vacuum_on_block_hit = true;
+    public transient boolean activate_vacuum_on_entity_hit = false;
     public int vacuum_duration_ticks = 80;
     public double vacuum_radius = 5.0D;
     public double pull_strength = 0.2D;
     public boolean affect_owner = false;
-    public boolean discard_when_vacuum_ends = true;
+    public transient boolean discard_when_vacuum_ends = true;
 
     public static IroncladBowConfig get() {
         return BowJsonConfigHelper.getConfig(FILE_NAME, IroncladBowConfig.class, IroncladBowConfig::new);

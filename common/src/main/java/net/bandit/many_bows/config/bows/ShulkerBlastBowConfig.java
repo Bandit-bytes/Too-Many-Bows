@@ -8,33 +8,33 @@ public class ShulkerBlastBowConfig {
 
     // Core
     public double base_damage = 6.0D;
-    public int max_lifetime_ticks = 100;
-    public boolean allow_pickup = false;
-    public boolean use_gravity = false;
+    public transient int max_lifetime_ticks = 100;
+    public transient boolean allow_pickup = false;
+    public transient boolean use_gravity = false;
 
     // Homing
     public double homing_range = 20.0D;
     public float speed = 0.7F;
     public double homing_factor = 0.2D;
-    public boolean ignore_tamed_animals = true;
+    public transient boolean ignore_tamed_animals = true;
 
     // Damage scaling
-    public boolean use_ranged_damage_attribute_scaling = true;
+    public transient boolean use_ranged_damage_attribute_scaling = true;
     public float ranged_damage_fallback = 6.0F;
     public float final_damage_multiplier = 1.0F;
 
     // Levitation
-    public boolean apply_levitation = true;
+    public transient boolean apply_levitation = true;
     public int levitation_duration_ticks = 40;
     public int levitation_amplifier = 1;
 
     // Visuals / sound
-    public boolean trail_particles_enabled = true;
-    public int trail_particle_count = 1;
-    public boolean impact_particles_enabled = true;
-    public int impact_particle_count = 10;
-    public float impact_sound_volume = 1.0F;
-    public float impact_sound_pitch = 1.0F;
+    public transient boolean trail_particles_enabled = true;
+    public transient int trail_particle_count = 1;
+    public transient boolean impact_particles_enabled = true;
+    public transient int impact_particle_count = 10;
+    public transient float impact_sound_volume = 1.0F;
+    public transient float impact_sound_pitch = 1.0F;
 
     public static ShulkerBlastBowConfig get() {
         return BowJsonConfigHelper.getConfig(FILE_NAME, ShulkerBlastBowConfig.class, ShulkerBlastBowConfig::new);

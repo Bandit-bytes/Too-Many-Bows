@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.ArcaneBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -24,8 +25,6 @@ import java.util.List;
 
 public class ArcaneBow extends ModBowItem {
 
-    private static final float SPREAD_ANGLE = 5.0F;
-
     public ArcaneBow(Properties properties) {
         super(properties);
     }
@@ -45,8 +44,9 @@ public class ArcaneBow extends ModBowItem {
         float mult = this.manybows$getChargeMultiplier(bowStack, entity);
         int scaledCharge = Math.max(0, (int) (charge * mult));
 
-        float power = getPowerForTime(scaledCharge);
-        if (power < 0.1F) return false;
+        ArcaneBowConfig config = ArcaneBowConfig.get();
+        float power = getPowerForTime(scaledCharge, config);
+        if (power < config.minimum_power_to_fire) return false;
 
         List<ItemStack> projectiles = ProjectileWeaponItem.draw(bowStack, ammoInInv, player);
         if (projectiles.isEmpty()) return false;
@@ -54,7 +54,7 @@ public class ArcaneBow extends ModBowItem {
         if (level instanceof ServerLevel serverLevel) {
             ItemStack usedAmmo = projectiles.get(0);
 
-            fireTriple(serverLevel, player, bowStack, usedAmmo, power);
+            fireConfiguredVolley(serverLevel, player, bowStack, usedAmmo, power, config);
         }
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -70,9 +70,11 @@ public class ArcaneBow extends ModBowItem {
     }
 }
 
-    private void fireTriple(ServerLevel level, Player player, ItemStack bowStack, ItemStack ammoStack, float power) {
-        for (int i = -1; i <= 1; i++) {
-            boolean center = (i == 0);
+    private void fireConfiguredVolley(ServerLevel level, Player player, ItemStack bowStack, ItemStack ammoStack, float power, ArcaneBowConfig config) {
+        int count = Math.max(1, config.projectile_count);
+        for (int i = 0; i < count; i++) {
+            float offset = (i - (count - 1) / 2.0F) * config.spread_angle_degrees;
+            boolean center = Math.abs(offset) < 0.001F;
 
             Projectile proj = this.createProjectile(level, player, bowStack, ammoStack, power == 1.0F);
             if (!(proj instanceof AbstractArrow arrow)) continue;
@@ -80,19 +82,23 @@ public class ArcaneBow extends ModBowItem {
             EnchantmentHelper.onProjectileSpawned(level, bowStack, arrow, (item) -> {});
 
 
+            setArrowDamage(arrow, config.base_damage);
             applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, 1.5D);
+            tryApplyBowCrit(arrow, player, config.crit_bonus_multiplier);
 
-            arrow.pickup = center ? AbstractArrow.Pickup.ALLOWED : AbstractArrow.Pickup.CREATIVE_ONLY;
+            arrow.pickup = center && config.center_arrow_pickup_allowed
+                    ? AbstractArrow.Pickup.ALLOWED
+                    : (config.side_arrows_creative_only ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED);
 
 
-            float yaw = player.getYRot() + (i * SPREAD_ANGLE);
-            arrow.shootFromRotation(player, player.getXRot(), yaw, 0.0F, power * 2.5F, 1.0F);
+            float yaw = player.getYRot() + offset;
+            arrow.shootFromRotation(player, player.getXRot(), yaw, 0.0F,
+                    power * config.projectile_velocity_multiplier, config.projectile_inaccuracy);
 
             level.addFreshEntity(arrow);
         }
 
-        if (!player.hasInfiniteMaterials()) {
+        if (config.damage_bow_when_fired && !player.hasInfiniteMaterials()) {
             damageBow(bowStack, player, player.getUsedItemHand());
         }
     }
@@ -120,9 +126,14 @@ public class ArcaneBow extends ModBowItem {
     }
 
     public static float getPowerForTime(int pCharge) {
-        float f = (float) pCharge / 16.0F;
+        return getPowerForTime(pCharge, ArcaneBowConfig.get());
+    }
+
+    private static float getPowerForTime(int pCharge, ArcaneBowConfig config) {
+        float divisor = Math.max(1.0F, config.charge_divisor);
+        float f = (float) pCharge / divisor;
         f = (f * f + f * 2.0F) / 3.0F;
-        return Math.min(f, 1.0F);
+        return Math.min(f, config.max_power);
     }
 
     @Override

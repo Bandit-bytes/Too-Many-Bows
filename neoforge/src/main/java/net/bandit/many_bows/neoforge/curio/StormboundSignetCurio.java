@@ -1,7 +1,7 @@
 package net.bandit.many_bows.neoforge.curio;
 
 import net.bandit.many_bows.ManyBowsMod;
-import net.bandit.many_bows.config.AccessoryBalance;
+import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +17,6 @@ public class StormboundSignetCurio implements ICurioItem {
     private static final Identifier MODIFIER_ID =
             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "stormbound_signet_bow_damage");
 
-    private static final double BONUS = AccessoryBalance.STORMBOUND_SIGNET_BONUS;
 
     @Override
     public CurioAttributeModifiers getDefaultCurioAttributeModifiers(ItemStack stack) {
@@ -26,7 +25,7 @@ public class StormboundSignetCurio implements ICurioItem {
 
         AttributeModifier modifier =
                 new AttributeModifier(MODIFIER_ID,
-                        BONUS,
+                        NeoForgeCompatConfigHolder.get().stormboundSignetBonus,
                         AttributeModifier.Operation.ADD_VALUE
                 );
 

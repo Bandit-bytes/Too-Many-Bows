@@ -8,12 +8,12 @@ public class WebstringBowConfig {
 
     // Core
     public double base_damage = 4.0D;
-    public int max_lifetime_ticks = 200;
-    public boolean allow_pickup = true;
-    public boolean discard_on_entity_hit = true;
+    public transient int max_lifetime_ticks = 200;
+    public transient boolean allow_pickup = true;
+    public transient boolean discard_on_entity_hit = true;
 
     // Debuff
-    public boolean apply_slowness = true;
+    public transient boolean apply_slowness = true;
     public int slowness_duration_ticks = 60;
     public int slowness_amplifier = 1;
 

@@ -4,7 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.common.LanternLightHelper;
-import net.bandit.many_bows.config.AccessoryBalance;
+import net.bandit.many_bows.neoforge.config.NeoForgeCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,7 +39,7 @@ public class SoulLanternCurio implements ICurioItem {
 
         map.put(holder, new AttributeModifier(
                 uniqueId,
-                AccessoryBalance.SOUL_LANTERN_DAMAGE_BONUS,
+                NeoForgeCompatConfigHolder.get().soulLanternGravewireDamageBonus,
                 AttributeModifier.Operation.ADD_VALUE
         ));
 
@@ -50,7 +50,7 @@ public class SoulLanternCurio implements ICurioItem {
         if (slotContext.entity() instanceof Player player) {
             LanternLightHelper.ensureLanternLight(
                     player,
-                    AccessoryBalance.LANTERN_LIGHT_LEVEL
+                    NeoForgeCompatConfigHolder.get().soulLanternLightLevel
             );
         }
     }

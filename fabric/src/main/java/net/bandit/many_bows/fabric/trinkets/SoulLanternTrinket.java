@@ -6,7 +6,7 @@ import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.common.LanternLightHelper;
-import net.bandit.many_bows.config.AccessoryBalance;
+import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -41,7 +41,7 @@ public class SoulLanternTrinket implements Trinket {
 
         map.put(holder, new AttributeModifier(
                 uniqueId,
-                AccessoryBalance.SOUL_LANTERN_DAMAGE_BONUS,
+                FabricCompatConfigHolder.get().soulLanternGravewireDamageBonus,
                 AttributeModifier.Operation.ADD_VALUE
         ));
 
@@ -52,7 +52,7 @@ public class SoulLanternTrinket implements Trinket {
         if (entity instanceof Player player) {
             LanternLightHelper.ensureLanternLight(
                     player,
-                    AccessoryBalance.LANTERN_LIGHT_LEVEL
+                    FabricCompatConfigHolder.get().soulLanternLightLevel
             );
         }
     }

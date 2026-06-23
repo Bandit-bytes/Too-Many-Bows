@@ -8,9 +8,9 @@ public class AurorasGraceBowConfig {
 
     // Core
     public double base_damage = 7.0D;
-    public int max_lifetime_ticks = 200;
-    public boolean allow_pickup = false;
-    public boolean discard_on_impact = true;
+    public transient int max_lifetime_ticks = 200;
+    public transient boolean allow_pickup = false;
+    public transient boolean discard_on_impact = true;
 
     // Rift behavior
     public boolean spawn_rift_on_entity_hit = true;

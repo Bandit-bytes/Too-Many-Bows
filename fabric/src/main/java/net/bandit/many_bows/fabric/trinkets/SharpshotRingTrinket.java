@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.Trinket;
 import net.bandit.many_bows.ManyBowsMod;
-import net.bandit.many_bows.config.AccessoryBalance;
+import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,7 +21,6 @@ public class SharpshotRingTrinket implements Trinket {
             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "sharpshot_ring_bow_damage");
 
     // +0.15 => base 1.0 becomes 1.15 (15% more)
-    private static final double BONUS = AccessoryBalance.SHARPSHOT_RING_BONUS;
 
     @Override
     public Multimap<Holder<Attribute>, AttributeModifier> getModifiers(
@@ -40,7 +39,7 @@ public class SharpshotRingTrinket implements Trinket {
                 MODIFIER_ID.getPath() + "/" + slotIdentifier.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(uniqueId, BONUS, AttributeModifier.Operation.ADD_VALUE));
+        map.put(holder, new AttributeModifier(uniqueId, FabricCompatConfigHolder.get().sharpshotRingBonus, AttributeModifier.Operation.ADD_VALUE));
         return map;
     }
 }

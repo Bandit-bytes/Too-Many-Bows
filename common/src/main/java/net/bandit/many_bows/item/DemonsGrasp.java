@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.DemonsGraspBowConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -59,7 +60,7 @@ public class DemonsGrasp extends ModBowItem {
                     player.getUsedItemHand(),
                     bowStack,
                     projectiles,
-                    power * 3.0F,
+                    power * DemonsGraspBowConfig.get().projectile_velocity,
                     1.0F,
                     power == 1.0F,
                     null
@@ -82,7 +83,7 @@ public class DemonsGrasp extends ModBowItem {
     }
 
     public static float getPowerForTime(int i) {
-        float f = (float)i / 20.0F;
+        float f = (float)i / Math.max(1.0F, DemonsGraspBowConfig.get().charge_divisor);
         f = (f * f + f * 2.0F) / 3.0F;
         if (f > 1.0F) f = 1.0F;
         return f;
@@ -121,8 +122,9 @@ public class DemonsGrasp extends ModBowItem {
     ) {
         Projectile projectile = super.createProjectile(level, shooter, weaponStack, ammoStack, critical);
         if (projectile instanceof AbstractArrow arrow && shooter instanceof Player player) {
+            setArrowDamage(arrow, DemonsGraspBowConfig.get().base_damage);
             applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, 1.5D);
+            tryApplyBowCrit(arrow, player, DemonsGraspBowConfig.get().crit_bonus_multiplier);
         }
         return projectile;
     }

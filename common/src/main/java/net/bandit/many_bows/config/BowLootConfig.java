@@ -2,102 +2,214 @@ package net.bandit.many_bows.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dev.architectury.platform.Platform;
 
-import java.io.Reader;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Small, server-friendly configuration for Too Many Bows.
- *
- * Individual bow behavior is intentionally kept as balanced built-in defaults.
- * This leaves only the broad controls that are useful to pack/server owners.
- */
-public final class BowLootConfig {
+public class BowLootConfig {
 
-    private static final Gson GSON = new GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .create();
+    public static final String MOD_ID = "too_many_bows";
 
-    private static final Path CONFIG_FILE = Platform.getConfigFolder()
-            .resolve("too_many_bows.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final File CONFIG_FILE = new File("config/too_many_bows.json");
 
-    /** Multiplies the final direct arrow damage of every mod bow. */
-    public Double globalBowPowerMultiplier = 1.0D;
+    public Boolean easyLootEnabled = true;
+    public Float easyLootDropChance = 0.5F;
 
-    /** Base number of ticks needed for a full draw. Lower is faster. */
+    public Boolean mediumLootEnabled = true;
+    public Float mediumLootDropChance = 0.4F;
+
+    public Boolean hardLootEnabled = true;
+    public Float hardLootDropChance = 0.3F;
+
+    public Boolean endgameLootEnabled = true;
+    public Float endgameLootDropChance = 0.2F;
+
     public Float globalBowPullSpeed = 16.0F;
 
-    /** Enables the built-in chest loot additions. */
-    public Boolean enableChestLoot = true;
+    // Optional overall balance control; individual bow configs remain authoritative.
+    public Double globalBowPowerMultiplier = 1.0D;
 
-    /** Multiplies all built-in chest loot chances. */
-    public Float lootChanceMultiplier = 1.0F;
+
+    public List<String> easyLootTables = List.of(
+            "minecraft:chests/simple_dungeon",
+            "minecraft:chests/abandoned_mineshaft"
+    );
+
+    public List<String> mediumLootTables = List.of(
+            "minecraft:chests/jungle_temple",
+            "minecraft:chests/pillager_outpost",
+            "minecraft:chests/abandoned_mineshaft",
+            "minecraft:chests/simple_dungeon"
+    );
+
+    public List<String> hardLootTables = List.of(
+            "minecraft:chests/stronghold_corridor",
+            "minecraft:chests/nether_bridge",
+            "minecraft:chests/bastion_treasure"
+    );
+
+    public List<String> endgameLootTables = List.of(
+            "minecraft:chests/end_city_treasure",
+            "minecraft:chests/nether_bridge",
+            "minecraft:chests/bastion_treasure"
+    );
+
+    public List<String> easyLootItems = List.of(
+            MOD_ID + ":ancient_sage_bow",
+            MOD_ID + ":aethers_call",
+            MOD_ID + ":burnt_relic",
+            MOD_ID + ":arcane_bow",
+            MOD_ID + ":sharpshot_ring",
+            MOD_ID + ":cyroheart_bow",
+            MOD_ID + ":power_crystal",
+            MOD_ID + ":emerald_sage_bow",
+            MOD_ID + ":torchbearer",
+            MOD_ID + ":demons_grasp",
+            MOD_ID + ":dead_eyes_pendant",
+            MOD_ID + ":fletchers_talisman"
+    );
+
+    public List<String> mediumLootItems = List.of(
+            MOD_ID + ":arcane_bow",
+            MOD_ID + ":cyroheart_bow",
+            MOD_ID + ":power_crystal",
+            MOD_ID + ":torchbearer",
+            MOD_ID + ":sharpshot_ring",
+            MOD_ID + ":emerald_sage_bow",
+            MOD_ID + ":demons_grasp",
+            MOD_ID + ":stormbound_signet",
+            MOD_ID + ":dead_eyes_pendant",
+            MOD_ID + ":fletchers_talisman"
+    );
+
+    public List<String> hardLootItems = List.of(
+            MOD_ID + ":sentinels_wrath",
+            MOD_ID + ":cursed_stone",
+            MOD_ID + ":solar_bow",
+            MOD_ID + ":arc_heavens",
+            MOD_ID + ":stormbound_signet",
+            MOD_ID + ":scatter_bow",
+            MOD_ID + ":sharpshot_ring",
+            MOD_ID + ":wind_glove",
+            MOD_ID + ":vitality_weaver",
+            MOD_ID + ":spectral_whisper",
+            MOD_ID + ":webstring",
+            MOD_ID + ":dead_eyes_pendant",
+            MOD_ID + ":fletchers_talisman"
+    );
+
+    public List<String> endgameLootItems = List.of(
+            MOD_ID + ":flame_bow",
+            MOD_ID + ":dark_bow",
+            MOD_ID + ":dragons_breath",
+            MOD_ID + ":wind_bow",
+            MOD_ID + ":stormbound_signet",
+            MOD_ID + ":wind_glove",
+            MOD_ID + ":sharpshot_ring",
+            MOD_ID + ":shulker_blast",
+            MOD_ID + ":astral_bound",
+            MOD_ID + ":auroras_grace",
+            MOD_ID + ":dead_eyes_pendant",
+            MOD_ID + ":fletchers_talisman"
+    );
 
     public static BowLootConfig loadConfig() {
-        BowLootConfig config = new BowLootConfig();
+        BowLootConfig config;
 
-        if (Files.exists(CONFIG_FILE)) {
-            try (Reader reader = Files.newBufferedReader(CONFIG_FILE, StandardCharsets.UTF_8)) {
-                BowLootConfig loaded = GSON.fromJson(reader, BowLootConfig.class);
-                if (loaded != null) {
-                    config = loaded;
-                }
-            } catch (Exception e) {
-                System.err.println("[too_many_bows] Could not read config; using defaults.");
-                e.printStackTrace();
-            }
+        if (!CONFIG_FILE.exists()) {
+            config = new BowLootConfig();
+            config.saveConfig();
+            return config;
         }
 
-        config.validate();
+        try (FileReader reader = new FileReader(CONFIG_FILE)) {
+            config = GSON.fromJson(reader, BowLootConfig.class);
+            if (config == null) config = new BowLootConfig();
+        } catch (IOException e) {
+            e.printStackTrace();
+            config = new BowLootConfig();
+        }
 
-        // Always rewrite so old per-tier/list-heavy versions migrate to the new compact format.
-        config.saveConfig();
+        boolean changed = config.validateAndFillDefaults();
+        if (changed) config.saveConfig();
+
         return config;
     }
 
     public void saveConfig() {
-        try {
-            Path parent = CONFIG_FILE.getParent();
-            if (parent != null) {
-                Files.createDirectories(parent);
-            }
+        File parent = CONFIG_FILE.getParentFile();
+        if (parent != null && !parent.exists()) parent.mkdirs();
 
-            try (Writer writer = Files.newBufferedWriter(CONFIG_FILE, StandardCharsets.UTF_8)) {
-                GSON.toJson(this, writer);
-            }
-        } catch (Exception e) {
-            System.err.println("[too_many_bows] Could not save config.");
+        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+            GSON.toJson(this, writer);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void validate() {
-        if (globalBowPowerMultiplier == null || !Double.isFinite(globalBowPowerMultiplier)) {
-            globalBowPowerMultiplier = 1.0D;
-        }
-        globalBowPowerMultiplier = clamp(globalBowPowerMultiplier, 0.05D, 20.0D);
+    public boolean validateAndFillDefaults() {
+        boolean changed = false;
+        BowLootConfig defaults = new BowLootConfig();
 
-        if (globalBowPullSpeed == null || !Float.isFinite(globalBowPullSpeed)) {
-            globalBowPullSpeed = 16.0F;
-        }
-        globalBowPullSpeed = (float) clamp(globalBowPullSpeed, 1.0D, 200.0D);
+        if (easyLootEnabled == null) { easyLootEnabled = defaults.easyLootEnabled; changed = true; }
+        if (easyLootDropChance == null) { easyLootDropChance = defaults.easyLootDropChance; changed = true; }
 
-        if (enableChestLoot == null) {
-            enableChestLoot = true;
-        }
+        if (mediumLootEnabled == null) { mediumLootEnabled = defaults.mediumLootEnabled; changed = true; }
+        if (mediumLootDropChance == null) { mediumLootDropChance = defaults.mediumLootDropChance; changed = true; }
 
-        if (lootChanceMultiplier == null || !Float.isFinite(lootChanceMultiplier)) {
-            lootChanceMultiplier = 1.0F;
-        }
-        lootChanceMultiplier = (float) clamp(lootChanceMultiplier, 0.0D, 10.0D);
+        if (hardLootEnabled == null) { hardLootEnabled = defaults.hardLootEnabled; changed = true; }
+        if (hardLootDropChance == null) { hardLootDropChance = defaults.hardLootDropChance; changed = true; }
+
+        if (endgameLootEnabled == null) { endgameLootEnabled = defaults.endgameLootEnabled; changed = true; }
+        if (endgameLootDropChance == null) { endgameLootDropChance = defaults.endgameLootDropChance; changed = true; }
+
+        if (globalBowPullSpeed == null) { globalBowPullSpeed = defaults.globalBowPullSpeed; changed = true; }
+        if (globalBowPowerMultiplier == null) { globalBowPowerMultiplier = defaults.globalBowPowerMultiplier; changed = true; }
+        if (globalBowPowerMultiplier < 0.0D) { globalBowPowerMultiplier = 0.0D; changed = true; }
+
+        if (easyLootTables == null) { easyLootTables = new ArrayList<>(defaults.easyLootTables); changed = true; }
+        if (mediumLootTables == null) { mediumLootTables = new ArrayList<>(defaults.mediumLootTables); changed = true; }
+        if (hardLootTables == null) { hardLootTables = new ArrayList<>(defaults.hardLootTables); changed = true; }
+        if (endgameLootTables == null) { endgameLootTables = new ArrayList<>(defaults.endgameLootTables); changed = true; }
+
+        if (easyLootItems == null) { easyLootItems = new ArrayList<>(defaults.easyLootItems); changed = true; }
+        if (mediumLootItems == null) { mediumLootItems = new ArrayList<>(defaults.mediumLootItems); changed = true; }
+        if (hardLootItems == null) { hardLootItems = new ArrayList<>(defaults.hardLootItems); changed = true; }
+        if (endgameLootItems == null) { endgameLootItems = new ArrayList<>(defaults.endgameLootItems); changed = true; }
+
+        changed |= clampChanceFields();
+        return changed;
     }
 
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
+    private boolean clampChanceFields() {
+        boolean changed = false;
+
+        if (easyLootDropChance != null) {
+            float c = clamp01(easyLootDropChance);
+            if (c != easyLootDropChance) { easyLootDropChance = c; changed = true; }
+        }
+        if (mediumLootDropChance != null) {
+            float c = clamp01(mediumLootDropChance);
+            if (c != mediumLootDropChance) { mediumLootDropChance = c; changed = true; }
+        }
+        if (hardLootDropChance != null) {
+            float c = clamp01(hardLootDropChance);
+            if (c != hardLootDropChance) { hardLootDropChance = c; changed = true; }
+        }
+        if (endgameLootDropChance != null) {
+            float c = clamp01(endgameLootDropChance);
+            if (c != endgameLootDropChance) { endgameLootDropChance = c; changed = true; }
+        }
+
+        return changed;
+    }
+
+    private float clamp01(float v) {
+        return Math.max(0.0F, Math.min(1.0F, v));
     }
 }

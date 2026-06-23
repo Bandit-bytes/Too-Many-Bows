@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.VerdantVigorBowConfig;
 import net.bandit.many_bows.entity.VitalityArrow;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
@@ -35,8 +36,6 @@ import java.util.function.Predicate;
 
 public class VerdantVigorBow extends ModBowItem {
 
-    private static final int REGENERATION_DURATION = 40;
-
     private static final Identifier RANGED_DAMAGE_ID =
             Identifier.fromNamespaceAndPath("ranged_weapon", "damage");
 
@@ -55,19 +54,22 @@ public class VerdantVigorBow extends ModBowItem {
         boolean holding = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
         if (!holding) return;
 
+        VerdantVigorBowConfig config = VerdantVigorBowConfig.get();
+
         // short refresh so it feels constant
         player.addEffect(new MobEffectInstance(
                 MobEffects.HEALTH_BOOST,
                 15,
-                1,
+                config.health_boost_amplifier,
                 true,
                 false,
                 false
         ));
 
-        if (level.getGameTime() % 40L != 0L) return;
+        int interval = Math.max(1, config.regeneration_interval_ticks);
+        if (level.getGameTime() % interval != 0L) return;
 
-        AABB area = player.getBoundingBox().inflate(5.0D);
+        AABB area = player.getBoundingBox().inflate(Math.max(0.0D, config.ally_regeneration_radius));
         level.getEntities(player, area, e ->
                 e instanceof LivingEntity le
                         && le.isAlive()
@@ -75,8 +77,8 @@ public class VerdantVigorBow extends ModBowItem {
                         && (e.getType().getCategory().isFriendly() || e instanceof Player)
         ).forEach(e -> ((LivingEntity) e).addEffect(new MobEffectInstance(
                 MobEffects.REGENERATION,
-                REGENERATION_DURATION,
-                0,
+                config.regeneration_duration_ticks,
+                config.regeneration_amplifier,
                 true, false, false
         )));
     }
@@ -109,7 +111,7 @@ public class VerdantVigorBow extends ModBowItem {
                         player.getUsedItemHand(),
                         bowStack,
                         projectiles,
-                        power * 2.5F,
+                        power * VerdantVigorBowConfig.get().projectile_velocity,
                         1.0F,
                         power == 1.0F,
                         null
@@ -141,7 +143,7 @@ public class VerdantVigorBow extends ModBowItem {
             arrow = new VitalityArrow(level, shooter, weaponStack, ammoStack);
 
             float base = getRangedWeaponDamage(level, shooter);
-            arrow.setBaseDamage(base / 2.25F);
+            arrow.setBaseDamage(base / Math.max(0.01F, VerdantVigorBowConfig.get().arrow_damage_divisor));
         }
 
         if (crit) arrow.setCritArrow(true);
@@ -152,7 +154,7 @@ public class VerdantVigorBow extends ModBowItem {
 
         if (shooter instanceof Player player) {
             applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, 1.5D);
+            tryApplyBowCrit(arrow, player, VerdantVigorBowConfig.get().crit_bonus_multiplier);
         }
 
         return arrow;
@@ -161,11 +163,11 @@ public class VerdantVigorBow extends ModBowItem {
     private static float getRangedWeaponDamage(Level level, LivingEntity shooter) {
         var lookup = level.registryAccess().lookupOrThrow(Registries.ATTRIBUTE);
         var holderOpt = lookup.get(RANGED_DAMAGE_ID);
-        if (holderOpt.isEmpty()) return 6.0F;
+        if (holderOpt.isEmpty()) return VerdantVigorBowConfig.get().fallback_ranged_damage;
 
         Holder<Attribute> holder = holderOpt.get();
         AttributeInstance inst = shooter.getAttribute(holder);
-        if (inst == null) return 6.0F;
+        if (inst == null) return VerdantVigorBowConfig.get().fallback_ranged_damage;
 
         return (float) inst.getValue();
     }

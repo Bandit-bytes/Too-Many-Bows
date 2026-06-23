@@ -8,14 +8,14 @@ public class FlameBowConfig {
 
     // Core
     public double base_damage = 5.0D;
-    public int max_lifetime_ticks = 200;
-    public int post_hit_linger_ticks = 40;
-    public boolean allow_pickup = false;
+    public transient int max_lifetime_ticks = 200;
+    public transient int post_hit_linger_ticks = 40;
+    public transient boolean allow_pickup = false;
 
     // Trail
-    public boolean trail_particles_enabled = true;
-    public int flame_trail_particles = 5;
-    public boolean smoke_trail_enabled = true;
+    public transient boolean trail_particles_enabled = true;
+    public transient int flame_trail_particles = 5;
+    public transient boolean smoke_trail_enabled = true;
 
     // Direct hit effects
     public int direct_hit_fire_ticks = 80;
@@ -26,16 +26,16 @@ public class FlameBowConfig {
     // Fire burst
     public double fire_burst_radius = 5.0D;
     public float aoe_fire_damage_fallback = 2.0F;
-    public boolean use_ranged_damage_attribute_for_aoe_damage = true;
-    public float ranged_damage_to_aoe_divisor = 3.0F;
+    public transient boolean use_ranged_damage_attribute_for_aoe_damage = true;
+    public transient float ranged_damage_to_aoe_divisor = 3.0F;
     public int aoe_fire_ticks = 80;
 
-    public int burst_flame_particle_count = 50;
-    public int burst_explosion_particle_count = 30;
-    public int burst_smoke_particle_count = 30;
+    public transient int burst_flame_particle_count = 50;
+    public transient int burst_explosion_particle_count = 30;
+    public transient int burst_smoke_particle_count = 30;
 
-    public float impact_sound_volume = 1.0F;
-    public float impact_sound_pitch = 1.2F;
+    public transient float impact_sound_volume = 1.0F;
+    public transient float impact_sound_pitch = 1.2F;
 
     public static FlameBowConfig get() {
         return BowJsonConfigHelper.getConfig(FILE_NAME, FlameBowConfig.class, FlameBowConfig::new);

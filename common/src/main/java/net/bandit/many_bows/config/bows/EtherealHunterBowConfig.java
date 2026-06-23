@@ -8,9 +8,9 @@ public class EtherealHunterBowConfig {
 
     // Core
     public double base_damage = 5.0D;
-    public int max_lifetime_ticks = 200;
-    public int post_hit_linger_ticks = 40;
-    public boolean allow_pickup = false;
+    public transient int max_lifetime_ticks = 200;
+    public transient int post_hit_linger_ticks = 40;
+    public transient boolean allow_pickup = false;
     public boolean use_gravity = true;
 
     public static EtherealHunterBowConfig get() {

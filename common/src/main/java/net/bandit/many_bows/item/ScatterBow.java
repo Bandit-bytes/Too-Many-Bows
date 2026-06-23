@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.ScatterBowConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -29,8 +30,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class ScatterBow extends ModBowItem {
-
-    private static final int PELLETS = 8;
 
     public ScatterBow(Properties properties) {
         super(properties);
@@ -67,7 +66,8 @@ public class ScatterBow extends ModBowItem {
                 // compute a small base damage for each pellet
                 float pelletBaseDamage = getPelletBaseDamage(serverLevel, player);
 
-                for (int i = 0; i < PELLETS; i++) {
+                ScatterBowConfig config = ScatterBowConfig.get();
+                for (int i = 0; i < Math.max(1, config.pellet_count); i++) {
                     // Create a normal arrow projectile (not consuming extra ammo per pellet)
                     AbstractArrow arrow = createVanillaArrow(serverLevel, player, bowStack, ammoInInv, power == 1.0F);
 
@@ -79,14 +79,14 @@ public class ScatterBow extends ModBowItem {
 
                     // your attributes
                     applyBowDamageAttribute(arrow, player);
-                    tryApplyBowCrit(arrow, player, 1.5D);
+                    tryApplyBowCrit(arrow, player, config.crit_bonus_multiplier);
 
                     // Pellet pickup behavior (same as “normal bow”)
                     arrow.pickup = infinite ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
 
                     // Spread per pellet
-                    float yawOffset = (serverLevel.getRandom().nextFloat() - 0.5F) * 20.0F;
-                    float pitchOffset = (serverLevel.getRandom().nextFloat() - 0.5F) * 10.0F;
+                    float yawOffset = (serverLevel.getRandom().nextFloat() - 0.5F) * config.horizontal_spread_degrees;
+                    float pitchOffset = (serverLevel.getRandom().nextFloat() - 0.5F) * config.vertical_spread_degrees;
 
                     // shoot (more punchy than default)
                     arrow.shootFromRotation(
@@ -94,7 +94,7 @@ public class ScatterBow extends ModBowItem {
                             player.getXRot() + pitchOffset,
                             player.getYRot() + yawOffset,
                             0.0F,
-                            power * 3.0F,
+                            power * config.projectile_velocity,
                             1.0F
                     );
 
@@ -141,7 +141,8 @@ public class ScatterBow extends ModBowItem {
     }
 
     private static float getPelletBaseDamage(Level level, Player player) {
-        float base = 2.0F;
+        ScatterBowConfig config = ScatterBowConfig.get();
+        float base = config.pellet_damage_fallback;
 
         var lookup = level.registryAccess().lookupOrThrow(Registries.ATTRIBUTE);
         var holderOpt = lookup.get(Identifier.fromNamespaceAndPath("ranged_weapon", "damage"));
@@ -150,7 +151,7 @@ public class ScatterBow extends ModBowItem {
             Holder<Attribute> holder = holderOpt.get();
             AttributeInstance inst = player.getAttribute(holder);
             if (inst != null) {
-                base = (float) inst.getValue() / 11.0F;
+                base = (float) inst.getValue() / Math.max(0.01F, config.ranged_damage_divisor);
             }
         }
 

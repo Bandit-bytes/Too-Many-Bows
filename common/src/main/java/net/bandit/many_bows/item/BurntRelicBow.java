@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.BurntRelicBowConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -57,7 +58,7 @@ public class BurntRelicBow extends ModBowItem {
                     player.getUsedItemHand(),
                     bowStack,
                     projectiles,
-                    power * 3.5F,
+                    power * BurntRelicBowConfig.get().projectile_velocity,
                     1.0F,
                     power == 1.0F,
                     null
@@ -88,14 +89,14 @@ public class BurntRelicBow extends ModBowItem {
             arrow = arrowItem.createArrow(level, ammoStack, shooter, weaponStack);
         } else {
             arrow = ((ArrowItem) Items.ARROW).createArrow(level, new ItemStack(Items.ARROW), shooter, weaponStack);
-            setArrowDamage(arrow, 3.0D);
+            setArrowDamage(arrow, BurntRelicBowConfig.get().base_damage);
         }
 
         if (crit) arrow.setCritArrow(true);
 
         if (shooter instanceof Player player) {
             applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, 1.5D);
+            tryApplyBowCrit(arrow, player, BurntRelicBowConfig.get().crit_bonus_multiplier);
         }
 
         arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;

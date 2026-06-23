@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.client.ClientTooltipHelper;
+import net.bandit.many_bows.config.bows.TwinShadowsBowConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -82,31 +83,32 @@ public class TwinShadowsBow extends ModBowItem {
         Item ammoItem = projectileStack.getItem();
         ArrowItem arrowItem = (ammoItem instanceof ArrowItem ai) ? ai : (ArrowItem) Items.ARROW;
 
+        TwinShadowsBowConfig config = TwinShadowsBowConfig.get();
         float rangedDamage = getRangedWeaponDamage(serverLevel, player);
 
         // ---------- Light Arrow ----------
         AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
-        lightArrow.setBaseDamage(rangedDamage / 3.0F);
+        lightArrow.setBaseDamage(rangedDamage / Math.max(0.01F, config.light_arrow_damage_divisor));
         applyBowDamageAttribute(lightArrow, player);
-        tryApplyBowCrit(lightArrow, player, 1.5D);
+        tryApplyBowCrit(lightArrow, player, config.crit_bonus_multiplier);
 
         // Prefer translatable if you want localization later; literal is fine too
         lightArrow.setCustomName(Component.literal("Light Arrow").withStyle(ChatFormatting.WHITE));
         lightArrow.addTag("light");
         lightArrow.pickup = AbstractArrow.Pickup.ALLOWED;
-        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
+        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.projectile_velocity, 1.0F);
         serverLevel.addFreshEntity(lightArrow);
 
         // ---------- Dark Arrow ----------
         AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
-        darkArrow.setBaseDamage(rangedDamage / 2.0F);
+        darkArrow.setBaseDamage(rangedDamage / Math.max(0.01F, config.dark_arrow_damage_divisor));
         applyBowDamageAttribute(darkArrow, player);
-        tryApplyBowCrit(darkArrow, player, 1.5D);
+        tryApplyBowCrit(darkArrow, player, config.crit_bonus_multiplier);
 
         darkArrow.setCustomName(Component.literal("Dark Arrow").withStyle(ChatFormatting.DARK_GRAY));
         darkArrow.addTag("dark");
         darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, power * 2.5F, 1.0F);
+        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + config.dark_arrow_yaw_offset, 0.0F, power * config.projectile_velocity, 1.0F);
         serverLevel.addFreshEntity(darkArrow);
 
         // consume exactly one ammo (since you spawn 2 arrows from it)
@@ -121,11 +123,11 @@ public class TwinShadowsBow extends ModBowItem {
     private static float getRangedWeaponDamage(Level level, LivingEntity shooter) {
         var lookup = level.registryAccess().lookupOrThrow(Registries.ATTRIBUTE);
         var holderOpt = lookup.get(RANGED_DAMAGE_ID);
-        if (holderOpt.isEmpty()) return 6.0F;
+        if (holderOpt.isEmpty()) return TwinShadowsBowConfig.get().fallback_ranged_damage;
 
         Holder<Attribute> holder = holderOpt.get();
         AttributeInstance inst = shooter.getAttribute(holder);
-        if (inst == null) return 6.0F;
+        if (inst == null) return TwinShadowsBowConfig.get().fallback_ranged_damage;
 
         return (float) inst.getValue();
     }
