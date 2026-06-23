@@ -1,0 +1,14 @@
+{
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "too_many_bows:item/cursed_lantern"
+	},
+	"overrides": [
+		{
+			"predicate": {
+				"too_many_bows:worn": 1.0
+			},
+			"model": "too_many_bows:item/cursed_lantern_equipped"
+		}
+	]
+}

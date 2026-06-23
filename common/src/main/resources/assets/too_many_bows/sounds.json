@@ -1,0 +1,65 @@
+{
+  "vault_portal_open": {
+    "subtitle": "subtitle.many_bows.vault_portal_open",
+    "sounds": [
+      {
+        "name": "too_many_bows:vault_portal_open",
+        "stream": false
+      }
+    ]
+  },
+  "vault_portal_fire": {
+    "subtitle": "subtitle.many_bows.vault_portal_fire",
+    "sounds": [
+      {
+        "name": "too_many_bows:vault_portal_fire",
+        "stream": false
+      }
+    ]
+  },
+  "gravewire_fire": {
+    "subtitle": "subtitle.many_bows.gravewire_fire",
+    "sounds": [
+      {
+        "name": "too_many_bows:gravewire_fire",
+        "stream": false
+      }
+    ]
+  },
+  "windbow_fire": {
+    "subtitle": "subtitle.many_bows.windbow_fire",
+    "sounds": [
+      {
+        "name": "too_many_bows:windbow_fire",
+        "stream": false
+      }
+    ]
+  },
+  "soulhoard_harvest": {
+    "subtitle": "subtitle.many_bows.soulhoard_harvest",
+    "sounds": [
+      {
+        "name": "too_many_bows:soulhoard_harvest",
+        "stream": false
+      }
+    ]
+  },
+  "soulhoard_release": {
+    "subtitle": "subtitle.many_bows.soulhoard_release",
+    "sounds": [
+      {
+        "name": "too_many_bows:soulhoard_release",
+        "stream": false
+      }
+    ]
+  },
+  "vault_portal_impact": {
+    "subtitle": "subtitle.many_bows.vault_portal_impact",
+    "sounds": [
+      {
+        "name": "too_many_bows:vault_portal_impact",
+        "stream": false
+      }
+    ]
+  }
+}

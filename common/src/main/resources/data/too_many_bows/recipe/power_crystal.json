@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:diamond",
+    "minecraft:quartz",
+    "minecraft:ender_pearl"
+  ],
+  "result": {
+    "id": "too_many_bows:power_crystal",
+    "count": 1
+  }
+}

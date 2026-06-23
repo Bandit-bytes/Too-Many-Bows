@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " XS",
+    "YZY",
+    " XS"
+  ],
+  "key": {
+    "X": "minecraft:diamond",
+    "S": "minecraft:shulker_shell",
+    "Y": "minecraft:ender_pearl",
+    "Z": "minecraft:bow"
+  },
+  "result": {
+    "count": 1,
+    "id": "too_many_bows:shulker_blast"
+  }
+}

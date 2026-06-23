@@ -1,0 +1,62 @@
+{
+  "type": "minecraft:generic",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:diamond",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 5.0
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:nether_star"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "too_many_bows:ancient_sage_bow"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "too_many_bows:emerald_sage_bow"
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:experience_bottle",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 10.0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "too_many_bows:power_crystal",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 10.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

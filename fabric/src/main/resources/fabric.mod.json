@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "too_many_bows",
+  "version": "${version}",
+  "name": "Too Many Bows",
+  "description": "Adds a large collection of unique bows, projectiles, accessories, and abilities.",
+  "authors": [
+    "Bandit-Bytes"
+  ],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/too_many_bows/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.bandit.many_bows.fabric.ManyBowsModFabric"
+    ],
+    "client": [
+      "net.bandit.many_bows.fabric.client.ManyBowsModFabricClient"
+    ]
+  },
+  "mixins": [
+    "too_many_bows.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.1.2",
+    "java": ">=25",
+    "architectury": ">=20.0.7",
+    "fabric-api": "*",
+    "trinkets": ">=3.12.0"
+  }
+}

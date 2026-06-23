@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "net.bandit.many_bows.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixins": [
+    "AbstractArrowAccessor",
+    "EntityWaterExtinguishMixin",
+    "LivingEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

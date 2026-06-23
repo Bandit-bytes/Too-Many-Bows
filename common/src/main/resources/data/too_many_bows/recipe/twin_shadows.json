@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " O ",
+    "EBE",
+    " D "
+  ],
+  "key": {
+    "O": "minecraft:obsidian",
+    "E": "minecraft:ender_pearl",
+    "B": "minecraft:bow",
+    "D": "minecraft:black_dye"
+  },
+  "result": {
+    "count": 1,
+    "id": "too_many_bows:twin_shadows"
+  }
+}

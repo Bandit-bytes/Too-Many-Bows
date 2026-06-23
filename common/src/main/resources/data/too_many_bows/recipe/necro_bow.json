@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SW ",
+    " B ",
+    " WS"
+  ],
+  "key": {
+    "S": "too_many_bows:cursed_stone",
+    "W": "minecraft:wither_skeleton_skull",
+    "B": "minecraft:bow"
+  },
+  "result": {
+    "count": 1,
+    "id": "too_many_bows:necro_flame_bow"
+  }
+}

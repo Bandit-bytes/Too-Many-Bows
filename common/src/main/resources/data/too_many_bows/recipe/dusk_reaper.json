@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "PNP",
+    " F "
+  ],
+  "key": {
+    "S": "too_many_bows:soul_fragment",
+    "P": "minecraft:phantom_membrane",
+    "N": "minecraft:netherite_ingot",
+    "F": "minecraft:bow"
+  },
+  "result": {
+    "count": 1,
+    "id": "too_many_bows:dusk_reaper"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " SA",
+    " B ",
+    "AS "
+  ],
+  "key": {
+    "A": "too_many_bows:power_crystal",
+    "B": "minecraft:bow",
+    "S": "minecraft:emerald"
+  },
+  "result": {
+    "count": 1,
+    "id": "too_many_bows:ancient_sage_bow"
+  }
+}

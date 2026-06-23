@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:arcane_bow"
+    },
+    "title": {
+      "translate": "advancement.too_many_bows.root.title"
+    },
+    "description": {
+      "translate": "advancement.too_many_bows.root.description"
+    },
+    "background": "minecraft:gui/advancements/backgrounds/adventure",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_any_bow": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#too_many_bows:bows"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_any_bow"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
