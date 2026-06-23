@@ -1,7 +1,3 @@
-plugins {
-    id 'com.github.johnrengelman.shadow'
-}
-
 architectury {
     platformSetupLoomIde()
     neoForge()
@@ -67,16 +63,20 @@ processResources {
     }
 }
 
-shadowJar {
-    configurations = [project.configurations.shadowBundle]
-    archiveClassifier = 'dev-shadow'
-}
-
-jar {
-    dependsOn shadowJar
+tasks.named('jar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn configurations.shadowBundle.buildDependencies
 
-    from {
-        zipTree(shadowJar.archiveFile.get().asFile)
+    from({
+        configurations.shadowBundle.collect { dependency ->
+            dependency.isDirectory() ? dependency : zipTree(dependency)
+        }
+    }) {
+        // Keep this platform jar's own manifest and discard signatures
+        // inherited from the transformed common artifact.
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.RSA'
+        exclude 'META-INF/*.DSA'
     }
 }
