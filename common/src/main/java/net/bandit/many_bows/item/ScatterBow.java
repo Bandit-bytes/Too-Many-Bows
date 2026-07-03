@@ -1,5 +1,6 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.compat.OriginsQuiverCompat;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -95,35 +96,56 @@ public class ScatterBow extends ModBowItem {
             return true;
         }
 
-        int removed = 0;
-
-        for (ItemStack invStack : player.getInventory().items) {
-            if (removed >= count) break;
-
-            ItemStack proj = player.getProjectile(invStack);
-            if (proj.isEmpty()) continue;
-
-            int removeAmount = Math.min(proj.getCount(), count - removed);
-            proj.shrink(removeAmount);
-            removed += removeAmount;
-
-            if (proj.isEmpty()) {
-                player.getInventory().removeItem(proj);
-            }
+        if (countArrows(player) < count) {
+            return false;
         }
 
-        return removed >= count;
+        int remaining = count;
+
+        for (int slot = 0;
+             slot < player.getInventory().getContainerSize() && remaining > 0;
+             slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (!isSupportedArrow(stack)) {
+                continue;
+            }
+
+            int amount = Math.min(stack.getCount(), remaining);
+            ItemStack extracted = player.getInventory().removeItem(slot, amount);
+            remaining -= extracted.getCount();
+        }
+
+        if (remaining > 0) {
+            remaining -= OriginsQuiverCompat.consumeProjectiles(
+                    player,
+                    this.getAllSupportedProjectiles(),
+                    remaining
+            );
+        }
+
+        return remaining == 0;
     }
 
     private int countArrows(Player player) {
         int total = 0;
-        for (ItemStack invStack : player.getInventory().items) {
-            ItemStack proj = player.getProjectile(invStack);
-            if (!proj.isEmpty()) {
-                total += proj.getCount();
+
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            if (isSupportedArrow(stack)) {
+                total += stack.getCount();
             }
         }
-        return total;
+
+        return total + OriginsQuiverCompat.countProjectiles(
+                player,
+                this.getAllSupportedProjectiles()
+        );
+    }
+
+    private boolean isSupportedArrow(ItemStack stack) {
+        return !stack.isEmpty()
+                && stack.getItem() instanceof net.minecraft.world.item.ArrowItem
+                && this.getAllSupportedProjectiles().test(stack);
     }
 
     @Override
