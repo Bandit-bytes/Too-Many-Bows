@@ -1,9 +1,7 @@
 package net.bandit.many_bows.fabric.trinkets;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.Trinket;
+import eu.pb4.trinkets.api.TrinketSlotAccess;
+import eu.pb4.trinkets.api.callback.TrinketCallback;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
@@ -15,38 +13,36 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 
-public class DrawSpeedGloveTrinket implements Trinket {
+public class DrawSpeedGloveTrinket implements TrinketCallback {
 
     private static final Identifier DRAW_SPEED_MODIFIER_ID =
             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "glove_draw_speed");
 
     @Override
-    public Multimap<Holder<Attribute>, AttributeModifier> getModifiers(
+    public void forEachTrinketModifier(
             ItemStack stack,
-            SlotReference slot,
+            TrinketSlotAccess slot,
             LivingEntity entity,
-            Identifier slotIdentifier
+            Identifier slotIdentifier,
+            java.util.function.BiConsumer<Holder<Attribute>, AttributeModifier> consumer
     ) {
-        Multimap<Holder<Attribute>, AttributeModifier> map = HashMultimap.create();
-
         Holder<Attribute> holder = entity.level().registryAccess()
                 .lookupOrThrow(Registries.ATTRIBUTE)
                 .get(AttributesRegistry.BOW_DRAW_SPEED.getKey())
                 .orElse(null);
 
-        if (holder == null) return map;
+        if (holder == null) return;
 
         Identifier uniqueId = Identifier.fromNamespaceAndPath(
                 DRAW_SPEED_MODIFIER_ID.getNamespace(),
                 DRAW_SPEED_MODIFIER_ID.getPath() + "/" + slotIdentifier.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(
+        consumer.accept(holder, new AttributeModifier(
                 uniqueId,
                 FabricCompatConfigHolder.get().drawSpeedGloveBonus,
                 AttributeModifier.Operation.ADD_VALUE
         ));
 
-        return map;
     }
 }

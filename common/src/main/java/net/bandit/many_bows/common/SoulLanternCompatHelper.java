@@ -21,16 +21,15 @@ public final class SoulLanternCompatHelper {
         Item soulLantern = ItemRegistry.SOUL_LANTERN.get();
 
         // Fabric / Trinkets
-        if (Platform.isModLoaded("trinkets")) {
+        if (Platform.isModLoaded("trinkets_updated")) {
             try {
-                Class<?> trinketsApiClass = Class.forName("dev.emi.trinkets.api.TrinketsApi");
-                Method getTrinketComponent = trinketsApiClass.getMethod("getTrinketComponent", net.minecraft.world.entity.LivingEntity.class);
+                Class<?> trinketsApiClass = Class.forName("eu.pb4.trinkets.api.TrinketsApi");
+                Method getAttachment = trinketsApiClass.getMethod("getAttachment", net.minecraft.world.entity.LivingEntity.class);
 
-                Object result = getTrinketComponent.invoke(null, player);
-                if (result instanceof Optional<?> optional && optional.isPresent()) {
-                    Object component = optional.get();
-                    Method isEquipped = component.getClass().getMethod("isEquipped", Item.class);
-                    Object equipped = isEquipped.invoke(component, soulLantern);
+                Object attachment = getAttachment.invoke(null, player);
+                if (attachment != null) {
+                    Method isEquipped = attachment.getClass().getMethod("isEquipped", Item.class);
+                    Object equipped = isEquipped.invoke(attachment, soulLantern);
 
                     if (equipped instanceof Boolean b && b) {
                         return true;

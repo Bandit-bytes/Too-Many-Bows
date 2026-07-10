@@ -1,9 +1,7 @@
 package net.bandit.many_bows.fabric.trinkets;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.Trinket;
+import eu.pb4.trinkets.api.TrinketSlotAccess;
+import eu.pb4.trinkets.api.callback.TrinketCallback;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.common.LanternLightHelper;
 import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
@@ -17,20 +15,19 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class CursedLanternTrinket implements Trinket {
+public class CursedLanternTrinket implements TrinketCallback {
 
     private static final Identifier MODIFIER_ID =
             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "cursed_lantern_necro_damage");
 
     @Override
-    public Multimap<Holder<Attribute>, AttributeModifier> getModifiers(
+    public void forEachTrinketModifier(
             ItemStack stack,
-            SlotReference slot,
+            TrinketSlotAccess slot,
             LivingEntity entity,
-            Identifier slotIdentifier
+            Identifier slotIdentifier,
+            java.util.function.BiConsumer<Holder<Attribute>, AttributeModifier> consumer
     ) {
-        Multimap<Holder<Attribute>, AttributeModifier> map = HashMultimap.create();
-
         Holder<Attribute> holder =
                 BuiltInRegistries.ATTRIBUTE.wrapAsHolder(AttributesRegistry.NECRO_BOW_DAMAGE.get());
 
@@ -39,16 +36,15 @@ public class CursedLanternTrinket implements Trinket {
                 MODIFIER_ID.getPath() + "/" + slotIdentifier.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(
+        consumer.accept(holder, new AttributeModifier(
                 uniqueId,
                 FabricCompatConfigHolder.get().cursedLanternNecroDamageBonus,
                 AttributeModifier.Operation.ADD_VALUE
         ));
 
-        return map;
     }
     @Override
-    public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
+    public void tick(ItemStack stack, TrinketSlotAccess slot, LivingEntity entity) {
         if (entity instanceof Player player) {
             LanternLightHelper.ensureLanternLight(
                     player,

@@ -1,8 +1,8 @@
 package net.bandit.many_bows.fabric.client.trinkets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.client.TrinketRenderer;
+import eu.pb4.trinkets.api.TrinketSlotAccess;
+import eu.pb4.trinkets.api.client.TrinketRenderer;
 import net.bandit.many_bows.client.renderer.LanternRenderHelper;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.model.EntityModel;
@@ -14,9 +14,9 @@ import net.minecraft.world.item.ItemStack;
 public class LanternTrinketRenderer implements TrinketRenderer {
 
     @Override
-    public void render(
+    public void submit(
             ItemStack stack,
-            SlotReference slotReference,
+            TrinketSlotAccess slotReference,
             EntityModel<? extends LivingEntityRenderState> contextModel,
             PoseStack poseStack,
             SubmitNodeCollector submitNodeCollector,

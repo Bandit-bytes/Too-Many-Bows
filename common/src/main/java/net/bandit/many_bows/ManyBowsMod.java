@@ -24,7 +24,6 @@ public final class ManyBowsMod {
 
         ModLootModifiers.registerLootModifiers();
 
-        // Preserve the original configuration layout: loot, every bow, and platform accessories.
         ManyBowsConfigHolder.reload();
         BowConfigRegistry.preloadAll();
         PlatformCompatReloadRegistry.preloadAll();

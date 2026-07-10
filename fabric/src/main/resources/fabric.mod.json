@@ -28,6 +28,6 @@
     "java": ">=25",
     "architectury": ">=20.0.7",
     "fabric-api": "*",
-    "trinkets": ">=3.12.0"
+    "trinkets_updated": ">=4.0.0-beta.3"
   }
 }

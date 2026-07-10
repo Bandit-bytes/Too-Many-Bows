@@ -20,23 +20,16 @@ configurations {
 }
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        filter {
-            includeGroup "maven.modrinth"
-        }
+    maven {
+        name = "Nucleoid"
+        url = "https://maven.nucleoid.xyz/releases"
     }
 }
 
 dependencies {
     implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
 
-    implementation "maven.modrinth:trinkets-continued:${rootProject.trinkets_version}"
+    implementation "eu.pb4:trinkets:${rootProject.trinkets_version}"
 
     api "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
     api "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"

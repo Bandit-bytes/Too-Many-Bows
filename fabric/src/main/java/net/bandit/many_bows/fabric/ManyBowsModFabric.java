@@ -1,6 +1,6 @@
 package net.bandit.many_bows.fabric;
 
-import dev.emi.trinkets.api.TrinketsApi;
+import eu.pb4.trinkets.api.callback.TrinketCallback;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
 import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
@@ -18,12 +18,12 @@ public final class ManyBowsModFabric implements ModInitializer {
 
         ManyBowsMod.init();
         ModAttributesFabric.init();
-        TrinketsApi.registerTrinket(ItemRegistry.WIND_GLOVE.get(), new DrawSpeedGloveTrinket());
-        TrinketsApi.registerTrinket(ItemRegistry.SHARPSHOT_RING.get(), new SharpshotRingTrinket());
-        TrinketsApi.registerTrinket(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetTrinket());
-        TrinketsApi.registerTrinket(ItemRegistry.FLETCHERS_TALISMAN.get(), new FletchersTalismanTrinket());
-        TrinketsApi.registerTrinket(ItemRegistry.DEAD_EYES_PENDANT.get(), new DeadEyesPendantTrinket());
-        TrinketsApi.registerTrinket(ItemRegistry.SOUL_LANTERN.get(), new SoulLanternTrinket());
-        TrinketsApi.registerTrinket(ItemRegistry.CURSED_LANTERN.get(), new CursedLanternTrinket());
+        TrinketCallback.setCallback(ItemRegistry.WIND_GLOVE.get(), new DrawSpeedGloveTrinket());
+        TrinketCallback.setCallback(ItemRegistry.SHARPSHOT_RING.get(), new SharpshotRingTrinket());
+        TrinketCallback.setCallback(ItemRegistry.STORMBOUND_SIGNET.get(), new StormboundSignetTrinket());
+        TrinketCallback.setCallback(ItemRegistry.FLETCHERS_TALISMAN.get(), new FletchersTalismanTrinket());
+        TrinketCallback.setCallback(ItemRegistry.DEAD_EYES_PENDANT.get(), new DeadEyesPendantTrinket());
+        TrinketCallback.setCallback(ItemRegistry.SOUL_LANTERN.get(), new SoulLanternTrinket());
+        TrinketCallback.setCallback(ItemRegistry.CURSED_LANTERN.get(), new CursedLanternTrinket());
     }
 }

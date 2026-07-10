@@ -1,9 +1,7 @@
 package net.bandit.many_bows.fabric.trinkets;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.Trinket;
+import eu.pb4.trinkets.api.TrinketSlotAccess;
+import eu.pb4.trinkets.api.callback.TrinketCallback;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.fabric.config.FabricCompatConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
@@ -15,7 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 
-public class SharpshotRingTrinket implements Trinket {
+public class SharpshotRingTrinket implements TrinketCallback {
 
     private static final Identifier MODIFIER_ID =
             Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "sharpshot_ring_bow_damage");
@@ -23,14 +21,13 @@ public class SharpshotRingTrinket implements Trinket {
     // +0.15 => base 1.0 becomes 1.15 (15% more)
 
     @Override
-    public Multimap<Holder<Attribute>, AttributeModifier> getModifiers(
+    public void forEachTrinketModifier(
             ItemStack stack,
-            SlotReference slot,
+            TrinketSlotAccess slot,
             LivingEntity entity,
-            Identifier slotIdentifier
+            Identifier slotIdentifier,
+            java.util.function.BiConsumer<Holder<Attribute>, AttributeModifier> consumer
     ) {
-        Multimap<Holder<Attribute>, AttributeModifier> map = HashMultimap.create();
-
         Holder<Attribute> holder =
                 BuiltInRegistries.ATTRIBUTE.wrapAsHolder(AttributesRegistry.BOW_DAMAGE.get());
 
@@ -39,7 +36,6 @@ public class SharpshotRingTrinket implements Trinket {
                 MODIFIER_ID.getPath() + "/" + slotIdentifier.toString().replace(':', '_')
         );
 
-        map.put(holder, new AttributeModifier(uniqueId, FabricCompatConfigHolder.get().sharpshotRingBonus, AttributeModifier.Operation.ADD_VALUE));
-        return map;
+        consumer.accept(holder, new AttributeModifier(uniqueId, FabricCompatConfigHolder.get().sharpshotRingBonus, AttributeModifier.Operation.ADD_VALUE));
     }
 }

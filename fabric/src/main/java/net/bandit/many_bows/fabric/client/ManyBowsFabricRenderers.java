@@ -1,6 +1,6 @@
 package net.bandit.many_bows.fabric.client;
 
-import dev.emi.trinkets.api.client.TrinketRendererRegistry;
+import eu.pb4.trinkets.api.client.TrinketRendererRegistry;
 import net.bandit.many_bows.fabric.client.trinkets.LanternTrinketRenderer;
 import net.bandit.many_bows.registry.ItemRegistry;
 
