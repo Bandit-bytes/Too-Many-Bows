@@ -5,6 +5,7 @@ import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.chicken.Chicken;
 import net.minecraft.world.entity.animal.cow.Cow;
@@ -90,18 +91,18 @@ public class HunterArrow extends AbstractArrow {
     private boolean isSupportedMob(LivingEntity entity, HunterBowConfig config) {
         EntityType<?> t = entity.getType();
 
-        return (config.affect_cows && t == EntityType.COW)
-                || (config.affect_pigs && t == EntityType.PIG)
-                || (config.affect_sheep && t == EntityType.SHEEP)
-                || (config.affect_chickens && t == EntityType.CHICKEN)
-                || (config.affect_rabbits && t == EntityType.RABBIT);
+        return (config.affect_cows && t == EntityTypes.COW)
+                || (config.affect_pigs && t == EntityTypes.PIG)
+                || (config.affect_sheep && t == EntityTypes.SHEEP)
+                || (config.affect_chickens && t == EntityTypes.CHICKEN)
+                || (config.affect_rabbits && t == EntityTypes.RABBIT);
     }
 
     private void improveDrops(ServerLevel serverLevel, LivingEntity entity, HunterBowConfig config) {
         RandomSource rng = serverLevel.getRandom();
         boolean cooked = entity.isOnFire();
 
-        if (entity.getType() == EntityType.COW && entity instanceof Cow) {
+        if (entity.getType() == EntityTypes.COW && entity instanceof Cow) {
             int beef = randomRange(rng, config.cow_beef_min, config.cow_beef_max);
             int leather = randomRange(rng, config.cow_leather_min, config.cow_leather_max);
 
@@ -112,14 +113,14 @@ public class HunterArrow extends AbstractArrow {
                 entity.spawnAtLocation(serverLevel, new ItemStack(Items.LEATHER, leather));
             }
 
-        } else if (entity.getType() == EntityType.PIG && entity instanceof Pig) {
+        } else if (entity.getType() == EntityTypes.PIG && entity instanceof Pig) {
             int pork = randomRange(rng, config.pig_pork_min, config.pig_pork_max);
 
             if (pork > 0) {
                 entity.spawnAtLocation(serverLevel, new ItemStack(cooked ? Items.COOKED_PORKCHOP : Items.PORKCHOP, pork));
             }
 
-        } else if (entity.getType() == EntityType.SHEEP && entity instanceof Sheep sheep) {
+        } else if (entity.getType() == EntityTypes.SHEEP && entity instanceof Sheep sheep) {
             int mutton = randomRange(rng, config.sheep_mutton_min, config.sheep_mutton_max);
 
             if (mutton > 0) {
@@ -133,7 +134,7 @@ public class HunterArrow extends AbstractArrow {
                 }
             }
 
-        } else if (entity.getType() == EntityType.CHICKEN && entity instanceof Chicken) {
+        } else if (entity.getType() == EntityTypes.CHICKEN && entity instanceof Chicken) {
             int meat = randomRange(rng, config.chicken_meat_min, config.chicken_meat_max);
             int feathers = randomRange(rng, config.chicken_feather_min, config.chicken_feather_max);
 
@@ -144,7 +145,7 @@ public class HunterArrow extends AbstractArrow {
                 entity.spawnAtLocation(serverLevel, new ItemStack(Items.FEATHER, feathers));
             }
 
-        } else if (entity.getType() == EntityType.RABBIT && entity instanceof Rabbit) {
+        } else if (entity.getType() == EntityTypes.RABBIT && entity instanceof Rabbit) {
             int meat = randomRange(rng, config.rabbit_meat_min, config.rabbit_meat_max);
             int hide = randomRange(rng, config.rabbit_hide_min, config.rabbit_hide_max);
 
@@ -167,24 +168,7 @@ public class HunterArrow extends AbstractArrow {
     }
 
     private Block woolFor(DyeColor color) {
-        return switch (color) {
-            case WHITE -> Blocks.WHITE_WOOL;
-            case ORANGE -> Blocks.ORANGE_WOOL;
-            case MAGENTA -> Blocks.MAGENTA_WOOL;
-            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_WOOL;
-            case YELLOW -> Blocks.YELLOW_WOOL;
-            case LIME -> Blocks.LIME_WOOL;
-            case PINK -> Blocks.PINK_WOOL;
-            case GRAY -> Blocks.GRAY_WOOL;
-            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_WOOL;
-            case CYAN -> Blocks.CYAN_WOOL;
-            case PURPLE -> Blocks.PURPLE_WOOL;
-            case BLUE -> Blocks.BLUE_WOOL;
-            case BROWN -> Blocks.BROWN_WOOL;
-            case GREEN -> Blocks.GREEN_WOOL;
-            case RED -> Blocks.RED_WOOL;
-            case BLACK -> Blocks.BLACK_WOOL;
-        };
+        return Blocks.WOOL.pick(color);
     }
 
     private static ItemStack safeArrowStack(ItemStack arrowStack) {

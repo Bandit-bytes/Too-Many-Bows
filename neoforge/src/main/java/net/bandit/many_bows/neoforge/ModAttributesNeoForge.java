@@ -7,6 +7,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
@@ -44,10 +45,10 @@ public class ModAttributesNeoForge {
                 )
         );
 
-        event.add(EntityType.PLAYER, bowDamage);
-        event.add(EntityType.PLAYER, bowDrawSpeed);
-        event.add(EntityType.PLAYER, bowCritChance);
-        event.add(EntityType.PLAYER, gravewireBowDamage);
-        event.add(EntityType.PLAYER, necroBowDamage);
+        event.add(EntityTypes.PLAYER, bowDamage);
+        event.add(EntityTypes.PLAYER, bowDrawSpeed);
+        event.add(EntityTypes.PLAYER, bowCritChance);
+        event.add(EntityTypes.PLAYER, gravewireBowDamage);
+        event.add(EntityTypes.PLAYER, necroBowDamage);
     }
 }

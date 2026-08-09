@@ -82,14 +82,18 @@ public class SonicBoomProjectile extends AbstractArrow {
 
         float finalDamage = damage * this.powerMultiplier * config.final_damage_multiplier;
 
+        var sonicDamageSource = damageSources().sonicBoom(this);
+
         if (finalDamage > 0.0F) {
-            target.hurt(damageSources().sonicBoom(this), finalDamage);
+            target.hurt(sonicDamageSource, finalDamage);
         }
 
         target.knockback(
                 config.knockback_strength,
                 Math.sin(this.getYRot() * Math.PI / 180.0F),
-                -Math.cos(this.getYRot() * Math.PI / 180.0F)
+                -Math.cos(this.getYRot() * Math.PI / 180.0F),
+                sonicDamageSource,
+                finalDamage
         );
 
         level().playSound(

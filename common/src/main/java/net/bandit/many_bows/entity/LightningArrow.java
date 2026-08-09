@@ -6,6 +6,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
@@ -78,7 +79,7 @@ public class LightningArrow extends AbstractArrow {
     private void summonLightning(double x, double y, double z) {
         if (!(level() instanceof ServerLevel serverLevel)) return;
 
-        LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, serverLevel);
+        LightningBolt bolt = new LightningBolt(EntityTypes.LIGHTNING_BOLT, serverLevel);
         bolt.setPos(x, y, z);
 
         if (this.getOwner() instanceof ServerPlayer player) {
