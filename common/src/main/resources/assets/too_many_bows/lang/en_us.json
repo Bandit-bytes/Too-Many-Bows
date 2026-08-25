@@ -242,6 +242,7 @@
   "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets.",
   "item.too_many_bows.torchbearer_bow": "Torchbearer Bow",
   "item.too_many_bows.torchbearer": "Torchbearer",
+  "items.too_many_bows.torchbearer_bow.tooltip": "Light the way..",
   "attribute.too_many_bows.bow_draw_speed": "Bow Draw Speed",
   "attribute.too_many_bows.bow_damage": "Bow Damage",
   "attribute.too_many_bows.bow_crit_chance": "Bow Crit Chance",
