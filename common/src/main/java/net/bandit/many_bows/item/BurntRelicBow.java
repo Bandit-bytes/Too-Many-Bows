@@ -31,51 +31,67 @@ public class BurntRelicBow extends ModBowItem {
 
     @Override
     public boolean releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
-       try{
-           if (!(entity instanceof Player player)) return false;
+        try {
+            if (!(entity instanceof Player player)) {
+                return false;
+            }
 
+            ItemStack foundAmmo = player.getProjectile(bowStack);
 
-        ItemStack ammoInInv = player.getProjectile(bowStack);
-        if (ammoInInv.isEmpty() && !player.hasInfiniteMaterials()) {
-            return false;
-        }
+            ItemStack ammo = foundAmmo.isEmpty()
+                    ? new ItemStack(Items.ARROW)
+                    : foundAmmo.copyWithCount(1);
 
-        int charge = this.getUseDuration(bowStack, entity) - chargeTime;
+            int charge = this.getUseDuration(bowStack, entity) - chargeTime;
 
-        float mult = this.manybows$getChargeMultiplier(bowStack, entity);
-        int scaledCharge = Math.max(0, (int) (charge * mult));
+            float mult = this.manybows$getChargeMultiplier(bowStack, entity);
+            int scaledCharge = Math.max(0, (int) (charge * mult));
 
-        float power = getPowerForTime(scaledCharge);
-        if (power < 0.1F) return false;
+            float power = getPowerForTime(scaledCharge);
+            if (power < 0.1F) {
+                return false;
+            }
 
-        List<ItemStack> projectiles = ProjectileWeaponItem.draw(bowStack, ammoInInv, player);
-        if (projectiles.isEmpty()) return false;
+            List<ItemStack> projectiles =
+                    ProjectileWeaponItem.draw(bowStack, ammo, player);
 
-        if (level instanceof ServerLevel serverLevel) {
-            this.shoot(
-                    serverLevel,
-                    player,
-                    player.getUsedItemHand(),
-                    bowStack,
-                    projectiles,
-                    power * BurntRelicBowConfig.get().projectile_velocity,
+            if (projectiles.isEmpty()) {
+                return false;
+            }
+
+            if (level instanceof ServerLevel serverLevel) {
+                this.shoot(
+                        serverLevel,
+                        player,
+                        player.getUsedItemHand(),
+                        bowStack,
+                        projectiles,
+                        power * BurntRelicBowConfig.get().projectile_velocity,
+                        1.0F,
+                        power == 1.0F,
+                        null
+                );
+            }
+
+            level.playSound(
+                    null,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    SoundEvents.ARROW_SHOOT,
+                    SoundSource.PLAYERS,
                     1.0F,
-                    power == 1.0F,
-                    null
+                    1.0F
             );
+
+            player.awardStat(Stats.ITEM_USED.get(this));
+            return true;
+
+        } finally {
+            if (level.isClientSide()) {
+                this.manybows$resetPullVisual(bowStack);
+            }
         }
-
-        level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS,
-                1.0F, 1.0F);
-
-        player.awardStat(Stats.ITEM_USED.get(this));
-        return true;
-    }finally {
-           if (level.isClientSide()) {
-               this.manybows$resetPullVisual(bowStack);
-           }
-       }
     }
 
     @Override
@@ -118,7 +134,7 @@ public class BurntRelicBow extends ModBowItem {
 
     @Override
     public Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true;
+        return ProjectileWeaponItem.ARROW_ONLY;
     }
 
     @Override
@@ -133,16 +149,10 @@ public class BurntRelicBow extends ModBowItem {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        ItemStack bowStack = player.getItemInHand(hand);
-        boolean hasArrows = !player.getProjectile(bowStack).isEmpty();
-
-        if (!player.hasInfiniteMaterials() && !hasArrows) {
-            return InteractionResult.FAIL;
-        }
-
         player.startUsingItem(hand);
         return InteractionResult.CONSUME;
     }
+
 
     @Override
     public int getDefaultProjectileRange() {
