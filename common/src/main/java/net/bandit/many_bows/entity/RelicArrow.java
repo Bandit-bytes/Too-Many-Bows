@@ -5,6 +5,7 @@ import net.bandit.many_bows.relic.*;
 
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
+import net.bandit.many_bows.registry.RelicParticleRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -31,8 +32,10 @@ public class RelicArrow extends AbstractArrow {
     private RelicBow.Kind kind = RelicBow.Kind.EVENTIDE;
     private boolean ready, perfect, empowered, airborne, impact;
     private int age, phase, trialShot;
+    private double visualDominance;
     private UUID targetId, bowId;
     private Vec3 origin = Vec3.ZERO;
+    private final Map<Integer, Vec3> fallingStarDestinations = new HashMap<>();
     private final Set<UUID> hit = new HashSet<>();
 
     public RelicArrow(EntityType<? extends RelicArrow> type, Level level) {
@@ -59,6 +62,9 @@ public class RelicArrow extends AbstractArrow {
         this.origin = origin;
         this.airborne = airborne;
         this.trialShot = shot;
+        visualDominance = kind == RelicBow.Kind.WORLDEATER
+                ? Math.min(1, RelicData.read(bow()).getInt("Dominance")
+                        / (double) Math.max(1, RelicConfig.get().maxDominance)) : 0;
     }
 
     private ItemStack bow() {
@@ -154,12 +160,16 @@ public class RelicArrow extends AbstractArrow {
                 target.hurt(level().damageSources().arrow(this, getOwner()), damage * (1 - bypass));
                 if (alive && !target.isAlive()) killed(target);
             }
+            RelicCombatEffects.fracture(server, result.getLocation(), stacks);
             server.sendParticles(headshot ? ParticleTypes.CRIT : ParticleTypes.ENCHANTED_HIT, target.getX(), result.getLocation().y, target.getZ(), 25, 0.25, 0.25, 0.25, 0.1);
             server.playSound(null, target.blockPosition(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.5f, 1.6f);
             if (hit.size() >= 5) discard();
             return;
         }
 
+        if (kind == RelicBow.Kind.GODSPLITTER) {
+            RelicCombatEffects.fracture(server, result.getLocation(), 0);
+        }
         boolean alive = target.isAlive();
         // Delay removal for ability carriers: vanilla arrows discard on ordinary entity impact.
         setRelicPiercing((byte)1);
@@ -182,6 +192,9 @@ public class RelicArrow extends AbstractArrow {
     @Override
     protected void onHitBlock(BlockHitResult result) {
         super.onHitBlock(result);
+        if (level() instanceof ServerLevel server && kind == RelicBow.Kind.GODSPLITTER) {
+            RelicCombatEffects.fracture(server, result.getLocation(), perfect ? 2 : 0);
+        }
 
         if (ready && kind == RelicBow.Kind.WORLDEATER) startImpact();
         else { resetPrecision(); if (kind == RelicBow.Kind.BLUNTED) RelicQuests.trialMiss(bow(), trialShot); }
@@ -237,31 +250,87 @@ public class RelicArrow extends AbstractArrow {
             for (Projectile other : server.getEntitiesOfClass(Projectile.class, getBoundingBox().inflate(0.6))) if (other != this && other.getOwner() != getOwner() && other instanceof AbstractArrow) other.discard();
             if (age % 2 == 0) { server.sendParticles(ParticleTypes.DRAGON_BREATH, getX(), getY(), getZ(), 5, 0.2, 0.2, 0.2, 0.01); wings(server, position(), direction, empowered ? 3 : 1); }
         }
+        if (!inGround) {
+            if (kind == RelicBow.Kind.GODSPLITTER) {
+                RelicCombatEffects.precisionTrail(server, position(), getDeltaMovement(), perfect);
+            } else if (kind == RelicBow.Kind.WORLDEATER) {
+                RelicCombatEffects.worldTrail(server, position(), getDeltaMovement(),
+                        age, visualDominance, empowered);
+            }
+        }
+        if (kind == RelicBow.Kind.EVENTIDE && !inGround) {
+            Vec3 motion = getDeltaMovement();
+            if (motion.lengthSqr() > 0.01) {
+                // Interpolate along this tick's path, rather than isolated dots at the arrow.
+                for (int i = 0; i < 3; i++) {
+                    Vec3 point = position().add(motion.scale(i / 3.0));
+                    CelestialEffects.send(server,
+                            i == 0 ? RelicParticleRegistry.ANGEL_TRAIL.get()
+                                    : RelicParticleRegistry.FALLING_STAR.get(),
+                            point, i == 0 ? motion : Vec3.ZERO, 96);
+                }
+            }
+        }
         super.tick();
     }
 
     private void starfall(ServerLevel server) {
         Entity entity = targetId == null ? null : server.getEntity(targetId);
         if (entity != null) setPos(entity.position());
-        if (phase % 5 == 0) server.sendParticles(ParticleTypes.ENCHANT, getX(), getY() + 3, getZ(), 12, 0.6, 0.2, 0.6, 0);
+
         int delay = Math.max(10, Math.min(100, RelicConfig.get().starfallDelayTicks));
-        if (phase >= delay && (phase - delay) % 8 == 0) {
-            int lance = (phase - delay) / 8;
-            if (lance >= 5) { discard(); return; }
-            Vec3 strike = position().add(Math.cos(lance * 1.3) * 1.5, 0, Math.sin(lance * 1.3) * 1.5);
-            beam(server, strike.add(0, 18, 0), strike, ParticleTypes.END_ROD);
-            server.sendParticles(ParticleTypes.EXPLOSION, strike.x, strike.y, strike.z, 5, 1, 0.2, 1, 0);
-            server.playSound(null, blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.PLAYERS, 0.6f, 1.5f);
+        if (phase % 5 == 0 && phase < delay) {
+            server.sendParticles(RelicParticleRegistry.FALLING_STAR.get(),
+                    getX(), getY() + 2, getZ(), 3, 0.8, 0.4, 0.8, 0.02);
+        }
+
+        // Schedule each descending core twelve ticks before its damage pulse.
+        // Even a ten-tick configured delay has a visible descent.
+        for (int lance = 0; lance < 5; lance++) {
+            int impactTick = delay + lance * 8;
+            int launchTick = Math.max(1, impactTick - 12);
+            if (phase == launchTick) {
+                Vec3 strike = position().add(
+                        Math.cos(lance * 1.3) * 1.5, 0,
+                        Math.sin(lance * 1.3) * 1.5);
+                fallingStarDestinations.put(lance, strike);
+                int flightTicks = impactTick - launchTick;
+                double height = flightTicks * 1.5;
+                // count=0 transmits an exact velocity through the particle packet.
+                CelestialEffects.send(server, RelicParticleRegistry.FALLING_STAR.get(),
+                        strike.add(0, height, 0), new Vec3(0, -1.5, flightTicks), 128);
+            }
+
+            if (phase != impactTick) continue;
+            Vec3 strike = fallingStarDestinations.remove(lance);
+            if (strike == null) {
+                // Restored arrows can resume their damage sequence without stored visuals.
+                strike = position().add(Math.cos(lance * 1.3) * 1.5, 0,
+                        Math.sin(lance * 1.3) * 1.5);
+            }
+            server.sendParticles(RelicParticleRegistry.FALLING_STAR.get(),
+                    strike.x, strike.y + 0.4, strike.z,
+                    18, 0.6, 0.3, 0.6, 0.15);
+            server.sendParticles(ParticleTypes.EXPLOSION,
+                    strike.x, strike.y, strike.z, 2, 0.4, 0.2, 0.4, 0);
+            server.playSound(null, blockPosition(), SoundEvents.LIGHTNING_BOLT_THUNDER,
+                    SoundSource.PLAYERS, 0.6F, 1.5F);
             for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class,
                     new AABB(strike, strike).inflate(3))) {
-                float extra = lance == 4 ? Math.min(100, target.getMaxHealth() * Math.max(0, RelicConfig.get().finalMaxHealthFraction) * (1 + RelicData.read(bow()).getInt("Alignment") * 0.15f)) : 0;
+                float extra = lance == 4
+                        ? Math.min(100, target.getMaxHealth()
+                        * Math.max(0, RelicConfig.get().finalMaxHealthFraction)
+                        * (1 + RelicData.read(bow()).getInt("Alignment") * 0.15F))
+                        : 0;
                 deal(target, RelicConfig.get().lanceDamage + extra);
             }
         }
+        if (phase >= delay + 40) discard();
     }
 
     private void dragonfire(ServerLevel server) {
         if (phase == 1) {
+            RelicCombatEffects.worldImpact(server, position(), empowered);
             Vec3 from = origin.add(0, 2, 0), to = position().add(0, 1, 0);
             Vec3 delta = to.subtract(from); if (delta.length() > 64) from = to.subtract(delta.normalize().scale(64));
             beam(server, from, to, ParticleTypes.DRAGON_BREATH);
@@ -299,7 +368,7 @@ public class RelicArrow extends AbstractArrow {
 
     @Override
     public void addAdditionalSaveData(CompoundTag t) {
-        super.addAdditionalSaveData(t); t.putInt("RelicKind", kind.ordinal()); t.putBoolean("Ready", ready);
+        super.addAdditionalSaveData(t); t.putDouble("VisualDominance", visualDominance); t.putInt("RelicKind", kind.ordinal()); t.putBoolean("Ready", ready);
         t.putBoolean("Perfect", perfect); t.putBoolean("Empowered", empowered); t.putBoolean("Airborne", airborne);
         t.putBoolean("Impact", impact); t.putInt("RelicAge", age); t.putInt("RelicPhase", phase); t.putInt("TrialShot", trialShot);
         t.putDouble("OriginX", origin.x); t.putDouble("OriginY", origin.y); t.putDouble("OriginZ", origin.z);
@@ -309,7 +378,8 @@ public class RelicArrow extends AbstractArrow {
 
     @Override
     public void readAdditionalSaveData(CompoundTag t) {
-        super.readAdditionalSaveData(t); kind = RelicBow.Kind.values()[Math.max(0, Math.min(3, t.getInt("RelicKind")))];
+        super.readAdditionalSaveData(t);
+        visualDominance = Math.max(0, Math.min(1, t.getDouble("VisualDominance"))); kind = RelicBow.Kind.values()[Math.max(0, Math.min(3, t.getInt("RelicKind")))];
         ready = t.getBoolean("Ready"); perfect = t.getBoolean("Perfect"); empowered = t.getBoolean("Empowered"); airborne = t.getBoolean("Airborne");
         impact = t.getBoolean("Impact"); age = t.getInt("RelicAge"); phase = t.getInt("RelicPhase"); trialShot = t.getInt("TrialShot");
         origin = new Vec3(t.getDouble("OriginX"), t.getDouble("OriginY"), t.getDouble("OriginZ"));

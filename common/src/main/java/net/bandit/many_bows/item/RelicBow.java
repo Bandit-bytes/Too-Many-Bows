@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.entity.RelicArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.bandit.many_bows.relic.RelicConfig;
+import net.bandit.many_bows.relic.RelicCombatEffects;
 import net.bandit.many_bows.relic.RelicData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -65,17 +66,18 @@ public class RelicBow extends ModBowItem {
             ItemStack stack,
             int remaining
     ) {
-        if (kind != Kind.GODSPLITTER
-                || !(entity instanceof Player player)
-                || level.isClientSide) {
+        if (!(entity instanceof Player player) || !(level instanceof ServerLevel server)) return;
+        int elapsed = getUseDuration(stack, entity) - remaining;
+        if (kind == Kind.WORLDEATER) {
+            double dominance = Math.min(1, RelicData.read(stack).getInt("Dominance")
+                    / (double) Math.max(1, RelicConfig.get().maxDominance));
+            RelicCombatEffects.worldCharge(server, player, elapsed, dominance);
             return;
         }
-
-        int elapsed = getUseDuration(stack, entity) - remaining;
+        if (kind != Kind.GODSPLITTER) return;
         Vec3 aim = entity.getLookAngle();
         AimState state = aimingPlayers.get(player);
 
-        // Reset when a different bow is used or a new draw begins.
         if (state == null
                 || state.bow != stack
                 || elapsed != state.lastElapsed + 1) {
@@ -88,10 +90,12 @@ public class RelicBow extends ModBowItem {
         if (elapsed < 20 || aim.dot(state.referenceAim) <= 0.99985) {
             state.steadyTicks = 0;
             state.referenceAim = aim;
+            RelicCombatEffects.precisionCharge(server, player, elapsed, 0);
             return;
         }
 
         state.steadyTicks++;
+        RelicCombatEffects.precisionCharge(server, player, elapsed, state.steadyTicks);
 
         if (state.steadyTicks == 30) {
             player.displayClientMessage(

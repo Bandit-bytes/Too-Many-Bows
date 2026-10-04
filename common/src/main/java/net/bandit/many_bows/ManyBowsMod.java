@@ -22,6 +22,7 @@ public final class ManyBowsMod {
         EffectRegistry.register();
         AttributesRegistry.register();
         SoundRegistry.register();
+        RelicParticleRegistry.register();
         ModLootModifiers.registerLootModifiers();
         net.bandit.many_bows.relic.RelicQuests.init();
 

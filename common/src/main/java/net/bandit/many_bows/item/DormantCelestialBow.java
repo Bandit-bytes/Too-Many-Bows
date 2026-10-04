@@ -1,6 +1,8 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.registry.ItemRegistry;
+import net.bandit.many_bows.registry.RelicParticleRegistry;
+import net.bandit.many_bows.relic.CelestialEffects;
 import net.bandit.many_bows.relic.RelicData;
 import net.bandit.many_bows.relic.RelicQuests;
 import net.minecraft.core.BlockPos;
@@ -11,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
@@ -112,6 +115,7 @@ public class DormantCelestialBow extends BowItem {
 
         RelicData.edit(bow, data -> {
             data.putBoolean("StarCalled", true);
+            data.putLong("StarVisualTime", level.getGameTime());
             data.putInt("StarX", destination.getX());
             data.putInt("StarY", destination.getY());
             data.putInt("StarZ", destination.getZ());
@@ -126,7 +130,27 @@ public class DormantCelestialBow extends BowItem {
                 )
         );
 
+        CelestialEffects.ritual(server, player, Vec3.atBottomCenterOf(destination));
         RelicQuests.award(player, "something_answered");
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        super.inventoryTick(stack, level, entity, slot, selected);
+        if (!(level instanceof ServerLevel server) || !(entity instanceof ServerPlayer player)
+                || !selected || level.dimension() != Level.OVERWORLD
+                || level.getGameTime() % 40 != 0) return;
+        var data = RelicData.read(stack);
+        if (!data.getBoolean("StarCalled")) return;
+        Vec3 landing = new Vec3(data.getInt("StarX") + 0.5,
+                data.getInt("StarY"), data.getInt("StarZ") + 0.5);
+        // Delay the landing marker until the comet has completed its five-second descent.
+        if (data.contains("StarVisualTime")
+                && level.getGameTime() - data.getLong("StarVisualTime") < 100) return;
+        if (player.position().distanceToSqr(landing) <= 512 * 512) {
+            CelestialEffects.sendTo(server, player, RelicParticleRegistry.STAR_BEACON.get(),
+                    landing, Vec3.ZERO);
+        }
     }
 
     @Override
