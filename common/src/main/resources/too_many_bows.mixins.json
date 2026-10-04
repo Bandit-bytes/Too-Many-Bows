@@ -1,14 +1,18 @@
 {
   "required": true,
   "package": "net.bandit.many_bows.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "minVersion": "0.8",
   "client": [
+    "RelicModelBoundsMixin"
   ],
   "mixins": [
     "AbstractArrowAccessor",
     "EntityWaterExtinguishMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "RelicArrowInvoker",
+    "RelicPlayerMixin",
+    "RelicDragonMixin"
   ],
   "injectors": {
     "defaultRequire": 1

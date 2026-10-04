@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:dormant_celestial_bow"
+    },
+    "title": "Something Answered",
+    "description": "Call a Falling Star at midnight.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "too_many_bows:relic/root"
+}

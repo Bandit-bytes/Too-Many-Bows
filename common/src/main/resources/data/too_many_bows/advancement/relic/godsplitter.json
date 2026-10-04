@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:godsplitter"
+    },
+    "title": "A Steady Hand",
+    "description": "Restore Godsplitter through all three trials.",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "too_many_bows:relic/trial_3"
+}

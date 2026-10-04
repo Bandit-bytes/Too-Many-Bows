@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "too_many_bows:celestial_limb",
+    "too_many_bows:celestial_string",
+    "too_many_bows:celestial_grip"
+  ],
+  "result": {
+    "id": "too_many_bows:dormant_celestial_bow",
+    "count": 1
+  }
+}

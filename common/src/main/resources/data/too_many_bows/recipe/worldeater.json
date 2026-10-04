@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "too_many_bows:heart_of_the_wyrm",
+    "minecraft:bow",
+    "minecraft:dragon_breath"
+  ],
+  "result": {
+    "id": "too_many_bows:worldeater",
+    "count": 1
+  }
+}

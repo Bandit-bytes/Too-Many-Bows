@@ -294,6 +294,12 @@ public class EntityRegistry {
                                     Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "hoarded_skull")
                             )));
 
+    public static final RegistrySupplier<EntityType<RelicArrow>> RELIC_ARROW =
+            ENTITY_TYPES.register("relic_arrow", () -> EntityType.Builder.<RelicArrow>of(RelicArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F).clientTrackingRange(8).updateInterval(1)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE,
+                            Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "relic_arrow"))));
+
     public static void register() {
         ENTITY_TYPES.register();
     }

@@ -11,6 +11,7 @@ public final class ManyBowsClient {
     }
 
     public static void init() {
+        EntityRendererRegistry.register(() -> EntityRegistry.RELIC_ARROW.get(), RelicArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DRAGONS_BREATH_ARROW.get(), DragonsBreathArrowRenderer::new);
