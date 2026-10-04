@@ -23,6 +23,7 @@ public final class ManyBowsMod {
         AttributesRegistry.register();
         SoundRegistry.register();
         ModLootModifiers.registerLootModifiers();
+        net.bandit.many_bows.relic.RelicQuests.init();
 
         CommandRegistrationEvent.EVENT.register(TmbCommands::register);
 

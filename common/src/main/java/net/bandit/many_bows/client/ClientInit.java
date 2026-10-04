@@ -1,4 +1,6 @@
 package net.bandit.many_bows.client;
+import net.bandit.many_bows.item.RelicBow;
+import net.bandit.many_bows.item.DormantCelestialBow;
 
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
@@ -26,6 +28,11 @@ public class ClientInit {
     public static void registerClientProperties() {
         // Bows
         List<Item> bows = List.of(
+                ItemRegistry.EVENTIDE.get(),
+                ItemRegistry.WORLDEATER.get(),
+                ItemRegistry.GODSPLITTER.get(),
+                ItemRegistry.BLUNTED_EDGE.get(),
+                ItemRegistry.DORMANT_CELESTIAL_BOW.get(),
                 ItemRegistry.ARCANE_BOW.get(),
                 ItemRegistry.SOLAR_BOW.get(),
                 ItemRegistry.FROSTBITE.get(),
@@ -83,8 +90,10 @@ public class ClientInit {
                         basePullTicks = psi.getPullTicks(stack, entity);
                     }
 
+                    boolean relicDraw = item instanceof net.bandit.many_bows.item.RelicBow || item instanceof net.bandit.many_bows.item.DormantCelestialBow;
+                    if (relicDraw) basePullTicks = 20.0F;
                     float drawSpeed = 1.0F;
-                    if (entity instanceof LivingEntity living) {
+                    if (!relicDraw && entity instanceof LivingEntity living) {
                         AttributeInstance inst = living.getAttribute(BOW_DRAW_SPEED_HOLDER);
                         if (inst != null) {
                             drawSpeed = (float) inst.getValue();
@@ -113,6 +122,7 @@ public class ClientInit {
 
 
     public static void registerEntityRenderers() {
+        EntityRendererRegistry.register(() -> EntityRegistry.RELIC_ARROW.get(), RelicArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.FROSTBITE_ARROW.get(), FrostbiteArrowRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.SONIC_BOOM_PROJECTILE.get(), SonicBoomProjectileRenderer::new);
         EntityRendererRegistry.register(() -> EntityRegistry.DRAGONS_BREATH_ARROW.get(), DragonsBreathArrowRenderer::new);

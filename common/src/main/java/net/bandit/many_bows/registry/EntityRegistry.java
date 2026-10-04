@@ -1,4 +1,5 @@
 package net.bandit.many_bows.registry;
+import net.bandit.many_bows.entity.RelicArrow;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -16,6 +17,8 @@ import static net.bandit.many_bows.ManyBowsMod.MOD_ID;
 public class EntityRegistry {
 
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(MOD_ID, Registries.ENTITY_TYPE);
+
+    public static final RegistrySupplier<EntityType<net.bandit.many_bows.entity.RelicArrow>> RELIC_ARROW = ENTITY_TYPES.register("relic_arrow", () -> EntityType.Builder.<net.bandit.many_bows.entity.RelicArrow>of(net.bandit.many_bows.entity.RelicArrow::new, MobCategory.MISC).sized(0.5f, 0.5f).clientTrackingRange(8).updateInterval(1).build("too_many_bows:relic_arrow"));
 
     public static final RegistrySupplier<EntityType<FrostbiteArrow>> FROSTBITE_ARROW = ENTITY_TYPES.register("frostbite_arrow",
             () -> EntityType.Builder.<FrostbiteArrow>of(FrostbiteArrow::new, MobCategory.MISC)

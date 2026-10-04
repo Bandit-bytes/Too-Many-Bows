@@ -5,11 +5,17 @@
   "minVersion": "0.8",
   "client": [
     "LevelRendererMixin",
-    "PlayerRendererMixin"
+    "PlayerRendererMixin",
+    "RelicTooltipMixin",
+    "RelicModelRotationMixin",
+    "RelicTooltipBackgroundMixin"
   ],
   "mixins": [
     "EntityWaterExtinguishMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "RelicPlayerMixin",
+    "RelicDragonMixin",
+    "RelicArrowInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

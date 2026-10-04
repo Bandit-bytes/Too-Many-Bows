@@ -7,6 +7,7 @@ import java.util.List;
 public final class BowConfigRegistry {
 
     private static final List<ConfigEntry<?>> ENTRIES = List.of(
+            new ConfigEntry<>("forbidden_three", net.bandit.many_bows.relic.RelicConfig.class, net.bandit.many_bows.relic.RelicConfig::new),
             new ConfigEntry<>("aethers_call", AethersCallBowConfig.class, AethersCallBowConfig::new),
             new ConfigEntry<>("ancient_sage_bow", AncientSageBowConfig.class, AncientSageBowConfig::new),
             new ConfigEntry<>("arcane_bow", ArcaneBowConfig.class, ArcaneBowConfig::new),

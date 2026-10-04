@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:blunted_edge"
+    },
+    "title": "Beyond the Horizon",
+    "description": "Kill a hostile mob from at least 100 blocks.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "too_many_bows:relic/root"
+}

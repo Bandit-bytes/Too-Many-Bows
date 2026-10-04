@@ -1,0 +1,19 @@
+{
+  "display": {
+    "icon": {
+      "id": "too_many_bows:blunted_edge"
+    },
+    "title": "Three Without Failure",
+    "description": "Three consecutive arrows. Three hostile kills.",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "parent": "too_many_bows:relic/trial_1"
+}

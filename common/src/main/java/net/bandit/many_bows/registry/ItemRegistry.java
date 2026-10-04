@@ -1,4 +1,7 @@
 package net.bandit.many_bows.registry;
+import net.bandit.many_bows.item.RelicBow;
+import net.bandit.many_bows.item.DormantCelestialBow;
+import net.bandit.many_bows.item.WyrmEffigy;
 
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
@@ -14,6 +17,17 @@ import net.minecraft.world.item.enchantment.Enchantments;
 public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ManyBowsMod.MOD_ID, Registries.ITEM);
 
+
+    public static final RegistrySupplier<Item> EVENTIDE = ITEMS.register("eventide", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.EVENTIDE));
+    public static final RegistrySupplier<Item> WORLDEATER = ITEMS.register("worldeater", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.WORLDEATER));
+    public static final RegistrySupplier<Item> GODSPLITTER = ITEMS.register("godsplitter", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.GODSPLITTER));
+    public static final RegistrySupplier<Item> BLUNTED_EDGE = ITEMS.register("blunted_edge", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.BLUNTED));
+    public static final RegistrySupplier<Item> DORMANT_CELESTIAL_BOW = ITEMS.register("dormant_celestial_bow", () -> new net.bandit.many_bows.item.DormantCelestialBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> WYRM_EFFIGY = ITEMS.register("wyrm_effigy", () -> new net.bandit.many_bows.item.WyrmEffigy(new Properties().stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+    public static final RegistrySupplier<Item> CELESTIAL_LIMB = ITEMS.register("celestial_limb", () -> new RelicMaterialItem(new Properties().rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.celestial_limb.description"));
+    public static final RegistrySupplier<Item> CELESTIAL_STRING = ITEMS.register("celestial_string", () -> new RelicMaterialItem(new Properties().rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.celestial_string.description"));
+    public static final RegistrySupplier<Item> CELESTIAL_GRIP = ITEMS.register("celestial_grip", () -> new RelicMaterialItem(new Properties().rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.celestial_grip.description"));
+    public static final RegistrySupplier<Item> HEART_OF_THE_WYRM = ITEMS.register("heart_of_the_wyrm", () -> new RelicMaterialItem(new Properties().rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.heart_of_the_wyrm.description"));
 
     //BOWS
     public static final RegistrySupplier<Item> ANCIENT_SAGE_BOW = ITEMS.register("ancient_sage_bow",

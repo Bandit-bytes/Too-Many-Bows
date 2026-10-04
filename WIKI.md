@@ -6,7 +6,7 @@ icon: bow
 
 # Too Many Bows
 ![bamf](https://media.forgecdn.net/attachments/1017/632/shulker.png)
-This page documents every bow currently present in the **Too Many Bows** mod, including abilities, special firing requirements, and how to repair them.
+This page documents bows currently present in the **Too Many Bows** mod, including abilities, special firing requirements, and how to repair them.
 
 > If a bow does not list a required resource, it uses **standard arrows** by default.
 
@@ -21,10 +21,10 @@ This page documents every bow currently present in the **Too Many Bows** mod, in
 | **Ancient Sage Bow**   | Pierces **33% of armor defenses**                                              | Standard arrows                |
 | **Verdant Viper**      | Arrows leave a poisonous cloud on impact                                       | Standard arrows                |
 | **Wind Bow**           | Knockback + magic dmg. Grants Speed II + Slow Fall      1.21  only             | Standard arrows                |
-| **Demon’s Grasp**      | _(No tooltip info yet)_                                                        | Standard arrows                |
+| **Demon’s Grasp**      | Dormant weapon; its tooltip describes no remaining power                       | Standard arrows                |
 | **Aether’s Call**      | Enemies hit are lifted with Levitation, grants Slow Falling  1.21 only         | Standard arrows                |
 | **Spectral Bow**       | _(Not fully documented yet)_                                                   | Standard arrows                |
-| **Cyroheart Bow**      | _(No tooltip info yet)_                                                        | Standard arrows                |
+| **Cyroheart Bow**      | Fires piercing icicle javelins; summons ice on block impact                      | Standard arrows                |
 | **Pyre’s Embrace**     | Shoots flaming arrows that cause explosions                                    | Standard arrows                |
 | **Necro Flame Bow**    | Applies **Cursed Flame**: blocks regen, can’t be extinguished, damage per tick | Standard arrows                |
 | **Tidal Bow**          | Shoots normally underwater + 2.5× underwater damage                            | Standard arrows                |
@@ -51,6 +51,111 @@ This page documents every bow currently present in the **Too Many Bows** mod, in
 | **Ethereal Hunter**    | Fires arrows using your hunger instead of arrows                               | ✅ Consumes **Hunger**         |
 | **Webstring Volley**   | Shoots 5 arrows in a wide spread + slowness                                    | Standard arrows                |
 | **Torchbearer Bow**    | Places torches on impact + emits light when held                               | Standard arrows                |
+
+
+| **Gravewire Bow** | Curses marked targets and lashes nearby foes with necrotic chains | Standard arrows |
+| **Vaultpiercer Bow** | Opens arcane vaults above the target, releasing follow-up arrows | Standard arrows |
+| **Eventide** | Full-draw ability hits call five astral lances; links marked targets and strengthens final judgment through repeat hits | Standard arrows |
+| **Worldeater** | Guided ability arrows trigger a dragon dive and lingering dragonfire; kills build Dominance for an empowered shot | Standard arrows |
+| **Godsplitter** | Steady perfect shots pierce enemies and bypass armor; headshots deal bonus damage | Standard arrows |
+| **Blunted Edge** | Trial bow that becomes Godsplitter after three combat challenges | Standard arrows |
+| **Dormant Celestial Bow** | Ritual bow that awakens into Eventide | One arrow for the awakening ritual |
+
+---
+
+##  Eventide — Celestial Awakening
+
+### Collect the components
+
+Each component has a **25% chance per matching chest** by default. These chances are controlled by `fragmentChance` in `forbidden_three.json`.
+
+| Component | Chest source |
+| --- | --- |
+| **Celestial Limb** | End City treasure |
+| **Celestial String** | Ancient City |
+| **Celestial Grip** | Stronghold library |
+
+Craft one of each component together in any arrangement to obtain the **Dormant Celestial Bow**.
+
+### Awaken the bow
+
+1. Bring the dormant bow and an arrow to the **Overworld**.
+2. Reach **Y 310 or higher** in a standard-height world, with unobstructed sky above you. The actual requirement is within ten blocks of the dimension's maximum build height.
+3. Wait until midnight: world time **17500–18500**. For testing, `/time set midnight` places the world inside this window.
+4. Aim almost straight up, at pitch **−85° to −90°**. Fully draw the bow for at least one second, then release.
+5. Read the **Falling Star coordinates** in chat or the bow's tooltip. The ritual consumes one arrow in Survival.
+6. Travel to those coordinates with the same dormant bow. End Rod particles mark the location when you approach.
+7. Stand within **six blocks** of the destination's block center and right-click with the bow. It becomes **Eventide**.
+
+The ritual selects a surface location in loaded terrain within 96 blocks along each horizontal axis. If no suitable loaded location is found, it asks you to try again. There is no separate star item to collect.
+
+### Abilities
+
+- **Astral lances:** A fully charged ability arrow hitting an entity calls five area strikes after a default two-second delay.
+- **Constellation:** Ability hits track up to three distinct targets. Once three are linked, subsequent links damage the other marked targets within 64 blocks. The list expires after eight seconds without a new link.
+- **Final judgment:** The fifth lance adds damage based on the victim's maximum health. Repeat hits on an already linked target build Alignment, strengthening this bonus.
+- **Cooldown:** Special shots share a default **four-second cooldown**. Ordinary shots do not trigger the special effects.
+
+---
+
+## Worldeater — Heart of the Wyrm
+
+The **Heart of the Wyrm** is a crafting ingredient for Worldeater. It is separate from Eventide's celestial components.
+
+### Craft and bind the Wyrm Effigy
+
+1. Craft **Dragon's Breath + Nether Star + End Crystal + Echo Shard** in any arrangement to make a **Wyrm Effigy**.
+2. Defeat the original Ender Dragon and earn the vanilla dragon-kill advancement.
+3. In the End, right-click a **Dragon Egg** with the effigy. This records the egg without consuming it.
+4. Place a **Dragon Head directly above a Respawn Anchor** in the End. Right-click the head with that same effigy to bind the hunt. The anchor does not need charging or activation.
+5. Respawn the Ender Dragon using End Crystals.
+6. Reduce the rematch dragon to **20% health or less**. While it is perched, hit it with an arrow while holding a **vanilla bow** in either hand. Keep the bound effigy in your inventory.
+7. The effigy is consumed and the **Heart of the Wyrm** is added to your inventory, or dropped if your inventory is full. Each dragon can award one heart through this mechanic.
+
+Craft **Heart of the Wyrm + vanilla Bow + Dragon's Breath** in any arrangement to obtain **Worldeater**.
+
+### Abilities
+
+- **Guided projectile:** Fully charged ability arrows gently steer toward valid nearby targets ahead of them and destroy nearby arrows belonging to other shooters.
+- **Dragon dive:** Impact creates a dragon-breath trail from the firing position to the hit location, damaging, launching and igniting enemies along it. The trail is capped at 64 blocks.
+- **Dragonfire:** Impact leaves a damaging zone for **five seconds** by default, dealing damage once per second.
+- **Dominance:** Kills credited to this bow build charges. At **10 charges**, the next fully charged ability shot consumes them, doubles dive and dragonfire damage, and expands the dragonfire radius from **three to seven blocks**.
+- **Cooldown:** Special shots have a default **four-second cooldown**.
+
+Dragon effects use Minecraft particles and sounds; no custom dragon model is required.
+
+---
+
+## Godsplitter — Blunted Edge Trials
+
+Find **Blunted Edge** through Ancient City chest loot or the vanilla Trial Chamber reward loot table. Its additional loot chance is **18%** by default, controlled by `bluntedEdgeChance`.
+
+Complete these trials in order with the same bow:
+
+1. Kill a hostile enemy from **at least 100 blocks** away, measured from the firing position.
+2. Kill **three distinct hostile enemies with three consecutive shots**.
+3. Kill a hostile enemy while **both you and the target are airborne**, at the time of the kill. Your shot must also have been fired while airborne.
+
+Completing the final trial consumes Blunted Edge and awards **Godsplitter**.
+
+### Abilities
+
+- Fully draw, then keep your aim steady for another **1.5 seconds** until **PERFECT SHOT** appears.
+- Perfect arrows travel without gravity and can hit up to **five entities**.
+- Hits in the upper quarter of a target's body count as headshots and use a default **3× damage multiplier**.
+- Perfect hits normally deal **75% armor-bypassing damage**. Five consecutive perfect hits against the same target raise that to **100%**.
+- Perfect headshots execute non-boss targets at **15% maximum health or less**.
+- An imperfect release or an arrow missing its target resets armor-severance progress.
+
+---
+
+## 🎨 Custom Tooltip Art
+
+All items in the mod's namespace receive decorative tooltip art. Designs are assigned by item theme rather than a gameplay tier system.
+
+The supplied themes include common, rare, epic, legendary, mythic, collectible, cosmetic and nature-themed art. Legendary and mythic animated variants are used on selected bows. Eventide, Worldeater and Godsplitter use the animated mythic design.
+
+Tooltip art does not alter item stats, loot probabilities or progression requirements.
 
 ---
 
@@ -124,16 +229,17 @@ All config files are generated automatically on first launch and can be edited f
 | Config Type | Path |
 | --- | --- |
 | **Bow Configs** | `config/too_many_bows/bows/<bow_name>.json` |
+| **Relic Bow Config** | `config/too_many_bows/bows/forbidden_three.json` |
 | **Loot Config** | `config/too_many_bows.json` |
 | **Accessories Config** | `config/too_many_bows/accessories/` |
 
-> Config files are created with default values if they don't exist. If a config is malformed or missing fields, the mod will fill in defaults automatically.
+> Missing config files are generated with defaults. Bow JSON loading falls back to defaults if parsing fails; it does not automatically rewrite every malformed file. Back up files before editing.
 
 ---
 
 ## 🏹 Bow Config Fields
 
-Each bow has its own dedicated JSON file inside the `bows/` folder. While every bow is unique, they share common categories of fields:
+Most configurable bows have their own JSON file inside the `bows/` folder. Eventide, Worldeater and Godsplitter share `forbidden_three.json`. While every bow is unique, they share common categories of fields:
 
 | Field Category | Examples | Description |
 | --- | --- | --- |
@@ -160,6 +266,44 @@ Each bow has its own dedicated JSON file inside the `bows/` folder. While every 
   "trail_particles_per_tick": 1
 }
 ```
+
+---
+
+
+## 🌠 Relic Bow Configuration
+
+The shared file is **`config/too_many_bows/bows/forbidden_three.json`**. In development, look under your launch's `run/config/` folder. The values below are the current source defaults; existing configs can override them.
+
+| Field | Default | Purpose |
+| --- | --- | --- |
+| `eventideDamage` | `14.0` | Eventide arrow damage setting |
+| `lanceDamage` | `8.0` | Eventide lance damage and constellation-link damage |
+| `finalMaxHealthFraction` | `0.08` | Extra maximum-health fraction on the final lance, before Alignment bonuses; extra damage is capped at 100 |
+| `worldeaterDamage` | `18.0` | Worldeater arrow damage setting |
+| `dragonDiveDamage` | `16.0` | Base dragon-dive damage |
+| `dragonfireDamage` | `4.0` | Dragonfire damage per pulse |
+| `godsplitterDamage` | `20.0` | Godsplitter arrow damage setting |
+| `headshotMultiplier` | `3.0` | Godsplitter perfect-headshot multiplier |
+| `abilityCooldownTicks` | `80` | Eventide and Worldeater special-shot cooldown |
+| `maxDominance` | `10` | Charges required for an empowered Worldeater shot |
+| `starfallDelayTicks` | `40` | Delay before Eventide's first lance; clamped to 10–100 ticks |
+| `dragonfireDurationTicks` | `100` | Dragonfire-zone duration; clamped to 20–180 ticks |
+| `fragmentChance` | `0.25` | Celestial component chance in its matching chest |
+| `bluntedEdgeChance` | `0.18` | Additional Blunted Edge loot chance |
+| `affectPlayers` | `false` | Allows relic targeting/effects against players |
+| `protectPets` | `true` | Excludes tamed animals from relic targeting/effects |
+
+**20 ticks = one second.** Actual arrow damage also depends on flight speed, critical hits, enchantments and attributes.
+
+For a stronger Eventide, these are suggested starting values rather than shipped defaults:
+
+```json
+"eventideDamage": 24.0,
+"lanceDamage": 12.0,
+"finalMaxHealthFraction": 0.12
+```
+
+Edit those fields inside the existing JSON object. Use `/tmb reload bows` for combat-value changes. **Restart the game/server after changing `fragmentChance` or `bluntedEdgeChance`**, because their loot pools are built during initialization. Loot changes do not reroll chests whose contents have already generated.
 
 ---
 
@@ -225,7 +369,7 @@ All **Too Many Bows** commands require **operator permission level 2** or higher
 | `/tmb reload loot` | Reloads only the loot config (`too_many_bows.json`) |
 | `/tmb reload accessories` | Reloads only the accessories/trinket configs |
 
-> Changes to config files take effect immediately after running the relevant reload command — **no restart required**.
+> Registered bow combat settings can be reloaded with `/tmb reload bows`, including `forbidden_three.json`. Relic chest-loot probabilities require a restart. Reloading does not reroll already generated chest contents.
 
 ---
 
@@ -274,6 +418,8 @@ The **Power Crystal** is used to repair bows from this mod.
 
 ## 🌙 Notes
 
-- Some bows still show placeholder or WIP tooltips and will be updated as development continues.
+- Some older bow mechanics still need fuller documentation; entries marked as undocumented should not be treated as confirmed ability descriptions.
+- Eventide, Worldeater and Godsplitter use a one-second full draw for their relic mechanics.
+- The acquisition instructions here describe the current Minecraft 1.21.1 source; older releases may differ.
 - Bows without listed special ammo use **normal arrows**.
 - More bows, synergies, and enchantments will be added as the mod evolves.
