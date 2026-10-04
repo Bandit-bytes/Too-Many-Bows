@@ -16,7 +16,7 @@ public class ItemRegistry {
     private static Item.Properties props(String path) {
         return new Item.Properties().setId(
                 ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(ManyBowsMod.MOD_ID, path))
-        );
+        ).component(net.minecraft.core.component.DataComponents.TOOLTIP_STYLE, RelicTooltipStyles.style(path));
     }
 
     public static final RegistrySupplier<Item> POWER_CRYSTAL = ITEMS.register("power_crystal",
@@ -129,6 +129,36 @@ public class ItemRegistry {
 
     public static final RegistrySupplier<Item> CURSED_LANTERN = ITEMS.register("cursed_lantern",
             () -> new CursedLanternItem(props("cursed_lantern").rarity(Rarity.EPIC).stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+
+    public static final RegistrySupplier<Item> EVENTIDE = ITEMS.register("eventide",
+            () -> new RelicBow(props("eventide").durability(2031).rarity(Rarity.EPIC).enchantable(16).repairable(POWER_CRYSTAL.get()).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), RelicBow.Kind.EVENTIDE));
+
+    public static final RegistrySupplier<Item> WORLDEATER = ITEMS.register("worldeater",
+            () -> new RelicBow(props("worldeater").durability(2031).rarity(Rarity.EPIC).enchantable(16).repairable(POWER_CRYSTAL.get()).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), RelicBow.Kind.WORLDEATER));
+
+    public static final RegistrySupplier<Item> GODSPLITTER = ITEMS.register("godsplitter",
+            () -> new RelicBow(props("godsplitter").durability(2031).rarity(Rarity.EPIC).enchantable(16).repairable(POWER_CRYSTAL.get()).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), RelicBow.Kind.GODSPLITTER));
+
+    public static final RegistrySupplier<Item> BLUNTED_EDGE = ITEMS.register("blunted_edge",
+            () -> new RelicBow(props("blunted_edge").durability(2031).rarity(Rarity.EPIC).enchantable(16).repairable(POWER_CRYSTAL.get()).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), RelicBow.Kind.BLUNTED));
+
+    public static final RegistrySupplier<Item> DORMANT_CELESTIAL_BOW = ITEMS.register("dormant_celestial_bow",
+            () -> new DormantCelestialBow(props("dormant_celestial_bow").durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+
+    public static final RegistrySupplier<Item> WYRM_EFFIGY = ITEMS.register("wyrm_effigy",
+            () -> new WyrmEffigy(props("wyrm_effigy").stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
+
+    public static final RegistrySupplier<Item> CELESTIAL_LIMB = ITEMS.register("celestial_limb",
+            () -> new RelicMaterialItem(props("celestial_limb").rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.celestial_limb.description"));
+
+    public static final RegistrySupplier<Item> CELESTIAL_STRING = ITEMS.register("celestial_string",
+            () -> new RelicMaterialItem(props("celestial_string").rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.celestial_string.description"));
+
+    public static final RegistrySupplier<Item> CELESTIAL_GRIP = ITEMS.register("celestial_grip",
+            () -> new RelicMaterialItem(props("celestial_grip").rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.celestial_grip.description"));
+
+    public static final RegistrySupplier<Item> HEART_OF_THE_WYRM = ITEMS.register("heart_of_the_wyrm",
+            () -> new RelicMaterialItem(props("heart_of_the_wyrm").rarity(Rarity.EPIC).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB), "item.too_many_bows.heart_of_the_wyrm.description"));
 
     public static void register() {
         ITEMS.register();

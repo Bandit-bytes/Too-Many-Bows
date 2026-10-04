@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:dragon_breath",
+    "minecraft:nether_star",
+    "minecraft:end_crystal",
+    "minecraft:echo_shard"
+  ],
+  "result": {
+    "id": "too_many_bows:wyrm_effigy",
+    "count": 1
+  }
+}
