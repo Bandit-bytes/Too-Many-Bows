@@ -1,10 +1,38 @@
-# Project exclude paths
-/.gradle/
-/common/.gradle/
-/common/build/
-/fabric/.gradle/
-/fabric/build/
-/neoforge/.gradle/
-/neoforge/build/
-/neoforge/run/**
-/fabric/run/**
+# Gradle
+.gradle/
+build/
+out/
+bin/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Run directories (dev worlds, logs, configs, etc.)
+run/
+runs/
+**/run/
+**/runs/
+
+# Architectury / Loom caches
+.architectury-transformer/
+**/.architectury-transformer/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse / VS Code
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / crash reports
+*.log
+crash-reports/
+hs_err_pid*
