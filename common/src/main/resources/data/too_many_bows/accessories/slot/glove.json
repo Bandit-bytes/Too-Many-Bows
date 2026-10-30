@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "amount": 2,
+  "operation": "set",
+  "order": 910,
+  "icon": "too_many_bows:gui/slot/glove",
+  "validators": [
+    "accessories:tag",
+    "accessories:component"
+  ]
+}
