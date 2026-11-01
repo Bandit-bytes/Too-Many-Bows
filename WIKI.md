@@ -142,7 +142,7 @@ Completing the final trial consumes Blunted Edge and awards **Godsplitter**.
 
 - Fully draw, then keep your aim steady for another **1.5 seconds** until **PERFECT SHOT** appears.
 - Perfect arrows travel without gravity and can hit up to **five entities**.
-- Hits in the upper quarter of a target's body count as headshots and use a default **3× damage multiplier**.
+- Hits in the upper quarter of a target's body count as headshots and use a default **8× damage multiplier**.
 - Perfect hits normally deal **75% armor-bypassing damage**. Five consecutive perfect hits against the same target raise that to **100%**.
 - Perfect headshots execute non-boss targets at **15% maximum health or less**.
 - An imperfect release or an arrow missing its target resets armor-severance progress.
@@ -276,14 +276,14 @@ The shared file is **`config/too_many_bows/bows/forbidden_three.json`**. In deve
 
 | Field | Default | Purpose |
 | --- | --- | --- |
-| `eventideDamage` | `14.0` | Eventide arrow damage setting |
-| `lanceDamage` | `8.0` | Eventide lance damage and constellation-link damage |
-| `finalMaxHealthFraction` | `0.08` | Extra maximum-health fraction on the final lance, before Alignment bonuses; extra damage is capped at 100 |
-| `worldeaterDamage` | `18.0` | Worldeater arrow damage setting |
-| `dragonDiveDamage` | `16.0` | Base dragon-dive damage |
-| `dragonfireDamage` | `4.0` | Dragonfire damage per pulse |
-| `godsplitterDamage` | `20.0` | Godsplitter arrow damage setting |
-| `headshotMultiplier` | `3.0` | Godsplitter perfect-headshot multiplier |
+| `eventideDamage` | `25.0` | Eventide arrow damage setting |
+| `lanceDamage` | `50.0` | Eventide lance damage and constellation-link damage |
+| `finalMaxHealthFraction` | `0.18` | Extra maximum-health fraction on the final lance, before Alignment bonuses; extra damage is capped at 100 |
+| `worldeaterDamage` | `25.0` | Worldeater arrow damage setting |
+| `dragonDiveDamage` | `50.0` | Base dragon-dive damage |
+| `dragonfireDamage` | `26.0` | Dragonfire damage per pulse |
+| `godsplitterDamage` | `25.0` | Godsplitter arrow damage setting |
+| `headshotMultiplier` | `8.0` | Godsplitter perfect-headshot multiplier |
 | `abilityCooldownTicks` | `80` | Eventide and Worldeater special-shot cooldown |
 | `maxDominance` | `10` | Charges required for an empowered Worldeater shot |
 | `starfallDelayTicks` | `40` | Delay before Eventide's first lance; clamped to 10–100 ticks |
@@ -295,12 +295,12 @@ The shared file is **`config/too_many_bows/bows/forbidden_three.json`**. In deve
 
 **20 ticks = one second.** Actual arrow damage also depends on flight speed, critical hits, enchantments and attributes.
 
-For a stronger Eventide, these are suggested starting values rather than shipped defaults:
+For a weaker Eventide, these are suggested starting values rather than shipped defaults:
 
 ```json
-"eventideDamage": 24.0,
-"lanceDamage": 12.0,
-"finalMaxHealthFraction": 0.12
+"eventideDamage": 14.0,
+"lanceDamage": 8.0,
+"finalMaxHealthFraction": 0.08
 ```
 
 Edit those fields inside the existing JSON object. Use `/tmb reload bows` for combat-value changes. **Restart the game/server after changing `fragmentChance` or `bluntedEdgeChance`**, because their loot pools are built during initialization. Loot changes do not reroll chests whose contents have already generated.

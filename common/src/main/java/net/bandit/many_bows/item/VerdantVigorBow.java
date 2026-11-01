@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.VerdantVigorBowConfig;
 import net.bandit.many_bows.entity.VitalityArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -8,7 +10,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,8 +20,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -38,32 +37,37 @@ import java.util.function.Predicate;
 
 public class VerdantVigorBow extends ModBowItem {
 
-    private static final int REGENERATION_DURATION = 40;
-
     public VerdantVigorBow(Properties properties) {
         super(properties);
+    }
+
+    private static VerdantVigorBowConfig config() {
+        return BowJsonConfigHelper.getConfig("verdant_vigor", VerdantVigorBowConfig.class, VerdantVigorBowConfig::new);
     }
 
 @Override
 public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
     if (entity instanceof Player player && !world.isClientSide) {
         boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+        VerdantVigorBowConfig config = config();
 
-        if (isHoldingBow) {
+        if (isHoldingBow && config.health_boost_enabled) {
             player.addEffect(new MobEffectInstance(
                     MobEffects.HEALTH_BOOST,
                     15,
-                    1,
+                    config.health_boost_amplifier,
                     true,
                     false,
                     false
             ));
         }
 
-            if (isHoldingBow && world.getGameTime() % 40 == 0) {
+            if (isHoldingBow && config.ally_regeneration_enabled
+                    && world.getGameTime() % Math.max(1, config.ally_regeneration_interval_ticks) == 0) {
+                double radius = config.ally_regeneration_radius;
                 AABB area = new AABB(
-                        player.getX() - 5, player.getY() - 5, player.getZ() - 5,
-                        player.getX() + 5, player.getY() + 5, player.getZ() + 5
+                        player.getX() - radius, player.getY() - radius, player.getZ() - radius,
+                        player.getX() + radius, player.getY() + radius, player.getZ() + radius
                 );
 
                 world.getEntities(player, area, e ->
@@ -74,8 +78,8 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
                 ).forEach(entityNearby -> {
                     ((LivingEntity) entityNearby).addEffect(new MobEffectInstance(
                             MobEffects.REGENERATION,
-                            REGENERATION_DURATION,
-                            0,
+                            config.ally_regeneration_duration_ticks,
+                            config.ally_regeneration_amplifier,
                             true, false, false
                     ));
                 });
@@ -97,6 +101,7 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
                     boolean arrowConsumed = false;
 
                     if (!projectiles.isEmpty() && level instanceof ServerLevel serverLevel) {
+                        VerdantVigorBowConfig config = config();
                         for (ItemStack projectileStack : projectiles) {
                             AbstractArrow arrow;
                             if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
@@ -104,18 +109,8 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
                             } else {
                                 arrow = new VitalityArrow(serverLevel, player, bowStack, projectileStack);
                                 if (arrow instanceof VitalityArrow vitalityArrow) {
-                                    Holder<Attribute> rangedDamageAttr = level.registryAccess()
-                                            .registryOrThrow(Registries.ATTRIBUTE)
-                                            .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
-                                            .orElse(null);
-
-                                    if (rangedDamageAttr != null) {
-                                        AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
-                                        if (attrInstance != null) {
-                                            float damage = (float) attrInstance.getValue();
-                                            vitalityArrow.setBaseDamage(damage / 2.25);
-                                        }
-                                    }
+                                    vitalityArrow.setBaseDamage(resolveConfiguredDamage(player, config.base_damage,
+                                            config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, 0.0D));
                                 }
                             }
 
@@ -123,13 +118,13 @@ public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot,
                             applyKnockbackEnchantment(arrow, bowStack, player, level);
                             applyFlameEnchantment(arrow, bowStack, level);
                             applyBowDamageAttribute(arrow, player);
-                            tryApplyBowCrit(arrow, player, 1.5D);
+                            tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
                             if (hasInfinityEnchantment(bowStack, level) || player.getAbilities().instabuild) {
                                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                             } else {
                                 arrow.pickup = AbstractArrow.Pickup.ALLOWED;
                             }
-                            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
+                            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
                             serverLevel.addFreshEntity(arrow);
                             if (!hasInfinityEnchantment(bowStack, level) && !player.getAbilities().instabuild && !arrowConsumed) {
                                 projectileStack.shrink(1);

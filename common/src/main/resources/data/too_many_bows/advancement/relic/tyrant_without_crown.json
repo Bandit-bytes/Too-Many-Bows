@@ -3,8 +3,8 @@
     "icon": {
       "id": "minecraft:dragon_head"
     },
-    "title": "A Tyrant Without a Crown",
-    "description": "Bind a Wyrm Effigy after defeating the dragon.",
+    "title": { "translate": "advancement.too_many_bows.relic.tyrant_without_crown.title" },
+    "description": { "translate": "advancement.too_many_bows.relic.tyrant_without_crown.description" },
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,

@@ -3,8 +3,8 @@
     "icon": {
       "id": "too_many_bows:blunted_edge"
     },
-    "title": "Three Without Failure",
-    "description": "Three consecutive arrows. Three hostile kills.",
+    "title": { "translate": "advancement.too_many_bows.relic.trial_2.title" },
+    "description": { "translate": "advancement.too_many_bows.relic.trial_2.description" },
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,

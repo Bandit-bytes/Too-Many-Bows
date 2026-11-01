@@ -6,7 +6,6 @@ import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,6 +17,7 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
@@ -68,6 +68,11 @@ public class DuskReaperArrow extends AbstractArrow {
                 return;
             }
 
+            // Marked before damage is dealt so that a killing shot also triggers the death explosion.
+            if (config.apply_marked_tag && !config.marked_tag.isBlank() && level() instanceof ServerLevel sl) {
+                DuskReaperMarks.mark(target, this.getOwner(), config.marked_tag, config.marked_tag_duration_ticks, sl.getServer());
+            }
+
             if (config.apply_direct_arrow_damage) {
                 target.hurt(this.damageSources().arrow(this, this.getOwner()), (float) this.getBaseDamage());
             }
@@ -108,23 +113,11 @@ public class DuskReaperArrow extends AbstractArrow {
                 ));
             }
 
-            if (config.apply_marked_tag && !config.marked_tag.isBlank()) {
-                target.addTag(config.marked_tag);
-
-                if (config.marked_tag_duration_ticks > 0 && level() instanceof ServerLevel sl) {
-                    scheduleTask(sl, config.marked_tag_duration_ticks, () -> {
-                        if (target.isAlive()) {
-                            target.removeTag(config.marked_tag);
-                        }
-                    });
-                }
-            }
-
-            if (config.floating_label_enabled && level() instanceof ServerLevel sl) {
+            if (config.floating_label_enabled && target.isAlive() && level() instanceof ServerLevel sl) {
                 spawnFloatingLabel(
                         sl,
                         target,
-                        Component.literal(config.floating_label_text),
+                        Component.translatable(config.floating_label_text),
                         config.floating_label_duration_ticks,
                         config.floating_label_y_offset,
                         config.floating_label_use_marker
@@ -196,7 +189,13 @@ public class DuskReaperArrow extends AbstractArrow {
                 target.getX(),
                 target.getY() + target.getBbHeight() + yOffset,
                 target.getZ()
-        );
+        ) {
+            // Labels are tied to an in-memory mark, so they must not outlive it in saved chunks.
+            @Override
+            public boolean saveAsPassenger(CompoundTag tag) {
+                return false;
+            }
+        };
 
         stand.setInvisible(true);
         stand.setNoGravity(true);
@@ -213,19 +212,6 @@ public class DuskReaperArrow extends AbstractArrow {
 
         sl.addFreshEntity(stand);
         stand.startRiding(target, true);
-
-        if (durationTicks > 0) {
-            scheduleTask(sl, durationTicks, () -> {
-                if (stand.isAlive()) {
-                    stand.discard();
-                }
-            });
-        }
-    }
-
-    private static void scheduleTask(ServerLevel sl, int delayTicks, Runnable task) {
-        sl.getServer().execute(() ->
-                sl.getServer().tell(new TickTask(sl.getServer().getTickCount() + delayTicks, task))
-        );
+        DuskReaperMarks.attachLabel(target, stand, durationTicks, sl.getServer());
     }
 }

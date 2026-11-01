@@ -31,15 +31,11 @@ public class WyrmEffigy extends Item {
             TooltipFlag flag
     ) {
         lines.add(
-                Component.literal(
-                        "Touch the dragon egg, then bind at the pedestal."
-                ).withStyle(ChatFormatting.GRAY)
+                Component.translatable("item.too_many_bows.wyrm_effigy.tooltip1").withStyle(ChatFormatting.GRAY)
         );
 
         lines.add(
-                Component.literal(
-                        "Hunt the perched rematch dragon below 20% health."
-                ).withStyle(ChatFormatting.GRAY)
+                Component.translatable("item.too_many_bows.wyrm_effigy.tooltip2").withStyle(ChatFormatting.GRAY)
         );
     }
 
@@ -63,10 +59,7 @@ public class WyrmEffigy extends Item {
             );
 
             player.sendSystemMessage(
-                    Component.literal(
-                            "The effigy remembers the First Tyrant. "
-                                    + "The egg is unharmed."
-                    )
+                    Component.translatable("item.too_many_bows.wyrm_effigy.egg_witnessed")
             );
 
             return InteractionResult.SUCCESS;
@@ -75,9 +68,7 @@ public class WyrmEffigy extends Item {
         if (!RelicData.read(context.getItemInHand())
                 .getBoolean("EggWitness")) {
             player.sendSystemMessage(
-                    Component.literal(
-                            "Touch the dragon egg with this effigy first."
-                    )
+                    Component.translatable("item.too_many_bows.wyrm_effigy.touch_egg_first")
             );
 
             return InteractionResult.FAIL;
@@ -99,9 +90,7 @@ public class WyrmEffigy extends Item {
         if (kill == null
                 || !player.getAdvancements().getOrStartProgress(kill).isDone()) {
             player.sendSystemMessage(
-                    Component.literal(
-                            "First defeat the dragon. Then bind your rematch."
-                    )
+                    Component.translatable("item.too_many_bows.wyrm_effigy.defeat_dragon_first")
             );
 
             return InteractionResult.FAIL;
@@ -115,11 +104,7 @@ public class WyrmEffigy extends Item {
         RelicQuests.award(player, "tyrant_without_crown");
 
         player.sendSystemMessage(
-                Component.literal(
-                        "Hunt bound. Respawn the dragon with End Crystals; "
-                                + "strike it perched below 20% health "
-                                + "with a vanilla bow."
-                )
+                Component.translatable("item.too_many_bows.wyrm_effigy.hunt_bound")
         );
 
         return InteractionResult.SUCCESS;

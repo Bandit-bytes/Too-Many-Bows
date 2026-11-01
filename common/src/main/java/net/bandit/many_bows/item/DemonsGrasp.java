@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.DemonsGraspBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -10,6 +12,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -21,6 +25,10 @@ public class DemonsGrasp extends ModBowItem {
 
     public DemonsGrasp(Properties properties) {
         super(properties);
+    }
+
+    private static DemonsGraspBowConfig config() {
+        return BowJsonConfigHelper.getConfig("demons_grasp", DemonsGraspBowConfig.class, DemonsGraspBowConfig::new);
     }
 
     @Override
@@ -35,7 +43,8 @@ public class DemonsGrasp extends ModBowItem {
                     if (level instanceof ServerLevel) {
                         ServerLevel serverLevel = (ServerLevel)level;
                         if (!list.isEmpty()) {
-                            this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, list, f * 3.0F, 1.0F, f == 1.0F, (LivingEntity)null);
+                            DemonsGraspBowConfig config = config();
+                            this.shoot(serverLevel, player, player.getUsedItemHand(), itemStack, list, f * config.arrow_velocity, config.arrow_inaccuracy, f == 1.0F, (LivingEntity)null);
                         }
                     }
 
@@ -45,6 +54,15 @@ public class DemonsGrasp extends ModBowItem {
 
             }
         }
+    }
+
+    @Override
+    protected Projectile createProjectile(Level level, LivingEntity shooter, ItemStack weapon, ItemStack ammo, boolean isCrit) {
+        Projectile projectile = super.createProjectile(level, shooter, weapon, ammo, isCrit);
+        if (projectile instanceof AbstractArrow arrow) {
+            arrow.setBaseDamage(config().base_damage);
+        }
+        return projectile;
     }
 
     @Override

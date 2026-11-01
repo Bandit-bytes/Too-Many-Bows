@@ -3,8 +3,8 @@
     "icon": {
       "id": "too_many_bows:heart_of_the_wyrm"
     },
-    "title": "Heart of the Wyrm",
-    "description": "Strike a perched rematch dragon below 20% health.",
+    "title": { "translate": "advancement.too_many_bows.relic.heart_of_the_wyrm.title" },
+    "description": { "translate": "advancement.too_many_bows.relic.heart_of_the_wyrm.description" },
     "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true,

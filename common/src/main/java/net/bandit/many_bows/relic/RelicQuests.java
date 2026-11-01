@@ -79,7 +79,7 @@ public final class RelicQuests {
         int completed = stage + 1;
         RelicData.edit(bow, t -> { t.putInt("Trials", completed); t.putInt("Streak", 0); t.putInt("LastTrialKill", shot); });
         award(player, "trial_" + completed);
-        player.displayClientMessage(Component.literal("The Blunted Edge: trial " + completed + "/3 complete").withStyle(ChatFormatting.GOLD), false);
+        player.displayClientMessage(Component.translatable("relic.too_many_bows.blunted.trial_complete", completed, 3).withStyle(ChatFormatting.GOLD), false);
         if (completed == 3) { bow.shrink(1); give(player,
                 new ItemStack(ItemRegistry.GODSPLITTER.get())); award(player, "godsplitter");
                 ((ServerLevel)player.level()).sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1, player.getZ(), 80, 1, 1, 1, 0.15); }

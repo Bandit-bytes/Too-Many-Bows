@@ -8,6 +8,7 @@ import net.bandit.many_bows.command.TmbCommands;
 import net.bandit.many_bows.config.BowConfigRegistry;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.config.PlatformCompatReloadRegistry;
+import net.bandit.many_bows.entity.DuskReaperMarks;
 import net.bandit.many_bows.loot.ModLootModifiers;
 import net.bandit.many_bows.registry.*;
 import net.minecraft.client.renderer.entity.NoopRenderer;
@@ -25,6 +26,7 @@ public final class ManyBowsMod {
         RelicParticleRegistry.register();
         ModLootModifiers.registerLootModifiers();
         net.bandit.many_bows.relic.RelicQuests.init();
+        DuskReaperMarks.init();
 
         CommandRegistrationEvent.EVENT.register(TmbCommands::register);
 

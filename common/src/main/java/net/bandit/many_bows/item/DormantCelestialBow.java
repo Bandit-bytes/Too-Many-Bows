@@ -53,10 +53,7 @@ public class DormantCelestialBow extends BowItem {
                 || !level.canSeeSky(player.blockPosition())
                 || power < 1) {
             player.displayClientMessage(
-                    Component.literal(
-                            "Draw at the world's ceiling at midnight. "
-                                    + "Aim straight into the stars."
-                    ),
+                    Component.translatable("item.too_many_bows.dormant_celestial_bow.ritual_hint"),
                     true
             );
             return;
@@ -99,9 +96,7 @@ public class DormantCelestialBow extends BowItem {
 
         if (star == null) {
             player.displayClientMessage(
-                    Component.literal(
-                            "The stars need open, explored land below you. Try again."
-                    ),
+                    Component.translatable("item.too_many_bows.dormant_celestial_bow.no_land"),
                     true
             );
             return;
@@ -122,11 +117,11 @@ public class DormantCelestialBow extends BowItem {
         });
 
         player.sendSystemMessage(
-                Component.literal(
-                        "Something answered. Falling Star: "
-                                + star.getX() + ", "
-                                + star.getY() + ", "
-                                + star.getZ()
+                Component.translatable(
+                        "item.too_many_bows.dormant_celestial_bow.answered",
+                        star.getX(),
+                        star.getY(),
+                        star.getZ()
                 )
         );
 
@@ -195,7 +190,7 @@ public class DormantCelestialBow extends BowItem {
                 );
 
                 player.sendSystemMessage(
-                        Component.literal("EVENTIDE AWAKENS")
+                        Component.translatable("item.too_many_bows.dormant_celestial_bow.awakens")
                 );
 
                 return InteractionResultHolder.success(
@@ -215,20 +210,18 @@ public class DormantCelestialBow extends BowItem {
             TooltipFlag flag
     ) {
         lines.add(
-                Component.literal(
-                        "Midnight. World ceiling. One arrow into the stars."
-                )
+                Component.translatable("item.too_many_bows.dormant_celestial_bow.tooltip")
         );
 
         var data = RelicData.read(stack);
 
         if (data.getBoolean("StarCalled")) {
             lines.add(
-                    Component.literal(
-                            "Falling Star: "
-                                    + data.getInt("StarX") + ", "
-                                    + data.getInt("StarY") + ", "
-                                    + data.getInt("StarZ")
+                    Component.translatable(
+                            "item.too_many_bows.dormant_celestial_bow.falling_star",
+                            data.getInt("StarX"),
+                            data.getInt("StarY"),
+                            data.getInt("StarZ")
                     )
             );
         }

@@ -3,8 +3,8 @@
     "icon": {
       "id": "minecraft:bow"
     },
-    "title": "The Forbidden Three",
-    "description": "Weapons that were never meant to be drawn.",
+    "title": { "translate": "advancement.too_many_bows.relic.root.title" },
+    "description": { "translate": "advancement.too_many_bows.relic.root.description" },
     "frame": "task",
     "show_toast": false,
     "announce_to_chat": false,

@@ -1,12 +1,11 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.CrimsonNexusBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -15,7 +14,6 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -33,38 +31,31 @@ public class CrimsonNexusBow extends ModBowItem {
     public CrimsonNexusBow(Properties properties) {
         super(properties);
     }
+    private static CrimsonNexusBowConfig config() {
+        return BowJsonConfigHelper.getConfig("crimson_nexus", CrimsonNexusBowConfig.class, CrimsonNexusBowConfig::new);
+    }
+
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (!(entity instanceof Player player) || !selected || level.isClientSide) return;
 
+        CrimsonNexusBowConfig config = config();
         Long lastUsedTime = activeLifeDrain.get(player);
-        if (lastUsedTime == null || level.getGameTime() - lastUsedTime > 60) return;
+        if (lastUsedTime == null || level.getGameTime() - lastUsedTime > config.life_drain_window_ticks) return;
 
-        if (level.getGameTime() % 20 == 0) {
-            float damage;
+        if (level.getGameTime() % Math.max(1, config.life_drain_interval_ticks) == 0) {
+            float damage = (float) resolveConfiguredDamage(player, config.life_drain_base_damage,
+                    config.use_ranged_damage_attribute, config.life_drain_ranged_damage_divisor, 0.0D);
 
-            var registry = level.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-            var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
-
-            if (rangedAttrHolder != null) {
-                var attrInstance = player.getAttribute(rangedAttrHolder);
-                if (attrInstance != null) {
-                    damage = (float) attrInstance.getValue() / 4.0F;
-                } else {
-                    damage = 1.0F;
-                }
-            } else {
-                damage = 1.0F;
-            }
-
-            AABB area = new AABB(player.getX() - 10, player.getY() - 10, player.getZ() - 10,
-                    player.getX() + 10, player.getY() + 10, player.getZ() + 10);
+            double radius = config.life_drain_radius;
+            AABB area = new AABB(player.getX() - radius, player.getY() - radius, player.getZ() - radius,
+                    player.getX() + radius, player.getY() + radius, player.getZ() + radius);
 
             level.getEntities(player, area, e -> e instanceof LivingEntity && e != player)
                     .forEach(target -> {
                         if (target instanceof LivingEntity livingEntity) {
                             livingEntity.hurt(player.damageSources().magic(), damage);
-                            player.heal(0.25F);
+                            player.heal(config.life_drain_heal_per_target);
                         }
                     });
         }
@@ -80,7 +71,8 @@ public class CrimsonNexusBow extends ModBowItem {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-                float healthCost = player.getHealth() > 4.0F ? 2.0F : 0.0F;
+                CrimsonNexusBowConfig config = config();
+                float healthCost = player.getHealth() > config.minimum_health_to_pay_cost ? config.health_cost : 0.0F;
                 player.hurt(player.damageSources().magic(), healthCost);
 
                 ItemStack arrowStack = player.getProjectile(bowStack);
@@ -90,27 +82,12 @@ public class CrimsonNexusBow extends ModBowItem {
                 AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player, bowStack);
                 arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 
-
-                Holder<Attribute> rangedDamageAttr = level.registryAccess()
-                        .registryOrThrow(Registries.ATTRIBUTE)
-                        .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
-                        .orElse(null);
-
-                if (rangedDamageAttr != null) {
-                    var attrInstance = player.getAttribute(rangedDamageAttr);
-                    if (attrInstance != null) {
-                        float damage = (float) attrInstance.getValue();
-                        arrow.setBaseDamage(damage / 2.5F);
-                    } else {
-                        arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
-                    }
-                } else {
-                    arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
-                }
+                arrow.setBaseDamage(resolveConfiguredDamage(player, config.base_damage,
+                        config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, 0.0D));
                 applyBowDamageAttribute(arrow, player);
-                tryApplyBowCrit(arrow, player, 1.5D);
+                tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
 
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
                 activeLifeDrain.put(player, level.getGameTime());
 
                 if (player.getHealth() == player.getMaxHealth()) {
@@ -187,7 +164,7 @@ public class CrimsonNexusBow extends ModBowItem {
         if (Screen.hasShiftDown()) {
             // Detailed information when holding Shift
             tooltipComponents.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.info").withStyle(ChatFormatting.DARK_RED));
-            tooltipComponents.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.health_cost", "2.0").withStyle(ChatFormatting.RED));
+            tooltipComponents.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.health_cost", String.valueOf(config().health_cost)).withStyle(ChatFormatting.RED));
             tooltipComponents.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.legend").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
             // Base message prompting to hold Shift

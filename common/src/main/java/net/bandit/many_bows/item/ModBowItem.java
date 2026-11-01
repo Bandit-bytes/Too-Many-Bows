@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.BowItem;
@@ -27,6 +28,27 @@ public abstract class ModBowItem extends BowItem {
 
     protected ModBowItem(Properties properties) {
         super(properties);
+    }
+
+    /**
+     * Returns attribute value / divisor + flatBonus when ranged_weapon:damage is available and enabled,
+     * otherwise the configured fallback damage.
+     */
+    protected double resolveConfiguredDamage(Player player, double fallback, boolean useAttribute, double divisor, double flatBonus) {
+        if (useAttribute && divisor > 0.0D) {
+            Holder<Attribute> holder = player.level().registryAccess()
+                    .registryOrThrow(Registries.ATTRIBUTE)
+                    .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                    .orElse(null);
+
+            if (holder != null) {
+                AttributeInstance instance = player.getAttribute(holder);
+                if (instance != null) {
+                    return instance.getValue() / divisor + flatBonus;
+                }
+            }
+        }
+        return fallback;
     }
 
     /** Applies the player's bow damage attribute */

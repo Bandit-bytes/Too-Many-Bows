@@ -99,7 +99,7 @@ public class RelicBow extends ModBowItem {
 
         if (state.steadyTicks == 30) {
             player.displayClientMessage(
-                    Component.literal("PERFECT SHOT")
+                    Component.translatable("relic.too_many_bows.godsplitter.perfect_shot")
                             .withStyle(ChatFormatting.AQUA),
                     true
             );
@@ -305,10 +305,14 @@ public class RelicBow extends ModBowItem {
                         .withStyle(ChatFormatting.GRAY)
         );
 
+        // Only Godsplitter's second ability line uses this argument; the others ignore it.
+        String headshotMultiplier = formatMultiplier(RelicConfig.get().headshotMultiplier);
+
         for (int i = 1; i <= 3; i++) {
             lines.add(
                     Component.translatable(
-                            translationPrefix + ".ability" + i
+                            translationPrefix + ".ability" + i,
+                            headshotMultiplier
                     ).withStyle(ChatFormatting.AQUA)
             );
         }
@@ -317,17 +321,20 @@ public class RelicBow extends ModBowItem {
 
         if (kind == Kind.WORLDEATER) {
             lines.add(
-                    Component.literal(
-                            "Dominance: " + tag.getInt("Dominance")
-                                    + "/" + RelicConfig.get().maxDominance
+                    Component.translatable(
+                            "relic.too_many_bows.worldeater.dominance",
+                            tag.getInt("Dominance"),
+                            RelicConfig.get().maxDominance
                     ).withStyle(ChatFormatting.GOLD)
             );
         }
 
         if (kind == Kind.BLUNTED) {
             lines.add(
-                    Component.literal(
-                            "Trials: " + tag.getInt("Trials") + "/3"
+                    Component.translatable(
+                            "relic.too_many_bows.blunted.trials",
+                            tag.getInt("Trials"),
+                            3
                     ).withStyle(ChatFormatting.GOLD)
             );
         }
@@ -336,5 +343,9 @@ public class RelicBow extends ModBowItem {
                 Component.translatable(translationPrefix + ".obtain")
                         .withStyle(ChatFormatting.GRAY)
         );
+    }
+
+    private static String formatMultiplier(float multiplier) {
+        return multiplier == (int) multiplier ? String.valueOf((int) multiplier) : String.valueOf(multiplier);
     }
 }

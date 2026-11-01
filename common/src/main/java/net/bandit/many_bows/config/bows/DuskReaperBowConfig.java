@@ -30,13 +30,25 @@ public class DuskReaperBowConfig {
 
     public boolean apply_marked_tag = true;
     public String marked_tag = "manybows:marked_for_death";
-    public int marked_tag_duration_ticks = 60;
+    public int marked_tag_duration_ticks = 200;
 
     public boolean floating_label_enabled = true;
-    public String floating_label_text = "Marked for Death";
-    public int floating_label_duration_ticks = 60;
+    // A translation key, or plain text to display as written.
+    public String floating_label_text = "item.many_bows.dusk_reaper.marked_label";
+    public int floating_label_duration_ticks = 200;
     public double floating_label_y_offset = 0.25D;
     public boolean floating_label_use_marker = true;
+
+    public boolean death_explosion_enabled = true;
+    public double death_explosion_radius = 4.0D;
+    public double death_explosion_damage = 8.0D;
+    public boolean death_explosion_affects_owner = false;
+    public boolean death_explosion_affects_allies = false;
+    public boolean death_explosion_affects_tamed_animals = false;
+    public boolean death_explosion_particles_enabled = true;
+    public boolean death_explosion_sound_enabled = true;
+    public float death_explosion_sound_volume = 1.0F;
+    public float death_explosion_sound_pitch = 0.7F;
 
     public boolean impact_sound_enabled = true;
     public float impact_sound_volume = 1.0F;

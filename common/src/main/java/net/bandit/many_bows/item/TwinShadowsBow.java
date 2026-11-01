@@ -1,11 +1,11 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.TwinShadowsBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,6 +28,10 @@ public class TwinShadowsBow extends ModBowItem {
 
     public TwinShadowsBow(Properties properties) {
         super(properties);
+    }
+
+    private static TwinShadowsBowConfig config() {
+        return BowJsonConfigHelper.getConfig("twin_shadows", TwinShadowsBowConfig.class, TwinShadowsBowConfig::new);
     }
 
     @Override
@@ -62,36 +66,30 @@ public class TwinShadowsBow extends ModBowItem {
         ItemStack projectileStack = projectileStacks.get(0);
         ArrowItem arrowItem = (ArrowItem) (projectileStack.getItem() instanceof ArrowItem ? projectileStack.getItem() : Items.ARROW);
 
-        float rangedDamage = 6.0f;
-        var registry = serverLevel.registryAccess().registryOrThrow(Registries.ATTRIBUTE);
-        var rangedAttrHolder = registry.getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage")).orElse(null);
-        if (rangedAttrHolder != null) {
-            var attrInstance = player.getAttribute(rangedAttrHolder);
-            if (attrInstance != null) {
-                rangedDamage = (float) attrInstance.getValue();
-            }
-        }
+        TwinShadowsBowConfig config = config();
 
         //Light Arrow
         AbstractArrow lightArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
-        lightArrow.setBaseDamage((rangedDamage / 3.0f));
+        lightArrow.setBaseDamage(resolveConfiguredDamage(player, config.light_arrow_base_damage,
+                config.use_ranged_damage_attribute, config.light_arrow_ranged_damage_divisor, 0.0D));
         applyBowDamageAttribute(lightArrow, player);
-        tryApplyBowCrit(lightArrow, player, 1.5D);
-        lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
+        tryApplyBowCrit(lightArrow, player, config.crit_damage_multiplier);
+        lightArrow.setCustomName(Component.translatable("entity.too_many_bows.twin_shadows.light_arrow").withStyle(ChatFormatting.WHITE));
         lightArrow.addTag("light");
         lightArrow.pickup = AbstractArrow.Pickup.ALLOWED;
-        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
+        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
         serverLevel.addFreshEntity(lightArrow);
 
         //Dark Arrow
         AbstractArrow darkArrow = arrowItem.createArrow(serverLevel, projectileStack, player, bowStack);
-        darkArrow.setBaseDamage((rangedDamage / 2.0f));
+        darkArrow.setBaseDamage(resolveConfiguredDamage(player, config.dark_arrow_base_damage,
+                config.use_ranged_damage_attribute, config.dark_arrow_ranged_damage_divisor, 0.0D));
         applyBowDamageAttribute(darkArrow, player);
-        tryApplyBowCrit(darkArrow, player, 1.5D);
-        darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
+        tryApplyBowCrit(darkArrow, player, config.crit_damage_multiplier);
+        darkArrow.setCustomName(Component.translatable("entity.too_many_bows.twin_shadows.dark_arrow").withStyle(ChatFormatting.DARK_GRAY));
         darkArrow.addTag("dark");
         darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 5.0F, 0.0F, power * 2.5F, 1.0F);
+        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + config.dark_arrow_yaw_offset_degrees, 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
         serverLevel.addFreshEntity(darkArrow);
 
         if (!player.getAbilities().instabuild) {

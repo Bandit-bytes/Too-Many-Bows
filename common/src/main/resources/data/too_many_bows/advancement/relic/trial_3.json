@@ -3,8 +3,8 @@
     "icon": {
       "id": "too_many_bows:blunted_edge"
     },
-    "title": "An Impossible Shot",
-    "description": "Kill while both archer and target are airborne.",
+    "title": { "translate": "advancement.too_many_bows.relic.trial_3.title" },
+    "description": { "translate": "advancement.too_many_bows.relic.trial_3.description" },
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,

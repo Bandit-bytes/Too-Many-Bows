@@ -1,12 +1,11 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.BurntRelicBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,8 +14,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
@@ -32,6 +29,10 @@ public class BurntRelicBow extends ModBowItem {
         super(properties);
     }
 
+    private static BurntRelicBowConfig config() {
+        return BowJsonConfigHelper.getConfig("burnt_relic", BurntRelicBowConfig.class, BurntRelicBowConfig::new);
+    }
+
     @Override
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
@@ -45,33 +46,20 @@ public class BurntRelicBow extends ModBowItem {
 
                 if (power >= 0.1F) {
                     if (level instanceof ServerLevel serverLevel) {
+                        BurntRelicBowConfig config = config();
                         AbstractArrow arrow;
                         if (arrowStack.is(Items.SPECTRAL_ARROW) || arrowStack.is(Items.TIPPED_ARROW)) {
                             arrow = ((ArrowItem) arrowStack.getItem()).createArrow(serverLevel, arrowStack, player, bowStack);
                         } else {
                             arrow = ((ArrowItem) Items.ARROW).createArrow(serverLevel, new ItemStack(Items.ARROW), player, bowStack);
-                            Holder<Attribute> rangedDamageAttr = level.registryAccess()
-                                    .registryOrThrow(Registries.ATTRIBUTE)
-                                    .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
-                                    .orElse(null);
-
-                            if (rangedDamageAttr != null) {
-                                AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
-                                if (attrInstance != null) {
-                                    float damage = (float) attrInstance.getValue();
-                                    arrow.setBaseDamage(damage / 2.5F + 1.5);
-                                } else {
-                                    arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
-                                }
-                            } else {
-                                arrow.setBaseDamage(arrow.getBaseDamage() + 3.0);
-                            }
+                            arrow.setBaseDamage(resolveConfiguredDamage(player, config.base_damage,
+                                    config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, config.ranged_damage_flat_bonus));
                         }
                         applyBowDamageAttribute(arrow, player);
-                        tryApplyBowCrit(arrow, player, 1.5D);
+                        tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
 
                         arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
-                        arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.5F, 1.0F);
+                        arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
                         serverLevel.addFreshEntity(arrow);
                     }
 
@@ -98,7 +86,7 @@ public class BurntRelicBow extends ModBowItem {
 
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return stack -> true;
+        return ARROW_ONLY;
     }
 
     @Override
