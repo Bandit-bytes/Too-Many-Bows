@@ -1,18 +1,17 @@
 package net.bandit.many_bows.entity;
 
-import net.bandit.many_bows.registry.EntityRegistry;
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.SpectralWhisperBowConfig;
 import net.bandit.many_bows.registry.EnchantmentRegistry;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -20,32 +19,50 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class SpectralArrow extends AbstractArrow {
-    private int remainingObstacles;
+
+    private static final String CONFIG_NAME = "spectral_whisper";
+
+    private int remainingObstacles = 1;
     private int lifespan = 140;
 
     public SpectralArrow(EntityType<? extends SpectralArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues(0);
     }
 
     public SpectralArrow(Level level, LivingEntity shooter, ItemStack bow) {
         super(EntityRegistry.SPECTRAL_ARROW.get(), shooter, level);
-        this.setBaseDamage(7.0);
+        applyConfiguredValues(EnchantmentHelper.getItemEnchantmentLevel(EnchantmentRegistry.SPECTRAL.get(), bow));
+    }
 
-        int spectralLevel = EnchantmentHelper.getItemEnchantmentLevel(EnchantmentRegistry.SPECTRAL.get(), bow);
-        this.remainingObstacles = 1 + spectralLevel;
+    private static SpectralWhisperBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, SpectralWhisperBowConfig.class, SpectralWhisperBowConfig::new);
+    }
+
+    private void applyConfiguredValues(int spectralEnchantmentLevel) {
+        SpectralWhisperBowConfig config = config();
+        this.setBaseDamage(config.direct_hit_damage);
+        this.remainingObstacles = Math.max(0, config.obstacles_to_phase_through
+                + spectralEnchantmentLevel * config.extra_phases_per_enchantment_level);
+        this.lifespan = config.max_lifetime_ticks;
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (--lifespan <= 0) {
+
+        if (lifespan > 0 && --lifespan <= 0) {
             this.discard();
             return;
         }
 
+        SpectralWhisperBowConfig config = config();
+
         Vec3 currentPosition = this.position();
         Vec3 nextPosition = currentPosition.add(this.getDeltaMovement());
-        EntityHitResult entityHitResult = this.findHitEntity(currentPosition, nextPosition);
+
+        EntityHitResult entityHitResult = this.findHitEntity(currentPosition, nextPosition, config.entity_hit_box_inflation);
         if (entityHitResult != null) {
             this.onHitEntity(entityHitResult);
             return;
@@ -67,16 +84,28 @@ public class SpectralArrow extends AbstractArrow {
     @Override
     protected void onHitBlock(BlockHitResult result) {
         if (!level().isClientSide()) {
+            SpectralWhisperBowConfig config = config();
+
             if (remainingObstacles > 0) {
                 remainingObstacles--;
 
                 Vec3 movement = this.getDeltaMovement();
                 Vec3 hitPos = result.getLocation();
-                this.setPos(hitPos.x + movement.x * 0.5, hitPos.y + movement.y * 0.5, hitPos.z + movement.z * 0.5);
+                double offset = config.phase_position_offset_multiplier;
+
+                this.setPos(
+                        hitPos.x + movement.x * offset,
+                        hitPos.y + movement.y * offset,
+                        hitPos.z + movement.z * offset
+                );
 
                 this.setDeltaMovement(movement);
-            } else {
-                this.setDeltaMovement(Vec3.ZERO);
+            } else if (config.stop_when_out_of_phases) {
+                if (config.discard_when_out_of_phases) {
+                    this.discard();
+                } else {
+                    this.setDeltaMovement(Vec3.ZERO);
+                }
             }
         }
     }
@@ -91,19 +120,20 @@ public class SpectralArrow extends AbstractArrow {
         }
     }
 
-    public EntityHitResult findHitEntity(Vec3 start, Vec3 end) {
-        return ProjectileUtil.getEntityHitResult(level(), this, start, end,
-                this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D),
-                entity -> super.canHitEntity(entity));
+    public EntityHitResult findHitEntity(Vec3 start, Vec3 end, double inflation) {
+        return ProjectileUtil.getEntityHitResult(
+                level(),
+                this,
+                start,
+                end,
+                this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(inflation),
+                entity -> super.canHitEntity(entity)
+        );
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
-    }
 }

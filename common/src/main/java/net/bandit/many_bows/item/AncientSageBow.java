@@ -45,7 +45,7 @@ public class AncientSageBow extends ModBowItem {
             AncientSageArrow arrow = new AncientSageArrow(level, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-            arrow.setBaseDamage(8.0D);
+            // Base damage comes from config (ancient_sage_bow.json, default 8.0).
 
             int powerLevel = net.minecraft.world.item.enchantment.EnchantmentHelper
                     .getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);

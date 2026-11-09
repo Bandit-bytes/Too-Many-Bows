@@ -44,7 +44,7 @@ public class HeavensBow extends ModBowItem {
             LightningArrow arrow = new LightningArrow(level, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
 
-            arrow.setBaseDamage(2.0D);
+            // Base damage comes from config (arc_heavens.json, default 2.0).
 
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             if (powerLevel > 0) {

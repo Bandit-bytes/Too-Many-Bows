@@ -44,7 +44,7 @@ public class AuroraBow extends ModBowItem {
         ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
         if (arrowStack.isEmpty() && !hasInfinity) {
-            player.displayClientMessage(Component.translatable("items.many_bows.aurora_bow.no_arrows")
+            player.displayClientMessage(Component.translatable("item.many_bows.aurora_bow.no_arrows")
                     .withStyle(ChatFormatting.RED), true);
             player.awardStat(Stats.ITEM_USED.get(this));
             return;

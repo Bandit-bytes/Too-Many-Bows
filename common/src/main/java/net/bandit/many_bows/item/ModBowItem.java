@@ -3,6 +3,7 @@ package net.bandit.many_bows.item;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.registry.AttributesRegistry;
+import net.bandit.many_bows.util.AttributeHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -95,13 +96,15 @@ public class ModBowItem extends BowItem {
             AbstractArrow arrow =
                     arrowItem.createArrow(level, arrowStack, player);
 
+            customizeArrow(arrow, player, bowStack, drawPower);
+
             arrow.shootFromRotation(
                     player,
                     player.getXRot(),
                     player.getYRot(),
                     0.0F,
-                    drawPower * 3.0F,
-                    1.0F
+                    drawPower * getArrowVelocity(),
+                    getArrowInaccuracy()
             );
 
             if (drawPower == 1.0F) {
@@ -191,6 +194,76 @@ public class ModBowItem extends BowItem {
         }
 
         player.awardStat(Stats.ITEM_USED.get(this));
+    }
+
+    /**
+     * Applies Power, Punch and Flame the way vanilla 1.20.1 bows do.
+     * (On 1.21 these come from the arrow's weapon stack automatically.)
+     */
+    protected static void applyStandardEnchantments(AbstractArrow arrow, ItemStack bowStack) {
+        applyStandardEnchantments(arrow, bowStack, 0.5D);
+    }
+
+    /**
+     * @param powerFlatBonus extra damage added on top of 0.5 per Power level
+     *                       (vanilla uses 0.5; several bows use more).
+     */
+    protected static void applyStandardEnchantments(AbstractArrow arrow, ItemStack bowStack, double powerFlatBonus) {
+        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, bowStack);
+        if (powerLevel > 0) {
+            arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5D + powerFlatBonus);
+        }
+
+        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, bowStack);
+        if (punchLevel > 0) {
+            arrow.setKnockback(punchLevel);
+        }
+
+        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, bowStack) > 0) {
+            arrow.setSecondsOnFire(100);
+        }
+    }
+
+    /**
+     * Hook for bows that use the shared firing path: adjust the arrow
+     * before it is shot (e.g. set a configured base damage).
+     */
+    protected void customizeArrow(
+            AbstractArrow arrow,
+            Player player,
+            ItemStack bowStack,
+            float drawPower
+    ) {
+    }
+
+    /** Arrow velocity at full draw for the shared firing path. */
+    protected float getArrowVelocity() {
+        return 3.0F;
+    }
+
+    /** Arrow inaccuracy for the shared firing path. */
+    protected float getArrowInaccuracy() {
+        return 1.0F;
+    }
+
+    /**
+     * Returns attribute value / divisor + flatBonus when ranged_weapon:damage
+     * is available and enabled, otherwise the configured fallback damage.
+     */
+    protected double resolveConfiguredDamage(
+            Player player,
+            double fallback,
+            boolean useAttribute,
+            double divisor,
+            double flatBonus
+    ) {
+        if (useAttribute && divisor > 0.0D) {
+            Double value = AttributeHelper.getValue(player, "ranged_weapon", "damage");
+            if (value != null) {
+                return value / divisor + flatBonus;
+            }
+        }
+        return fallback;
     }
 
     /**

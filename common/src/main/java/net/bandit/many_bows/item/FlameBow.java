@@ -43,7 +43,7 @@ public class FlameBow extends ModBowItem {
         if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
             FlameArrow flameArrow = new FlameArrow(level, player);
             flameArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-            flameArrow.setBaseDamage(flameArrow.getBaseDamage() * 2.0D);
+            // Base damage comes from config (flame_bow.json, default 4.0).
             flameArrow.setSecondsOnFire(100);
 
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);

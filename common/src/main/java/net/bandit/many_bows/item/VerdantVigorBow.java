@@ -1,6 +1,8 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.entity.VitalityArrow;
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.VerdantVigorBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,8 +19,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
@@ -27,55 +27,56 @@ import java.util.List;
 
 public class VerdantVigorBow extends ModBowItem {
 
-    private static final int HEALTH_BOOST_LEVEL = 1;
-    private static final int REGENERATION_DURATION = 40;
-    private static final int HEALTH_BOOST_DURATION = 100;
-    private static final int BUFFER_DURATION = 100;
-    private static final int HEALTH_BOOST_HEARTS = 4;
-    private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
-
-    private int bufferTimer = 0;
-
     public VerdantVigorBow(Properties properties) {
         super(properties);
     }
 
+    private static VerdantVigorBowConfig config() {
+        return BowJsonConfigHelper.getConfig("verdant_vigor", VerdantVigorBowConfig.class, VerdantVigorBowConfig::new);
+    }
+
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && !world.isClientSide) {
-            boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+        if (!(entity instanceof Player player) || world.isClientSide) return;
 
-            if (isHoldingBow) {
-                bufferTimer = BUFFER_DURATION;
-                MobEffectInstance healthBoost = player.getEffect(MobEffects.HEALTH_BOOST);
-                if (healthBoost == null || healthBoost.getAmplifier() != HEALTH_BOOST_LEVEL || healthBoost.getDuration() < 60) {
-                    player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, HEALTH_BOOST_DURATION, HEALTH_BOOST_LEVEL, true, false, false));
-                    if (player.getHealth() < player.getMaxHealth()) {
-                        player.setHealth(Math.min(player.getMaxHealth(), player.getHealth() + (HEALTH_BOOST_HEARTS * 2)));
-                    }
-                }
-                if (world.getGameTime() % 40 == 0) {
-                    AABB area = new AABB(
-                            player.getX() - 5, player.getY() - 5, player.getZ() - 5,
-                            player.getX() + 5, player.getY() + 5, player.getZ() + 5
-                    );
+        boolean isHoldingBow = player.getMainHandItem() == stack || player.getOffhandItem() == stack;
+        if (!isHoldingBow) return;
 
-                    world.getEntities(player, area, e -> e instanceof LivingEntity && e.isAlive() && e != player)
-                            .forEach(entityNearby -> {
-                                if (entityNearby instanceof LivingEntity livingEntity) {
-                                    livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, REGENERATION_DURATION, 0, true, false, false));
-                                }
-                            });
-                }
-            } else {
-                if (bufferTimer > 0) {
-                    bufferTimer--;
-                } else {
-                    if (player.hasEffect(MobEffects.HEALTH_BOOST)) {
-                        player.removeEffect(MobEffects.HEALTH_BOOST);
-                    }
+        VerdantVigorBowConfig config = config();
+
+        if (config.health_boost_enabled) {
+            MobEffectInstance healthBoost = player.getEffect(MobEffects.HEALTH_BOOST);
+            if (healthBoost == null
+                    || healthBoost.getAmplifier() < config.health_boost_amplifier
+                    || (healthBoost.getAmplifier() == config.health_boost_amplifier
+                    && healthBoost.getDuration() < config.health_boost_refresh_below_ticks)) {
+                player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST,
+                        config.health_boost_duration_ticks, config.health_boost_amplifier, true, false, false));
+                if (config.health_boost_refresh_heal > 0.0F && player.getHealth() < player.getMaxHealth()) {
+                    player.heal(config.health_boost_refresh_heal);
                 }
             }
+        }
+
+        if (config.ally_regeneration_enabled
+                && world.getGameTime() % Math.max(1, config.ally_regeneration_interval_ticks) == 0) {
+            double radius = config.ally_regeneration_radius;
+            AABB area = new AABB(
+                    player.getX() - radius, player.getY() - radius, player.getZ() - radius,
+                    player.getX() + radius, player.getY() + radius, player.getZ() + radius
+            );
+
+            world.getEntities(player, area, e ->
+                    e instanceof LivingEntity
+                            && e.isAlive()
+                            && e != player
+                            && (e.getType().getCategory().isFriendly() || e instanceof Player)
+            ).forEach(entityNearby -> ((LivingEntity) entityNearby).addEffect(new MobEffectInstance(
+                    MobEffects.REGENERATION,
+                    config.ally_regeneration_duration_ticks,
+                    config.ally_regeneration_amplifier,
+                    true, false, false
+            )));
         }
     }
 
@@ -97,32 +98,26 @@ public class VerdantVigorBow extends ModBowItem {
                     arrowStack = new ItemStack(Items.ARROW);
                 }
 
+                VerdantVigorBowConfig config = config();
                 VitalityArrow arrow = new VitalityArrow(level, player);
-                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                arrow.setBaseDamage(8.0);
+                arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F,
+                        power * config.arrow_velocity, config.arrow_inaccuracy);
+                arrow.setBaseDamage(resolveConfiguredDamage(player, config.base_damage,
+                        config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, 0.0D));
 
-                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-                if (powerLevel > 0) {
-                    arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
-                }
-
-                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-                if (punchLevel > 0) {
-                    arrow.setKnockback(punchLevel);
-                }
-
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-                    arrow.setSecondsOnFire(100);
-                }
+                applyStandardEnchantments(arrow, stack);
 
                 applyBowDamageAttribute(arrow, player);
-                tryApplyBowCrit(arrow, player, DEFAULT_CRIT_MULTIPLIER);
+                tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
 
                 arrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
 
-                arrow.setOnHitCallback(target -> {
-                    target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 1));
-                });
+                if (config.wither_on_hit_enabled) {
+                    int witherTicks = config.wither_on_hit_duration_ticks;
+                    int witherAmplifier = config.wither_on_hit_amplifier;
+                    arrow.setOnHitCallback(target ->
+                            target.addEffect(new MobEffectInstance(MobEffects.WITHER, witherTicks, witherAmplifier)));
+                }
 
                 level.addFreshEntity(arrow);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);

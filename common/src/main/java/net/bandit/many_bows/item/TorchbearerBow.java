@@ -14,6 +14,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
@@ -80,6 +81,10 @@ public class TorchbearerBow extends ModBowItem {
         applyBowDamageAttribute(arrow, player);
         tryApplyBowCrit(arrow, player, DEFAULT_CRIT_MULTIPLIER);
 
+        if (isCreative || hasInfinity) {
+            arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+        }
+
         if (!isCreative && !hasInfinity && !projectile.isEmpty()) {
             projectile.shrink(1);
             if (projectile.isEmpty()) {
@@ -115,7 +120,7 @@ public class TorchbearerBow extends ModBowItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.too_many_bows.torchbearer_bow").withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.translatable("items.too_many_bows.torchbearer_bow.tooltip").withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.translatable("item.too_many_bows.torchbearer_bow.tooltip").withStyle(ChatFormatting.GREEN));
 
         if (Screen.hasShiftDown()) {
             tooltip.add(Component.translatable("item.too_many_bows.torchbearer_bow.shift").withStyle(ChatFormatting.YELLOW));

@@ -1,5 +1,6 @@
 package net.bandit.many_bows.fabric.trinkets;
 
+import net.bandit.many_bows.config.AccessoriesConfigHolder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import dev.emi.trinkets.api.SlotReference;
@@ -14,12 +15,10 @@ import java.util.UUID;
 
 public class StormboundSignetTrinket implements Trinket {
 
-    private static final double BONUS = 0.30D;
-
     @Override
     public Multimap<Attribute, AttributeModifier> getModifiers(ItemStack stack, SlotReference slot, LivingEntity entity, UUID uuid) {
         Multimap<Attribute, AttributeModifier> map = HashMultimap.create();
-        map.put(AttributesRegistry.BOW_DAMAGE.get(), new AttributeModifier(uuid, "stormbound_signet_bow_damage", BONUS, AttributeModifier.Operation.ADDITION));
+        map.put(AttributesRegistry.BOW_DAMAGE.get(), new AttributeModifier(uuid, "stormbound_signet_bow_damage", AccessoriesConfigHolder.get().stormboundSignetBonus, AttributeModifier.Operation.ADDITION));
         return map;
     }
 }

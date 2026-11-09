@@ -34,25 +34,21 @@ public final class ModLootModifiers {
 
         registered = true;
 
-        BowLootConfig config =
-                ManyBowsConfigHolder.CONFIG;
-
-        final Set<ResourceLocation> easyTables =
-                parseLootTables(config.easyLootTables);
-        final Set<ResourceLocation> mediumTables =
-                parseLootTables(config.mediumLootTables);
-        final Set<ResourceLocation> hardTables =
-                parseLootTables(config.hardLootTables);
-        final Set<ResourceLocation> endgameTables =
-                parseLootTables(config.endgameLootTables);
-        final Set<ResourceLocation> accessoryTables =
-                parseLootTables(config.accessoryLootTables);
-
         LootEvent.MODIFY_LOOT_TABLE.register(
                 (lootDataManager, id, context, builtin) -> {
                     if (!builtin) {
                         return;
                     }
+
+                    // Read the live config so /tmb reload loot applies on the next /reload.
+                    BowLootConfig config = ManyBowsConfigHolder.CONFIG;
+                    ParsedTables tables = parsedTablesFor(config);
+
+                    final Set<ResourceLocation> easyTables = tables.easy();
+                    final Set<ResourceLocation> mediumTables = tables.medium();
+                    final Set<ResourceLocation> hardTables = tables.hard();
+                    final Set<ResourceLocation> endgameTables = tables.endgame();
+                    final Set<ResourceLocation> accessoryTables = tables.accessory();
 
                     if (Boolean.TRUE.equals(config.easyLootEnabled)
                             && easyTables.contains(id)) {
@@ -105,6 +101,32 @@ public final class ModLootModifiers {
                     }
                 }
         );
+    }
+
+    private record ParsedTables(
+            BowLootConfig source,
+            Set<ResourceLocation> easy,
+            Set<ResourceLocation> medium,
+            Set<ResourceLocation> hard,
+            Set<ResourceLocation> endgame,
+            Set<ResourceLocation> accessory
+    ) {
+    }
+
+    private static ParsedTables parsedTables;
+
+    private static synchronized ParsedTables parsedTablesFor(BowLootConfig config) {
+        if (parsedTables == null || parsedTables.source() != config) {
+            parsedTables = new ParsedTables(
+                    config,
+                    parseLootTables(config.easyLootTables),
+                    parseLootTables(config.mediumLootTables),
+                    parseLootTables(config.hardLootTables),
+                    parseLootTables(config.endgameLootTables),
+                    parseLootTables(config.accessoryLootTables)
+            );
+        }
+        return parsedTables;
     }
 
     private static Set<ResourceLocation> parseLootTables(

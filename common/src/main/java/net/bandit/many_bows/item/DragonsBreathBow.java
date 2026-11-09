@@ -46,7 +46,7 @@ public class DragonsBreathBow extends ModBowItem {
         if (power >= 0.1F && (hasInfinity || !arrowStack.isEmpty())) {
             DragonsBreathArrow arrow = new DragonsBreathArrow(level, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.5F, 1.0F);
-            arrow.setBaseDamage(arrow.getBaseDamage() * 2.5D);
+            // Base damage comes from config (dragons_breath.json, default 5.0).
 
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             if (powerLevel > 0) {

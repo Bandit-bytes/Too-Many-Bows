@@ -242,7 +242,7 @@
   "item.too_many_bows.webstring_volley.details": "Shoots 5 arrows in a spread pattern, applying slowness to targets.",
   "item.too_many_bows.torchbearer_bow": "Torchbearer Bow",
   "item.too_many_bows.torchbearer": "Torchbearer",
-  "items.too_many_bows.torchbearer_bow.tooltip": "Light the way..",
+  "item.too_many_bows.torchbearer_bow.tooltip": "Light the way..",
   "attribute.too_many_bows.bow_draw_speed": "Bow Draw Speed",
   "attribute.too_many_bows.bow_damage": "Bow Damage",
   "attribute.too_many_bows.bow_crit_chance": "Bow Crit Chance",
@@ -284,5 +284,9 @@
   "curios.modifiers.glove": "glove",
 
   "item.many_bows.aether_bow.tooltip": "A bow attuned to the winds of the Aether.",
-  "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact"
+  "item.many_bows.aether_bow.tooltip.extended": "Fully charged shots unleash an Aether Burst:\n • Enemies hit are lifted with Levitation\n • The wielder is granted Slow Falling\n • Creates shimmering aetheric particles upon impact",
+  "item.many_bows.dusk_reaper.marked_label": "Marked for Death",
+  "entity.too_many_bows.twin_shadows.light_arrow": "Light Arrow",
+  "entity.too_many_bows.twin_shadows.dark_arrow": "Dark Arrow",
+  "item.many_bows.aurora_bow.no_arrows": "You need arrows to fire this bow!"
 }

@@ -279,5 +279,11 @@
   "item.many_bows.bow_damage_ring.equip_hint": "Екіпіруйте в слот персня.",
 
   "item.many_bows.aether_bow.tooltip": "Лук, налаштований на вітри Етеру.",
-  "item.many_bows.aether_bow.tooltip.extended": "Повністю заряджені постріли вивільняють Ефірний Вибух:\n • Влучені вороги піднімаються з Левітацією\n • Власник отримує Повільне Падіння\n • Створює мерехтливі ефірні частинки при ударі"
+  "item.many_bows.aether_bow.tooltip.extended": "Повністю заряджені постріли вивільняють Ефірний Вибух:\n • Влучені вороги піднімаються з Левітацією\n • Власник отримує Повільне Падіння\n • Створює мерехтливі ефірні частинки при ударі",
+  "curios.modifiers.glove": "рукавиця",
+  "item.too_many_bows.torchbearer_bow.tooltip": "Освітлюй шлях..",
+  "item.many_bows.dusk_reaper.marked_label": "Позначений Смертю",
+  "entity.too_many_bows.twin_shadows.light_arrow": "Стріла Світла",
+  "entity.too_many_bows.twin_shadows.dark_arrow": "Стріла Темряви",
+  "item.many_bows.aurora_bow.no_arrows": "Вам потрібні стріли для пострілу з цього лука!"
 }

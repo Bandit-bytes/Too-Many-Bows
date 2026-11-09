@@ -1,7 +1,9 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
 import net.bandit.many_bows.config.BowLootConfig;
 import net.bandit.many_bows.config.ManyBowsConfigHolder;
+import net.bandit.many_bows.config.bows.CrimsonNexusBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -19,22 +21,27 @@ import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
 
 public class CrimsonNexusBow extends ModBowItem {
 
-    private static final double CRIT_MULTIPLIER = 1.5D;
+    private final WeakHashMap<Player, Long> lastShotTime = new WeakHashMap<>();
 
     public CrimsonNexusBow(Properties properties) {
         super(properties);
+    }
+
+    private static CrimsonNexusBowConfig config() {
+        return BowJsonConfigHelper.getConfig("crimson_nexus", CrimsonNexusBowConfig.class, CrimsonNexusBowConfig::new);
     }
 
     @Override
@@ -50,7 +57,8 @@ public class CrimsonNexusBow extends ModBowItem {
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-        float healthCost = player.getHealth() <= 4.0F ? 0.0F : 2.0F;
+        CrimsonNexusBowConfig config = config();
+        float healthCost = player.getHealth() <= config.minimum_health_to_pay_cost ? 0.0F : config.health_cost;
         if (healthCost > 0.0F) {
             player.hurt(player.damageSources().magic(), healthCost);
         }
@@ -68,18 +76,25 @@ public class CrimsonNexusBow extends ModBowItem {
         AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
         arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
 
-        arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-        applyEnchantments(stack, arrow);
+        if (config.use_ranged_damage_attribute || config.base_damage >= 0.0D) {
+            double fallback = config.base_damage >= 0.0D ? config.base_damage : arrow.getBaseDamage();
+            arrow.setBaseDamage(resolveConfiguredDamage(player, fallback,
+                    config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, 0.0D));
+        }
+
+        arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
+        applyStandardEnchantments(arrow, stack, 1.5D);
 
         applyBowDamageAttribute(arrow, player);
-        tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
+        tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
 
         if (player.getHealth() == player.getMaxHealth()) {
             arrow.setCritArrow(true);
-            arrow.setSecondsOnFire(200);
+            arrow.setSecondsOnFire(config.full_health_fire_seconds);
         }
 
         level.addFreshEntity(arrow);
+        lastShotTime.put(player, level.getGameTime());
 
         damageBow(stack, player, player.getUsedItemHand());
         player.awardStat(Stats.ITEM_USED.get(this));
@@ -97,63 +112,55 @@ public class CrimsonNexusBow extends ModBowItem {
         }
     }
 
-    private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
-        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-        if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
-        }
-
-        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-        if (punchLevel > 0) {
-            arrow.setKnockback(punchLevel);
-        }
-
-        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-            arrow.setSecondsOnFire(100);
-        }
-    }
-
-    private ItemStack findArrowInInventory(Player player) {
-        for (ItemStack invStack : player.getInventory().items) {
-            if (invStack.getItem() instanceof ArrowItem) {
-                return invStack;
-            }
-        }
-        return ItemStack.EMPTY;
-    }
-
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (!(entity instanceof Player player)) return;
         if (!selected) return;
         if (level.isClientSide) return;
 
-        if (level.getGameTime() % 20 != 0) return;
+        CrimsonNexusBowConfig config = config();
+        if (!config.life_drain_enabled) return;
+
+        if (config.life_drain_window_ticks >= 0) {
+            Long lastShot = lastShotTime.get(player);
+            if (lastShot == null || level.getGameTime() - lastShot > config.life_drain_window_ticks) return;
+        }
+
+        if (level.getGameTime() % Math.max(1, config.life_drain_interval_ticks) != 0) return;
         if (player.getHealth() >= player.getMaxHealth()) return;
 
-        AABB area = new AABB(player.getX() - 8, player.getY() - 4, player.getZ() - 8,
-                player.getX() + 8, player.getY() + 4, player.getZ() + 8);
+        double h = config.life_drain_horizontal_radius;
+        double v = config.life_drain_vertical_radius;
+        AABB area = new AABB(player.getX() - h, player.getY() - v, player.getZ() - h,
+                player.getX() + h, player.getY() + v, player.getZ() + h);
 
-        List<LivingEntity> nearby = level.getEntitiesOfClass(LivingEntity.class, area,
-                e -> e != player && e.isAlive() && !(e instanceof Player));
+        List<LivingEntity> nearby = new ArrayList<>(level.getEntitiesOfClass(LivingEntity.class, area,
+                e -> e != player && e.isAlive() && !(config.life_drain_ignores_players && e instanceof Player)));
 
-        BowLootConfig config = ManyBowsConfigHolder.getConfig();
+        BowLootConfig lootConfig = ManyBowsConfigHolder.getConfig();
 
         nearby.removeIf(target -> {
             String id = target.getType().builtInRegistryHolder().key().location().toString();
-            return config.emeraldSageCrimsonNexusBlacklist.contains(id);
+            return lootConfig.emeraldSageCrimsonNexusBlacklist.contains(id);
         });
 
-        if (nearby.isEmpty()) return;
+        if (nearby.isEmpty() || config.life_drain_max_targets <= 0) return;
 
-        LivingEntity target = nearby.get(level.random.nextInt(nearby.size()));
-        target.hurt(player.damageSources().magic(), 2.0F);
-        player.heal(1.0F);
+        float damage = (float) resolveConfiguredDamage(player, config.life_drain_base_damage,
+                config.use_ranged_damage_attribute, config.life_drain_ranged_damage_divisor, 0.0D);
+
+        Collections.shuffle(nearby, new java.util.Random(level.random.nextLong()));
+        for (LivingEntity target : nearby.subList(0, Math.min(config.life_drain_max_targets, nearby.size()))) {
+            target.hurt(player.damageSources().magic(), damage);
+            player.heal(config.life_drain_heal_per_target);
+        }
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 0.3F, 1.5F);
 
-        damageBow(stack, player, player.getUsedItemHand());
+        if (config.life_drain_damages_bow) {
+            damageBow(stack, player, player.getUsedItemHand());
+        }
     }
 
     @Override
@@ -180,7 +187,7 @@ public class CrimsonNexusBow extends ModBowItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.info").withStyle(ChatFormatting.DARK_RED));
-            tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.health_cost", "2.0").withStyle(ChatFormatting.RED));
+            tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.health_cost", String.valueOf(config().health_cost)).withStyle(ChatFormatting.RED));
             tooltip.add(Component.translatable("item.many_bows.crimson_nexus.tooltip.legend").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         } else {
             tooltip.add(Component.translatable("item.too_many_bows.shulker_blast_bow.hold_shift"));

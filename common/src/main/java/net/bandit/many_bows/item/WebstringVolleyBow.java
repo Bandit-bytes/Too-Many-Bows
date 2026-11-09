@@ -56,7 +56,7 @@ public class WebstringVolleyBow extends ModBowItem {
                     float angleOffset = SPREAD_ANGLE * (i - (ARROW_COUNT - 1) / 2.0F) / (ARROW_COUNT - 1);
                     arrow.shootFromRotation(player, player.getXRot(), player.getYRot() + angleOffset, 0.0F, power * 3.0F, 1.0F);
 
-                    arrow.setBaseDamage(5.0);
+                    // Base damage comes from config (webstring.json, default 5.0).
                     int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                     if (powerLevel > 0) {
                         arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);

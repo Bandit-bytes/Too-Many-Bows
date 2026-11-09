@@ -27,7 +27,6 @@ import java.util.List;
 public class FrostbiteBow extends ModBowItem {
 
     private static final int MIN_CHARGE_REQUIRED = 10;
-    private static final double BASE_DAMAGE = 2.0D;
     private static final double CRIT_MULTIPLIER = 1.5D;
 
     private boolean hasPlayedPullSound = false;
@@ -51,7 +50,7 @@ public class FrostbiteBow extends ModBowItem {
                 FrostbiteArrow arrow = new FrostbiteArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 4.0F, 1.0F);
 
-                arrow.setBaseDamage(BASE_DAMAGE);
+                // Base damage comes from config (frostbite.json, default 2.0).
 
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {

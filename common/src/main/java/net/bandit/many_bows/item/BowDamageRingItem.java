@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.AccessoriesConfig;
+import net.bandit.many_bows.config.AccessoriesConfigHolder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -45,7 +47,11 @@ public class BowDamageRingItem extends Item {
     }
 
     public double getBonus() {
-        return tier.bonus();
+        AccessoriesConfig config = AccessoriesConfigHolder.get();
+        return switch (tier) {
+            case SHARPSHOT -> config.sharpshotRingBonus;
+            case STORMBOUND -> config.stormboundSignetBonus;
+        };
     }
 
     @Override

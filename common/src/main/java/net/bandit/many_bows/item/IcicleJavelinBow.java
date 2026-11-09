@@ -25,7 +25,6 @@ import java.util.List;
 public class IcicleJavelinBow extends ModBowItem {
 
     private static final int MIN_CHARGE_REQUIRED = 10;
-    private static final double BASE_DAMAGE = 3.0D;
     private static final double CRIT_MULTIPLIER = 1.5D;
 
     private boolean hasPlayedPullSound = false;
@@ -49,7 +48,8 @@ public class IcicleJavelinBow extends ModBowItem {
                 IcicleJavelin javelin = new IcicleJavelin(level, player);
                 javelin.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.5F, 1.0F);
 
-                double dmg = BASE_DAMAGE;
+                // Base damage comes from config (cyroheart_bow.json, default 3.0).
+                double dmg = javelin.getBaseDamage();
                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
                 if (powerLevel > 0) {
                     dmg += powerLevel * 0.5D;

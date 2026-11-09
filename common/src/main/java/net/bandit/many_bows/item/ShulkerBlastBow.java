@@ -22,7 +22,6 @@ import java.util.List;
 
 public class ShulkerBlastBow extends ModBowItem {
 
-    private static final float DAMAGE_MULTIPLIER = 2.0F;
     private static final double CRIT_MULTIPLIER = 1.5D;
 
     public ShulkerBlastBow(Properties properties) {
@@ -74,7 +73,8 @@ public class ShulkerBlastBow extends ModBowItem {
     }
 
     private void applyEnchantments(ItemStack stack, ShulkerBlastProjectile projectile) {
-        double baseDamage = 5.0D * (double) DAMAGE_MULTIPLIER;
+        // Base damage comes from config (shulker_blast.json, default 10.0).
+        double baseDamage = projectile.getBaseDamage();
 
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {

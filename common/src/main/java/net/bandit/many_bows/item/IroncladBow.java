@@ -43,7 +43,7 @@ public class IroncladBow extends ModBowItem {
             IronCladArrow arrow = new IronCladArrow(level, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
 
-            arrow.setBaseDamage(8.0D);
+            // Base damage comes from config (ironclad.json, default 8.0).
 
             int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
             if (powerLevel > 0) {

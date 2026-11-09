@@ -44,6 +44,7 @@ public class RadianceBow extends ModBowItem {
                 RadiantArrow arrow = new RadiantArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
                 arrow.setCritArrow(charge >= 20);
+                arrow.setPowerMultiplier(power);
 
                 applyEnchantments(stack, arrow);
 
@@ -80,12 +81,9 @@ public class RadianceBow extends ModBowItem {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
-        if (player.getAbilities().instabuild || player.getProjectile(stack).isEmpty() || this.getAllSupportedProjectiles().test(player.getProjectile(stack))) {
-            player.startUsingItem(hand);
-            return InteractionResultHolder.consume(stack);
-        } else {
-            return InteractionResultHolder.fail(stack);
-        }
+        // Shots are paid for with experience, so arrows are not required to draw.
+        player.startUsingItem(hand);
+        return InteractionResultHolder.consume(stack);
     }
 
     private void applyEnchantments(ItemStack stack, RadiantArrow arrow) {
@@ -121,7 +119,9 @@ public class RadianceBow extends ModBowItem {
 
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return s -> true;
+        // Fires on experience, not arrows. Matching every item made getProjectile()
+        // treat whatever sat in the first inventory slot as ammo.
+        return s -> false;
     }
 
     @Override

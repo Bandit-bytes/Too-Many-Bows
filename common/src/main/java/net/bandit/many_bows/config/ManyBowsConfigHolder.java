@@ -11,4 +11,9 @@ public final class ManyBowsConfigHolder {
     public static BowLootConfig getConfig() {
         return CONFIG;
     }
+
+    public static BowLootConfig reload() {
+        CONFIG = BowLootConfig.loadConfig();
+        return CONFIG;
+    }
 }

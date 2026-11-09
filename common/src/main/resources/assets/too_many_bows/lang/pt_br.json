@@ -279,5 +279,11 @@
   "item.many_bows.bow_damage_ring.equip_hint": "Equipe em um slot de anel.",
 
   "item.many_bows.aether_bow.tooltip": "Um arco sintonizado aos ventos do Éter.",
-  "item.many_bows.aether_bow.tooltip.extended": "Tiros totalmente carregados liberam uma Explosão Etérea:\n • Inimigos atingidos são elevados com Levitação\n • O portador recebe Queda Lenta\n • Cria partículas etéreas cintilantes no impacto"
+  "item.many_bows.aether_bow.tooltip.extended": "Tiros totalmente carregados liberam uma Explosão Etérea:\n • Inimigos atingidos são elevados com Levitação\n • O portador recebe Queda Lenta\n • Cria partículas etéreas cintilantes no impacto",
+  "curios.modifiers.glove": "luva",
+  "item.too_many_bows.torchbearer_bow.tooltip": "Ilumine o caminho..",
+  "item.many_bows.dusk_reaper.marked_label": "Marcado para Morrer",
+  "entity.too_many_bows.twin_shadows.light_arrow": "Flecha de Luz",
+  "entity.too_many_bows.twin_shadows.dark_arrow": "Flecha Sombria",
+  "item.many_bows.aurora_bow.no_arrows": "Você precisa de flechas para disparar este arco!"
 }

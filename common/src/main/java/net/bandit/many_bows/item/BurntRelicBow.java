@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.BurntRelicBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,7 +16,6 @@ import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -23,10 +24,12 @@ import java.util.List;
 
 public class BurntRelicBow extends ModBowItem {
 
-    private static final double CRIT_MULTIPLIER = 1.5D;
-
     public BurntRelicBow(Properties properties) {
         super(properties);
+    }
+
+    private static BurntRelicBowConfig config() {
+        return BowJsonConfigHelper.getConfig("burnt_relic", BurntRelicBowConfig.class, BurntRelicBowConfig::new);
     }
 
     @Override
@@ -34,20 +37,28 @@ public class BurntRelicBow extends ModBowItem {
         if (!(entity instanceof Player player)) return;
         if (level.isClientSide) return;
 
+        ItemStack arrowStack = player.getProjectile(stack);
+        if (arrowStack.isEmpty() && !player.getAbilities().instabuild) return;
+
         int charge = this.getUseDuration(stack) - timeCharged;
         float power = getPowerForTime(charge);
 
         if (power >= 0.1F) {
-            ItemStack arrowStack = player.getProjectile(stack);
-            ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
+            BurntRelicBowConfig config = config();
+            AbstractArrow arrow;
+            if (arrowStack.getItem() instanceof ArrowItem arrowItem && !arrowStack.is(Items.ARROW)) {
+                // Spectral, tipped and modded arrows keep their own projectile.
+                arrow = arrowItem.createArrow(level, arrowStack, player);
+            } else {
+                arrow = ((ArrowItem) Items.ARROW).createArrow(level, new ItemStack(Items.ARROW), player);
+                arrow.setBaseDamage(resolveConfiguredDamage(player, config.base_damage,
+                        config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, config.ranged_damage_flat_bonus));
+            }
+            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * config.arrow_velocity, config.arrow_inaccuracy);
 
-            AbstractArrow arrow = arrowItem.createArrow(level, arrowStack, player);
-            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-
-            applyEnchantments(stack, arrow);
-
+            applyStandardEnchantments(arrow, stack, 1.5D);
             applyBowDamageAttribute(arrow, player);
-            tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
+            tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
 
             arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
 
@@ -60,22 +71,6 @@ public class BurntRelicBow extends ModBowItem {
         }
 
         player.awardStat(Stats.ITEM_USED.get(this));
-    }
-
-    private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
-        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-        if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
-        }
-
-        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-        if (punchLevel > 0) {
-            arrow.setKnockback(punchLevel);
-        }
-
-        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-            arrow.setSecondsOnFire(100);
-        }
     }
 
     @Override

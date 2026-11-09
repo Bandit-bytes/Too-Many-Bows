@@ -15,8 +15,6 @@ import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,23 +52,11 @@ public class VitalityWeaverBow extends ModBowItem {
                     return;
                 }
 
+                // Base damage comes from config (vitality_weaver.json, default 8.0).
                 VitalityArrow arrow = new VitalityArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                arrow.setBaseDamage(8.0);
 
-                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-                if (powerLevel > 0) {
-                    arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 0.5);
-                }
-
-                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-                if (punchLevel > 0) {
-                    arrow.setKnockback(punchLevel);
-                }
-
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-                    arrow.setSecondsOnFire(100);
-                }
+                applyStandardEnchantments(arrow, stack);
 
                 applyBowDamageAttribute(arrow, player);
                 tryApplyBowCrit(arrow, player, DEFAULT_CRIT_MULTIPLIER);

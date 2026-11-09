@@ -1,13 +1,15 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.AncientSageBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
+import net.bandit.many_bows.util.AttributeHelper;
 import net.bandit.many_bows.util.AncientSageDamageSource;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -16,17 +18,40 @@ import net.minecraft.world.phys.EntityHitResult;
 
 public class AncientSageArrow extends AbstractArrow {
 
-    private static final float DEFAULT_ARMOR_PENETRATION_FACTOR = 0.33f;
-    private static final int PARTICLE_LIFESPAN = 60; // Number of ticks to show particles
-    private float armorPenetration = DEFAULT_ARMOR_PENETRATION_FACTOR;
-    private int particleTicksRemaining = PARTICLE_LIFESPAN;
+    private static final String CONFIG_NAME = "ancient_sage_bow";
 
-    public AncientSageArrow(EntityType<? extends AncientSageArrow> entityType, Level level) {
+    private float powerMultiplier = 1.0F;
+    private float armorPenetration = 0.33F;
+    private int particleTicksRemaining = 60;
+
+    public AncientSageArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues();
     }
 
     public AncientSageArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.ANCIENT_SAGE_ARROW.get(), shooter, level);
+        applyConfiguredValues();
+    }
+
+    private static AncientSageBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, AncientSageBowConfig.class, AncientSageBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        AncientSageBowConfig config = config();
+
+        this.armorPenetration = (float) config.default_armor_penetration_factor;
+        this.particleTicksRemaining = Math.max(0, config.trail_particle_lifespan_ticks);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+
+        if (config.direct_hit_damage_override >= 0.0D) {
+            this.setBaseDamage(config.direct_hit_damage_override);
+        }
+    }
+
+    public void setPowerMultiplier(float power) {
+        this.powerMultiplier = power;
     }
 
     public void setArmorPenetration(float armorPenetration) {
@@ -37,45 +62,103 @@ public class AncientSageArrow extends AbstractArrow {
     protected void onHitEntity(EntityHitResult result) {
         super.onHitEntity(result);
 
+        AncientSageBowConfig config = config();
+
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            float baseDamage = (float) this.getBaseDamage();
-            float armorReducedDamage = baseDamage * (1 - armorPenetration);
-            target.hurt(AncientSageDamageSource.create(this.level(), this, this.getOwner()), armorReducedDamage);
-            createHitParticles();
+            if (config.bonus_penetration_damage_enabled) {
+                float baseDamage = (float) this.getBaseDamage();
+                float resolvedPenetration = resolveArmorPenetration(config);
+                float multiplier = config.bonus_penetration_scales_with_power_multiplier ? this.powerMultiplier : 1.0F;
+                float bonusDamage = baseDamage * resolvedPenetration * multiplier;
+
+                if (bonusDamage > 0.0F) {
+                    target.hurt(AncientSageDamageSource.create(this.level(), this, this.getOwner()), bonusDamage);
+                }
+            }
+
+            createHitParticles(config);
         }
-        this.discard();
+
+        if (config.discard_after_entity_hit) {
+            this.discard();
+        }
     }
 
+    private float resolveArmorPenetration(AncientSageBowConfig config) {
+        float resolved = this.armorPenetration;
+
+        if (config.use_ranged_damage_attribute_for_penetration && this.getOwner() instanceof Player player
+                && config.ranged_damage_attribute_divisor != 0.0D) {
+            Double value = AttributeHelper.getValue(player,
+                    config.ranged_damage_attribute_namespace, config.ranged_damage_attribute_path);
+            if (value != null) {
+                resolved = (float) (value / config.ranged_damage_attribute_divisor);
+            }
+        }
+
+        float min = (float) config.min_armor_penetration_factor;
+        float max = (float) config.max_armor_penetration_factor;
+
+        if (min > max) {
+            float temp = min;
+            min = max;
+            max = temp;
+        }
+
+        return Math.min(Math.max(resolved, min), max);
+    }
 
     @Override
     public void tick() {
         super.tick();
-        if (particleTicksRemaining > 0) {
-            createTrailParticles();
+
+        AncientSageBowConfig config = config();
+
+        if (config.trail_particles_enabled && particleTicksRemaining > 0) {
+            createTrailParticles(config);
             particleTicksRemaining--;
         }
     }
 
-    private void createHitParticles() {
-        for (int i = 0; i < 15; i++) {
-            double offsetX = (this.random.nextDouble() - 0.5) * 0.5;
-            double offsetY = this.random.nextDouble() * 0.5;
-            double offsetZ = (this.random.nextDouble() - 0.5) * 0.5;
-            level().addParticle(ParticleTypes.ENCHANTED_HIT, this.getX() + offsetX, this.getY() + offsetY, this.getZ() + offsetZ, 0, 0.1, 0);
+    private void createHitParticles(AncientSageBowConfig config) {
+        if (!config.hit_particles_enabled) {
+            return;
+        }
+
+        if (this.level() instanceof ServerLevel serverLevel) {
+            serverLevel.sendParticles(
+                    ParticleTypes.ENCHANTED_HIT,
+                    this.getX(),
+                    this.getY(),
+                    this.getZ(),
+                    Math.max(0, config.hit_particle_count),
+                    config.hit_particle_offset_x,
+                    config.hit_particle_offset_y,
+                    config.hit_particle_offset_z,
+                    config.hit_particle_speed
+            );
         }
     }
 
-    private void createTrailParticles() {
-        level().addParticle(ParticleTypes.GLOW, this.getX(), this.getY(), this.getZ(), 0, 0.05, 0);
-    }
+    private void createTrailParticles(AncientSageBowConfig config) {
+        int count = Math.max(0, config.trail_particles_per_tick);
 
-    @Override
-    public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this);
+        for (int i = 0; i < count; i++) {
+            level().addParticle(
+                    ParticleTypes.GLOW,
+                    this.getX(),
+                    this.getY() + config.trail_particle_offset_y,
+                    this.getZ(),
+                    config.trail_particle_velocity_x,
+                    config.trail_particle_velocity_y,
+                    config.trail_particle_velocity_z
+            );
+        }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
+
 }

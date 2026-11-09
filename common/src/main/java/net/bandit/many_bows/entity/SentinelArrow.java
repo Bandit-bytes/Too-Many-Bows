@@ -1,5 +1,8 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.SentinelWrathBowConfig;
+import net.minecraft.server.level.ServerLevel;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -19,34 +22,56 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class SentinelArrow extends AbstractArrow {
-    private static final float DAMAGE_MULTIPLIER = 5.0f;
+
+    private static final String CONFIG_NAME = "sentinel_wrath";
 
     public SentinelArrow(EntityType<? extends SentinelArrow> entityType, Level level) {
         super(entityType, level);
+        applyConfiguredValues();
     }
 
     public SentinelArrow(Level level, LivingEntity shooter) {
         super(EntityRegistry.SENTINEL_ARROW.get(), shooter, level);
-        this.setBaseDamage(4.0);
+        applyConfiguredValues();
+    }
+
+    private static SentinelWrathBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, SentinelWrathBowConfig.class, SentinelWrathBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        SentinelWrathBowConfig config = config();
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
+
+        if (config.direct_hit_damage_override >= 0.0D) {
+            this.setBaseDamage(config.direct_hit_damage_override);
+        }
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        // Captured before the vanilla hit, which may discard the arrow.
+        float baseDamage = (float) this.getBaseDamage();
+
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            float finalDamage = (float) this.getBaseDamage();
+            SentinelWrathBowConfig config = config();
+            float finalDamage = baseDamage;
             Entity owner = this.getOwner();
 
-            if (isRaidMob(target)) {
-                finalDamage *= DAMAGE_MULTIPLIER;
+            if (config.bonus_damage_vs_raid_mobs_enabled && isRaidMob(target, config)) {
+                finalDamage *= (float) config.raid_mob_damage_multiplier;
 
-                level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.RAVAGER_ROAR, SoundSource.PLAYERS, 0.7F, 1.0F);
-                for (int i = 0; i < 10; i++) {
-                    double xOffset = (this.random.nextDouble() - 0.5) * 0.2;
-                    double yOffset = (this.random.nextDouble() - 0.5) * 0.2;
-                    double zOffset = (this.random.nextDouble() - 0.5) * 0.2;
-                    level().addParticle(ParticleTypes.CRIT, this.getX() + xOffset, this.getY() + yOffset, this.getZ() + zOffset, 0, 0, 0);
+                if (config.impact_sound_enabled) {
+                    level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.RAVAGER_ROAR,
+                            SoundSource.PLAYERS, config.impact_sound_volume, config.impact_sound_pitch);
+                }
+                if (config.impact_particles_enabled && config.impact_particle_count > 0
+                        && level() instanceof ServerLevel serverLevel) {
+                    double spread = config.impact_particle_offset_scale / 2.0D;
+                    serverLevel.sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(),
+                            config.impact_particle_count, spread, spread, spread, 0.0D);
                 }
             }
 
@@ -58,10 +83,9 @@ public class SentinelArrow extends AbstractArrow {
         }
     }
 
-
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 
     @Override
@@ -69,12 +93,8 @@ public class SentinelArrow extends AbstractArrow {
         return new ClientboundAddEntityPacket(this);
     }
 
-    private boolean isRaidMob(LivingEntity entity) {
-        return entity instanceof Pillager ||
-                entity instanceof Vindicator ||
-                entity instanceof Evoker ||
-                entity instanceof Ravager ||
-                entity instanceof Illusioner ||
-                entity instanceof Witch;
+    private static boolean isRaidMob(LivingEntity entity, SentinelWrathBowConfig config) {
+        String id = entity.getType().builtInRegistryHolder().key().location().toString();
+        return config.raid_mob_whitelist.contains(id);
     }
 }

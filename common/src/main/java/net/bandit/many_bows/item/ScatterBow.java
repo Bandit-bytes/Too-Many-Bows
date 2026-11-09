@@ -1,6 +1,8 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.compat.OriginsQuiverCompat;
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.ScatterBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,8 +16,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,11 +23,12 @@ import java.util.List;
 
 public class ScatterBow extends ModBowItem {
 
-    private static final int NUM_ARROWS = 8;
-    private static final double CRIT_MULTIPLIER = 1.5D;
-
     public ScatterBow(Properties properties) {
         super(properties);
+    }
+
+    private static ScatterBowConfig config() {
+        return BowJsonConfigHelper.getConfig("scatter_bow", ScatterBowConfig.class, ScatterBowConfig::new);
     }
 
     @Override
@@ -38,43 +39,36 @@ public class ScatterBow extends ModBowItem {
         int charge = this.getUseDuration(stack) - timeCharged;
         float power = getPowerForTime(charge);
 
+        ScatterBowConfig config = config();
+        int maxArrows = Math.max(1, config.max_arrows);
         boolean hasInfinity = canFireWithoutArrows(stack, player);
-        int arrowsToShoot = hasInfinity ? NUM_ARROWS : Math.min(NUM_ARROWS, countArrows(player));
+        int arrowsToShoot = hasInfinity ? maxArrows : Math.min(maxArrows, countArrows(player));
 
-        if (power >= 0.1F && (hasInfinity || consumeArrow(player, arrowsToShoot))) {
+        if (power >= 0.1F && arrowsToShoot > 0 && (hasInfinity || consumeArrow(player, arrowsToShoot))) {
+            double baseDamage = resolveConfiguredDamage(player, config.base_damage,
+                    config.use_ranged_damage_attribute, config.ranged_damage_attribute_divisor, 0.0D);
+
             for (int i = 0; i < arrowsToShoot; i++) {
                 Arrow arrow = new Arrow(level, player);
-                arrow.setBaseDamage(1.0D);
+                arrow.setBaseDamage(baseDamage);
 
-                int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-                if (powerLevel > 0) {
-                    arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5D + 0.5D);
-                }
-
-                int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-                if (punchLevel > 0) {
-                    arrow.setKnockback(punchLevel);
-                }
-
-                if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-                    arrow.setSecondsOnFire(100);
-                }
+                applyStandardEnchantments(arrow, stack);
 
                 applyBowDamageAttribute(arrow, player);
-                tryApplyBowCrit(arrow, player, CRIT_MULTIPLIER);
+                tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
 
                 if (hasInfinity) {
                     arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
                 }
 
-                float yawOffset = (level.getRandom().nextFloat() - 0.5F) * 20.0F;
-                float pitchOffset = (level.getRandom().nextFloat() - 0.5F) * 10.0F;
+                float yawOffset = (level.getRandom().nextFloat() - 0.5F) * config.yaw_spread_degrees;
+                float pitchOffset = (level.getRandom().nextFloat() - 0.5F) * config.pitch_spread_degrees;
                 arrow.shootFromRotation(player,
                         player.getXRot() + pitchOffset,
                         player.getYRot() + yawOffset,
                         0.0F,
-                        power * 3.0F,
-                        1.0F);
+                        power * config.arrow_velocity,
+                        config.arrow_inaccuracy);
 
                 level.addFreshEntity(arrow);
             }

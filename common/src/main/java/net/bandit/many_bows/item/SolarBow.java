@@ -1,5 +1,6 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.entity.SolarArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,7 +12,6 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -63,7 +63,8 @@ public class SolarBow extends ModBowItem {
     }
 
     private void fireFlamingArrow(Level level, Player player, boolean hasInfinity, ItemStack stack) {
-        Arrow arrow = new Arrow(level, player);
+        SolarArrow arrow = new SolarArrow(level, player);
+        arrow.setPowerMultiplier(1.0F);
 
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {

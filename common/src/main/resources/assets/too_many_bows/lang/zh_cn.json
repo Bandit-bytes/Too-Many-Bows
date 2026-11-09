@@ -279,5 +279,11 @@
   "item.many_bows.bow_damage_ring.equip_hint": "装备在戒指槽。",
 
   "item.many_bows.aether_bow.tooltip": "与以太之风调谐的弓。",
-  "item.many_bows.aether_bow.tooltip.extended": "完全充能的射击释放以太爆发:\n • 被击中的敌人被漂浮提升\n • 持有者获得缓降\n • 撞击时产生闪烁的以太粒子"
+  "item.many_bows.aether_bow.tooltip.extended": "完全充能的射击释放以太爆发:\n • 被击中的敌人被漂浮提升\n • 持有者获得缓降\n • 撞击时产生闪烁的以太粒子",
+  "curios.modifiers.glove": "手套",
+  "item.too_many_bows.torchbearer_bow.tooltip": "照亮前路……",
+  "item.many_bows.dusk_reaper.marked_label": "死亡标记",
+  "entity.too_many_bows.twin_shadows.light_arrow": "光明之箭",
+  "entity.too_many_bows.twin_shadows.dark_arrow": "黑暗之箭",
+  "item.many_bows.aurora_bow.no_arrows": "你需要箭矢才能发射此弓!"
 }

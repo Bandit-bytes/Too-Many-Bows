@@ -48,6 +48,7 @@ public class DuskReaperBow extends ModBowItem {
 
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
             arrow.setCritArrow(charge >= 20);
+            arrow.setPowerMultiplier(power);
 
             applyEnchantments(stack, arrow);
 

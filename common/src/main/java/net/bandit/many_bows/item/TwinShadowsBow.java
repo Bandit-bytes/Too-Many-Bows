@@ -1,5 +1,7 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.TwinShadowsBowConfig;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,8 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,10 +27,12 @@ import java.util.function.Predicate;
 
 public class TwinShadowsBow extends ModBowItem {
 
-    private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
-
     public TwinShadowsBow(Properties properties) {
         super(properties);
+    }
+
+    private static TwinShadowsBowConfig config() {
+        return BowJsonConfigHelper.getConfig("twin_shadows", TwinShadowsBowConfig.class, TwinShadowsBowConfig::new);
     }
 
     @Override
@@ -116,45 +118,33 @@ public class TwinShadowsBow extends ModBowItem {
     }
 
     private void fireTwinArrows(Level level, Player player, boolean hasInfinity, ItemStack bowStack, ItemStack arrowStack) {
+        TwinShadowsBowConfig config = config();
         ArrowItem arrowItem = (ArrowItem) (arrowStack.getItem() instanceof ArrowItem ? arrowStack.getItem() : Items.ARROW);
 
         AbstractArrow lightArrow = arrowItem.createArrow(level, arrowStack, player);
-        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0F, 1.0F);
-        lightArrow.setBaseDamage(4.0);
-        lightArrow.setCustomName(Component.literal(ChatFormatting.WHITE + "Light Arrow"));
-        applyEnchantments(lightArrow, bowStack);
+        lightArrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, config.arrow_velocity, config.arrow_inaccuracy);
+        lightArrow.setBaseDamage(resolveConfiguredDamage(player, config.light_arrow_base_damage,
+                config.use_ranged_damage_attribute, config.light_arrow_ranged_damage_divisor, 0.0D));
+        lightArrow.setCustomName(Component.translatable("entity.too_many_bows.twin_shadows.light_arrow").withStyle(ChatFormatting.WHITE));
+        applyStandardEnchantments(lightArrow, bowStack, 1.5D);
         applyBowDamageAttribute(lightArrow, player);
-        tryApplyBowCrit(lightArrow, player, DEFAULT_CRIT_MULTIPLIER);
+        tryApplyBowCrit(lightArrow, player, config.crit_damage_multiplier);
         lightArrow.pickup = hasInfinity ? AbstractArrow.Pickup.CREATIVE_ONLY : AbstractArrow.Pickup.ALLOWED;
         level.addFreshEntity(lightArrow);
 
         AbstractArrow darkArrow = arrowItem.createArrow(level, arrowStack, player);
-        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + 3.0F, 0.0F, 3.0F, 1.0F);
-        darkArrow.setBaseDamage(6.0);
-        darkArrow.setCustomName(Component.literal(ChatFormatting.DARK_GRAY + "Dark Arrow"));
-        applyEnchantments(darkArrow, bowStack);
+        darkArrow.shootFromRotation(player, player.getXRot(), player.getYRot() + config.dark_arrow_yaw_offset_degrees, 0.0F,
+                config.arrow_velocity, config.arrow_inaccuracy);
+        darkArrow.setBaseDamage(resolveConfiguredDamage(player, config.dark_arrow_base_damage,
+                config.use_ranged_damage_attribute, config.dark_arrow_ranged_damage_divisor, 0.0D));
+        darkArrow.setCustomName(Component.translatable("entity.too_many_bows.twin_shadows.dark_arrow").withStyle(ChatFormatting.DARK_GRAY));
+        applyStandardEnchantments(darkArrow, bowStack, 1.5D);
         applyBowDamageAttribute(darkArrow, player);
-        tryApplyBowCrit(darkArrow, player, DEFAULT_CRIT_MULTIPLIER);
+        tryApplyBowCrit(darkArrow, player, config.crit_damage_multiplier);
         darkArrow.pickup = AbstractArrow.Pickup.DISALLOWED;
         level.addFreshEntity(darkArrow);
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-    }
-
-    private void applyEnchantments(AbstractArrow arrow, ItemStack stack) {
-        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
-        if (powerLevel > 0) {
-            arrow.setBaseDamage(arrow.getBaseDamage() + powerLevel * 0.5 + 1.5);
-        }
-
-        int punchLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.PUNCH_ARROWS, stack);
-        if (punchLevel > 0) {
-            arrow.setKnockback(punchLevel);
-        }
-
-        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FLAMING_ARROWS, stack) > 0) {
-            arrow.setSecondsOnFire(100);
-        }
     }
 
     @Override

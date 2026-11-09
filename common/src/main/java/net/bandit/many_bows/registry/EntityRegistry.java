@@ -137,6 +137,26 @@ public class EntityRegistry {
 
 
 
+    public static final RegistrySupplier<EntityType<EtherealArrow>> ETHEREAL_ARROW = ENTITY_TYPES.register("ethereal_arrow",
+            () -> EntityType.Builder.<EtherealArrow>of(EtherealArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "ethereal_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<TorchbearerArrow>> TORCHBEARER_ARROW = ENTITY_TYPES.register("torchbearer_arrow",
+            () -> EntityType.Builder.<TorchbearerArrow>of(TorchbearerArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "torchbearer_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<SolarArrow>> SOLAR_ARROW = ENTITY_TYPES.register("solar_arrow",
+            () -> EntityType.Builder.<SolarArrow>of(SolarArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "solar_arrow").toString()));
+
+    public static final RegistrySupplier<EntityType<AethersCallArrow>> AETHERS_CALL_ARROW = ENTITY_TYPES.register("aethers_call_arrow",
+            () -> EntityType.Builder.<AethersCallArrow>of(AethersCallArrow::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build(new ResourceLocation(MOD_ID, "aethers_call_arrow").toString()));
+
     public static void register() {
         ENTITY_TYPES.register();
     }

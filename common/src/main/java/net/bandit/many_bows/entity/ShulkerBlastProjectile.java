@@ -1,5 +1,7 @@
 package net.bandit.many_bows.entity;
 
+import net.bandit.many_bows.config.BowJsonConfigHelper;
+import net.bandit.many_bows.config.bows.ShulkerBlastBowConfig;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -12,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.AABB;
@@ -20,69 +23,76 @@ import net.minecraft.world.phys.EntityHitResult;
 import java.util.List;
 
 public class ShulkerBlastProjectile extends AbstractArrow {
-    private static final double HOMING_RANGE = 20.0;
-    private static final float SPEED = 0.7f;
-    private static final float DAMAGE = 6.0f;
-    private static final int LEVITATION_DURATION = 40; // 2 seconds
-    private static final int MAX_LIFETIME = 100; // Max lifetime in ticks (100 ticks = 5 seconds)
 
-    private int lifetime = 0; // Counter for the projectile's lifetime
+    private static final String CONFIG_NAME = "shulker_blast";
+
+    private int lifetime = 0;
 
     public ShulkerBlastProjectile(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
-        this.setNoGravity(true);
-        this.setBaseDamage(DAMAGE);
+        applyConfiguredValues();
     }
 
     public ShulkerBlastProjectile(Level level, LivingEntity shooter) {
         super(EntityRegistry.SHULKER_BLAST_PROJECTILE.get(), shooter, level);
-        this.setNoGravity(true);
-        this.setBaseDamage(DAMAGE);
+        applyConfiguredValues();
+    }
+
+    private static ShulkerBlastBowConfig config() {
+        return BowJsonConfigHelper.getConfig(CONFIG_NAME, ShulkerBlastBowConfig.class, ShulkerBlastBowConfig::new);
+    }
+
+    private void applyConfiguredValues() {
+        ShulkerBlastBowConfig config = config();
+        this.setNoGravity(config.no_gravity);
+        this.setBaseDamage(config.direct_hit_damage);
+        this.pickup = config.allow_pickup ? Pickup.ALLOWED : Pickup.DISALLOWED;
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        // Increase lifetime counter
+        ShulkerBlastBowConfig config = config();
+
         lifetime++;
-        if (lifetime > MAX_LIFETIME) {
-            this.discard(); // Discard the projectile if it has existed for too long
+        if (config.max_lifetime_ticks > 0 && lifetime > config.max_lifetime_ticks) {
+            this.discard();
             return;
         }
 
-        if (!this.level().isClientSide) {
-            // Find the nearest target within the homing range
-            LivingEntity target = findNearestTarget();
+        if (!this.level().isClientSide && config.homing_enabled) {
+            LivingEntity target = findNearestTarget(config);
             if (target != null) {
-                // Calculate the direction vector towards the target
                 double dx = target.getX() - this.getX();
                 double dy = (target.getY() + target.getEyeHeight() / 2) - this.getY();
                 double dz = target.getZ() - this.getZ();
                 double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
                 if (distance > 0) {
-                    double homingFactor = 0.2; // Controls how strongly it homes in on the target
+                    double homingFactor = config.homing_factor;
+                    double speed = config.homing_speed;
                     this.setDeltaMovement(
-                            this.getDeltaMovement().x * (1.0 - homingFactor) + (dx / distance) * SPEED * homingFactor,
-                            this.getDeltaMovement().y * (1.0 - homingFactor) + (dy / distance) * SPEED * homingFactor,
-                            this.getDeltaMovement().z * (1.0 - homingFactor) + (dz / distance) * SPEED * homingFactor
+                            this.getDeltaMovement().x * (1.0 - homingFactor) + (dx / distance) * speed * homingFactor,
+                            this.getDeltaMovement().y * (1.0 - homingFactor) + (dy / distance) * speed * homingFactor,
+                            this.getDeltaMovement().z * (1.0 - homingFactor) + (dz / distance) * speed * homingFactor
                     );
                 }
             }
         }
 
-        // Spawn particles along its path for visual effect
-        this.level().addParticle(ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+        if (config.trail_particles_enabled) {
+            this.level().addParticle(ParticleTypes.END_ROD, this.getX(), this.getY(), this.getZ(), 0, 0, 0);
+        }
     }
 
-    private LivingEntity findNearestTarget() {
-        AABB searchBox = this.getBoundingBox().inflate(HOMING_RANGE);
+    private LivingEntity findNearestTarget(ShulkerBlastBowConfig config) {
+        AABB searchBox = this.getBoundingBox().inflate(Math.max(0.0D, config.homing_range));
         List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, searchBox,
-                entity -> entity != this.getOwner()
-                        && entity.isAlive()
-                        && !(entity instanceof ArmorStand)
-                        && !(entity instanceof TamableAnimal tamable && tamable.isTame())
+                entity -> entity.isAlive()
+                        && !(config.exclude_owner && entity == this.getOwner())
+                        && !(config.exclude_armor_stands && entity instanceof ArmorStand)
+                        && !(config.exclude_tamed_animals && entity instanceof TamableAnimal tamable && tamable.isTame())
         );
         return entities.stream()
                 .min((e1, e2) -> Double.compare(e1.distanceTo(this), e2.distanceTo(this)))
@@ -91,27 +101,40 @@ public class ShulkerBlastProjectile extends AbstractArrow {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
+        ShulkerBlastBowConfig config = config();
+
         // Let AbstractArrow apply the configured base damage, Power, Punch and Flame once.
         super.onHitEntity(result);
 
         if (!level().isClientSide() && result.getEntity() instanceof LivingEntity target) {
-            target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, LEVITATION_DURATION, 1));
+            if (config.apply_levitation) {
+                target.addEffect(new MobEffectInstance(MobEffects.LEVITATION,
+                        config.levitation_duration_ticks, config.levitation_amplifier));
+            }
 
-            // Play a sound and spawn particles on hit
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.SHULKER_BULLET_HIT, SoundSource.PLAYERS, 1.0F, 1.0F);
-            for (int i = 0; i < 10; i++) {
-                double xOffset = (this.random.nextDouble() - 0.5) * 0.3;
-                double yOffset = this.random.nextDouble() * 0.3;
-                double zOffset = (this.random.nextDouble() - 0.5) * 0.3;
-                this.level().addParticle(ParticleTypes.ENCHANTED_HIT, this.getX() + xOffset, this.getY() + yOffset, this.getZ() + zOffset, 0.0, 0.0, 0.0);
+            if (config.impact_sound_enabled) {
+                this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
+                        SoundEvents.SHULKER_BULLET_HIT, SoundSource.PLAYERS,
+                        config.impact_sound_volume, config.impact_sound_pitch);
+            }
+
+            if (config.impact_particles_enabled && config.impact_particle_count > 0
+                    && this.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(ParticleTypes.ENCHANTED_HIT,
+                        this.getX(), this.getY() + config.impact_particle_offset_y / 2.0D, this.getZ(),
+                        config.impact_particle_count,
+                        config.impact_particle_offset_xz / 2.0D, config.impact_particle_offset_y / 2.0D,
+                        config.impact_particle_offset_xz / 2.0D, 0.0D);
             }
         }
 
-        this.discard(); // Remove the projectile after hitting
+        if (config.discard_after_entity_hit) {
+            this.discard();
+        }
     }
 
     @Override
     protected ItemStack getPickupItem() {
-        return new ItemStack(Items.ARROW);
+        return config().allow_pickup ? new ItemStack(Items.ARROW) : ItemStack.EMPTY;
     }
 }

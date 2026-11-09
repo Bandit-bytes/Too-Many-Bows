@@ -1,5 +1,6 @@
 package net.bandit.many_bows.item;
 
+import net.bandit.many_bows.entity.EtherealArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,7 +12,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -44,8 +45,8 @@ public class EtherealHunterBow extends ModBowItem {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.5F);
 
-            Arrow arrow = new Arrow(level, player);
-            arrow.setBaseDamage(9.0D);
+            // Base damage comes from config (ethereal_hunter.json, default 9.0).
+            EtherealArrow arrow = new EtherealArrow(level, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
             arrow.setCritArrow(charge >= 20);
 
@@ -76,7 +77,7 @@ public class EtherealHunterBow extends ModBowItem {
         return false;
     }
 
-    private void applyEnchantments(ItemStack stack, Arrow arrow) {
+    private void applyEnchantments(ItemStack stack, AbstractArrow arrow) {
         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, stack);
         if (powerLevel > 0) {
             arrow.setBaseDamage(arrow.getBaseDamage() + (powerLevel * 0.5D) + 1.5D);
@@ -116,7 +117,9 @@ public class EtherealHunterBow extends ModBowItem {
 
     @Override
     public @NotNull Predicate<ItemStack> getAllSupportedProjectiles() {
-        return s -> true;
+        // Fires on hunger, not arrows. Matching every item made getProjectile()
+        // treat whatever sat in the first inventory slot as ammo.
+        return s -> false;
     }
 
     @Override

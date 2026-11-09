@@ -279,5 +279,11 @@
   "item.many_bows.bow_damage_ring.equip_hint": "指輪スロットに装備。",
 
   "item.many_bows.aether_bow.tooltip": "エーテルの風に調和した弓。",
-  "item.many_bows.aether_bow.tooltip.extended": "フルチャージ射撃でエーテルバーストを解き放つ：\n • 命中した敵は浮遊で持ち上げられる\n • 使用者に低速落下を付与\n • 着弾時に輝くエーテルパーティクルを作成"
+  "item.many_bows.aether_bow.tooltip.extended": "フルチャージ射撃でエーテルバーストを解き放つ：\n • 命中した敵は浮遊で持ち上げられる\n • 使用者に低速落下を付与\n • 着弾時に輝くエーテルパーティクルを作成",
+  "curios.modifiers.glove": "グローブ",
+  "item.too_many_bows.torchbearer_bow.tooltip": "道を照らせ……",
+  "item.many_bows.dusk_reaper.marked_label": "死の印",
+  "entity.too_many_bows.twin_shadows.light_arrow": "光の矢",
+  "entity.too_many_bows.twin_shadows.dark_arrow": "闇の矢",
+  "item.many_bows.aurora_bow.no_arrows": "この弓を発射するには矢が必要！"
 }
