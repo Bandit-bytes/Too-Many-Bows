@@ -1,0 +1,79 @@
+name: Bug report
+description: Something isn't working, crashes, or behaves wrong.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much as you can — it makes fixing it a lot faster.
+  - type: dropdown
+    id: mc-version
+    attributes:
+      label: Minecraft version
+      options:
+        - "1.20.1"
+        - "1.21.1"
+        - "1.21.11"
+        - "26.1.2"
+        - "26.2"
+    validations:
+      required: true
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod loader
+      options:
+        - Fabric
+        - Forge
+        - NeoForge
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Too Many Bows version
+      description: The exact file/version you have installed (e.g. 4.2.0).
+      placeholder: "4.2.0"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug. Which bow, arrow, or feature is affected?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Equip ...
+        2. Shoot at ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+  - type: textarea
+    id: logs
+    attributes:
+      label: Crash report / latest.log
+      description: Upload to https://mclo.gs or https://pastebin.com and paste the link. Please don't paste whole logs here.
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods / modpack
+      description: Modpack name and version, or a list of other mods installed (especially combat, accessory, or ranged-weapon mods).
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I'm using the latest version of Too Many Bows for my Minecraft version.
+          required: true
+        - label: I searched existing issues and this hasn't been reported yet.
+          required: true
