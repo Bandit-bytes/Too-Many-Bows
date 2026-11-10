@@ -3,6 +3,7 @@
 build/
 out/
 bin/
+classes/
 !gradle/wrapper/gradle-wrapper.jar
 
 # Run directories (dev worlds, logs, configs, etc.)
@@ -14,6 +15,8 @@ runs/
 # Architectury / Loom caches
 .architectury-transformer/
 **/.architectury-transformer/
+remappedSrc/
+**/src/generated/resources/.cache/
 
 # IntelliJ IDEA
 .idea/
@@ -34,5 +37,6 @@ desktop.ini
 
 # Logs / crash reports
 *.log
+logs/
 crash-reports/
 hs_err_pid*
