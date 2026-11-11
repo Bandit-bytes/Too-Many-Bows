@@ -64,10 +64,15 @@ public class EtherealHunterBow extends ModBowItem {
         }
     }
 
+    /**
+     * Charges the shot as food exhaustion (4 exhaustion = 1 hunger point), the way vanilla charges
+     * sprinting and jumping: saturation drains first, then the food bar, and the server syncs the
+     * result to the client. Setting the food level directly skipped saturation and desynced the HUD
+     * (issue #1, visible with AppleSkin).
+     */
     private boolean consumeHunger(Player player) {
-        int currentHunger = player.getFoodData().getFoodLevel();
-        if (currentHunger >= HUNGER_COST) {
-            player.getFoodData().setFoodLevel(currentHunger - HUNGER_COST);
+        if (player.getFoodData().getFoodLevel() >= HUNGER_COST) {
+            player.causeFoodExhaustion(4.0F * HUNGER_COST);
             return true;
         }
         player.displayClientMessage(
