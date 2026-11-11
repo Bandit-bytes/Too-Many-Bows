@@ -40,7 +40,7 @@ public class ArcaneBow extends ModBowItem {
         if (!(entity instanceof Player player)) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.SHROOMLIGHT_BREAK, SoundSource.PLAYERS, 1.0F, 1.0F);

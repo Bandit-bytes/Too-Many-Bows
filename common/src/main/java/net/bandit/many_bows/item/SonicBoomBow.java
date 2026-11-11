@@ -35,7 +35,7 @@ public class SonicBoomBow extends ModBowItem {
         if (level.isClientSide) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         boolean hasInfinity = canFireWithoutArrows(stack, player);
         ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);

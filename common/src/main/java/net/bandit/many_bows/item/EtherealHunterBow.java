@@ -39,7 +39,7 @@ public class EtherealHunterBow extends ModBowItem {
         if (level.isClientSide) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         if (power >= 0.1F && consumeHunger(player)) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -48,7 +48,7 @@ public class EtherealHunterBow extends ModBowItem {
             // Base damage comes from config (ethereal_hunter.json, default 9.0).
             EtherealArrow arrow = new EtherealArrow(level, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-            arrow.setCritArrow(charge >= 20);
+            arrow.setCritArrow(isFullyDrawn(charge, entity));
 
             applyEnchantments(stack, arrow);
 

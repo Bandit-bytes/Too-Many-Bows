@@ -42,7 +42,7 @@ public class AethersCall extends ModBowItem {
         if (arrowStack.isEmpty() && !hasInfinity) return;
         if (arrowStack.isEmpty()) arrowStack = new ItemStack(Items.ARROW);
 
-        float power = getPowerForTime(getUseDuration(bowStack) - timeLeft);
+        float power = getPowerForTime(getUseDuration(bowStack) - timeLeft, entity);
         if (power < 0.1F) return;
 
         boolean infiniteNormalArrow = hasInfinity && arrowStack.is(Items.ARROW);

@@ -37,13 +37,13 @@ public class RadianceBow extends ModBowItem {
         if (!(entity instanceof Player player)) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         if (!level.isClientSide) {
             if (power >= 0.1F && consumeExperience(player)) {
                 RadiantArrow arrow = new RadiantArrow(level, player);
                 arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-                arrow.setCritArrow(charge >= 20);
+                arrow.setCritArrow(isFullyDrawn(charge, entity));
                 arrow.setPowerMultiplier(power);
 
                 applyEnchantments(stack, arrow);

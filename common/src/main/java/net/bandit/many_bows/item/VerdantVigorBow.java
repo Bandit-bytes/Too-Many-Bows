@@ -84,7 +84,7 @@ public class VerdantVigorBow extends ModBowItem {
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
         if (entity instanceof Player player && !level.isClientSide) {
             int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime(charge);
+            float power = getPowerForTime(charge, entity);
 
             boolean isCreative = player.getAbilities().instabuild;
             boolean hasInfinity = hasInfinity(stack, player);

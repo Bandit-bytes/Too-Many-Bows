@@ -40,7 +40,7 @@ public class FrostbiteBow extends ModBowItem {
         if (!(entity instanceof Player player)) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         if (!level.isClientSide) {
             boolean hasInfinity = canFireWithoutArrows(stack, player);

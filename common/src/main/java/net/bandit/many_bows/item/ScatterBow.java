@@ -37,7 +37,7 @@ public class ScatterBow extends ModBowItem {
         if (level.isClientSide) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         ScatterBowConfig config = config();
         int maxArrows = Math.max(1, config.max_arrows);

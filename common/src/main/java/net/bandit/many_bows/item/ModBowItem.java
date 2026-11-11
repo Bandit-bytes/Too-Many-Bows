@@ -11,6 +11,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
@@ -29,8 +30,44 @@ public class ModBowItem extends BowItem {
     private static final float FLETCHERS_SAVE_CHANCE = 0.25F;
     private static final double DEFAULT_CRIT_MULTIPLIER = 1.5D;
 
+    private static final float DEFAULT_PULL_TICKS = 20.0F;
+    private static final float MIN_DRAW_SPEED = 0.05F;
+
     public ModBowItem(Properties properties) {
         super(properties);
+    }
+
+    /** Ticks to full draw before the bow_draw_speed attribute; override for faster/slower bows. */
+    public float getBasePullTicks() {
+        return DEFAULT_PULL_TICKS;
+    }
+
+    /**
+     * Single source of truth for draw time. Used by the server (shot power) and the
+     * client (pull animation) so both reach full draw on the same tick.
+     */
+    public float getPullTicks(LivingEntity entity) {
+        return getBasePullTicks() / getDrawSpeedMultiplier(entity);
+    }
+
+    /** Returns the entity's bow_draw_speed attribute value (1.0 if missing) */
+    public static float getDrawSpeedMultiplier(LivingEntity entity) {
+        if (entity == null) return 1.0F;
+        AttributeInstance instance = entity.getAttribute(AttributesRegistry.BOW_DRAW_SPEED.get());
+        if (instance == null) return 1.0F;
+        return Math.max(MIN_DRAW_SPEED, (float) instance.getValue());
+    }
+
+    /** Vanilla bow power curve, scaled to this bow's draw time for the entity */
+    public float getPowerForTime(int charge, LivingEntity entity) {
+        float f = charge / getPullTicks(entity);
+        f = (f * f + f * 2.0F) / 3.0F;
+        return Math.min(f, 1.0F);
+    }
+
+    /** True once the bow has reached full draw for this entity */
+    public boolean isFullyDrawn(int charge, LivingEntity entity) {
+        return charge >= getPullTicks(entity);
     }
 
     public boolean hasInfinity(ItemStack stack, Player player) {
@@ -75,7 +112,7 @@ public class ModBowItem extends BowItem {
         }
 
         int charge = getUseDuration(bowStack) - timeLeft;
-        float drawPower = getPowerForTime(charge);
+        float drawPower = getPowerForTime(charge, shooter);
 
         if (drawPower < 0.1F) {
             return;

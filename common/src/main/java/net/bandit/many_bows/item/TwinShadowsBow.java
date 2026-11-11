@@ -47,8 +47,8 @@ public class TwinShadowsBow extends ModBowItem {
         if (arrowStack.isEmpty() && !isCreative && !canFireNoArrows) return;
 
         int charge = this.getUseDuration(itemStack) - i;
-        float power = getPowerForTime(charge);
-        if (charge < 20 || power < 1.0F) return;
+        float power = getPowerForTime(charge, livingEntity);
+        if (power < 1.0F) return;
 
         ItemStack usedArrowStack = arrowStack;
         if (usedArrowStack.isEmpty() && canFireNoArrows) {
@@ -75,14 +75,10 @@ public class TwinShadowsBow extends ModBowItem {
         player.awardStat(Stats.ITEM_USED.get(this));
     }
 
-    public static float getPowerForTime(int charge) {
-        if (charge < 20) {
-            return 0.0F;
-        }
-
-        float f = (float) charge / 20.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        return Math.min(f, 1.0F);
+    /** Twin Shadows only fires at full draw. */
+    @Override
+    public float getPowerForTime(int charge, LivingEntity entity) {
+        return isFullyDrawn(charge, entity) ? super.getPowerForTime(charge, entity) : 0.0F;
     }
 
     @Override

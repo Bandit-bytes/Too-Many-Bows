@@ -43,7 +43,7 @@ public class SolarBow extends ModBowItem {
         boolean hasInfinity = canFireWithoutArrows(stack, player);
         ItemStack arrowStack = hasInfinity ? ItemStack.EMPTY : player.getProjectile(stack);
 
-        if (charge >= 20 && (hasInfinity || !arrowStack.isEmpty())) {
+        if (isFullyDrawn(charge, entity) && (hasInfinity || !arrowStack.isEmpty())) {
             fireFlamingArrow(level, player, hasInfinity, stack);
 
             damageBow(stack, player, player.getUsedItemHand());

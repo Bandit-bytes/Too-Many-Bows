@@ -36,7 +36,7 @@ public class DuskReaperBow extends ModBowItem {
         if (level.isClientSide) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         if (power >= 0.1F && consumeSoulFragments(player, 1)) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -47,7 +47,7 @@ public class DuskReaperBow extends ModBowItem {
 
 
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
-            arrow.setCritArrow(charge >= 20);
+            arrow.setCritArrow(isFullyDrawn(charge, entity));
             arrow.setPowerMultiplier(power);
 
             applyEnchantments(stack, arrow);

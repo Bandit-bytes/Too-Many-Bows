@@ -55,7 +55,7 @@ public class TorchbearerBow extends ModBowItem {
         if (!(entity instanceof Player player) || level.isClientSide()) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
         if (power < 0.1F) return;
 
         ItemStack projectile = player.getProjectile(stack);

@@ -35,7 +35,7 @@ public class DragonsBreathBow extends ModBowItem {
         if (level.isClientSide) return;
 
         int charge = this.getUseDuration(stack) - timeCharged;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 0.4F, 0.3F);

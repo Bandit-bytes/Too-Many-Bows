@@ -1,15 +1,14 @@
 package net.bandit.many_bows.client;
 
+import net.bandit.many_bows.item.ModBowItem;
+
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
 import net.bandit.many_bows.client.renderer.*;
-import net.bandit.many_bows.registry.AttributesRegistry;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
@@ -78,22 +77,11 @@ public class ClientInit {
                     if (entity == null) return 0.0F;
                     if (entity.getUseItem() != stack) return 0.0F;
 
-                    float basePullTicks = 20.0F;
-
-                    if (item instanceof PullSpeedItem) {
-                        basePullTicks = ((PullSpeedItem) item).getPullTicks(stack, entity);
-                    }
-
-                    float drawSpeed = 1.0F;
-                    if (entity instanceof LivingEntity) {
-                        LivingEntity living = (LivingEntity) entity;
-                        AttributeInstance inst = living.getAttribute(AttributesRegistry.BOW_DRAW_SPEED.get());
-                        if (inst != null) {
-                            drawSpeed = (float) inst.getValue();
-                        }
-                    }
-
-                    float pullTicks = basePullTicks / Math.max(0.05F, drawSpeed);
+                    // Must match the server-side power curve in ModBowItem.getPowerForTime so the
+                    // model hits its last frame on the same tick the shot reaches full power.
+                    float pullTicks = item instanceof ModBowItem bow
+                            ? bow.getPullTicks(entity)
+                            : 20.0F / ModBowItem.getDrawSpeedMultiplier(entity);
 
                     int used = stack.getUseDuration() - entity.getUseItemRemainingTicks();
                     return (float) used / pullTicks;

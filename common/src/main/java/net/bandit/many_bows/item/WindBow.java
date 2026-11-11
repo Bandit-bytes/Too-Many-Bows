@@ -46,11 +46,17 @@ public class WindBow extends ModBowItem {
         super.onUseTick(level, entity, stack, count);
     }
 
+    /** Wind Bow draws three times faster than a standard bow. */
+    @Override
+    public float getBasePullTicks() {
+        return super.getBasePullTicks() / 3.0F;
+    }
+
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int timeCharged) {
         if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(stack) - timeCharged;
-            float power = getPowerForTime((int) (charge * 3F));
+            float power = getPowerForTime(charge, entity);
 
             boolean isCreative = player.getAbilities().instabuild;
             boolean hasInfinity = hasInfinity(stack, player);
