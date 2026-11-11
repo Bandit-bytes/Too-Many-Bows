@@ -44,71 +44,79 @@ public class EtherealHunterBow extends ModBowItem {
             int charge = this.getUseDuration(bowStack, entity) - chargeTime;
             float power = getPowerForTime(charge, entity);
 
-            if (power >= 0.1F && (consumeHunger(player) || player.getAbilities().instabuild)) {
-                if (level instanceof ServerLevel serverLevel) {
-                    boolean arrowConsumed = false;
+            // Hunger is charged once, on the server, only when an arrow is actually fired.
+            if (power >= 0.1F && level instanceof ServerLevel serverLevel
+                    && (player.getAbilities().instabuild || consumeHunger(player))) {
+                boolean arrowConsumed = false;
 
-                    ItemStack fakeArrow = new ItemStack(Items.ARROW);
-                    List<ItemStack> projectiles = draw(bowStack, fakeArrow, player);
+                ItemStack fakeArrow = new ItemStack(Items.ARROW);
+                List<ItemStack> projectiles = draw(bowStack, fakeArrow, player);
 
-                    for (ItemStack projectileStack : projectiles) {
-                        AbstractArrow arrow;
+                for (ItemStack projectileStack : projectiles) {
+                    AbstractArrow arrow;
 
-                        if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
-                            arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
-                        }  else {
-                            arrow = new EtherealArrow(serverLevel, player, bowStack, projectileStack);
-                            if (arrow instanceof EtherealArrow etherealArrow) {
-                                Holder<Attribute> rangedDamageAttr = level.registryAccess()
-                                        .registryOrThrow(Registries.ATTRIBUTE)
-                                        .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
-                                        .orElse(null);
+                    if (projectileStack.is(Items.SPECTRAL_ARROW) || projectileStack.is(Items.TIPPED_ARROW)) {
+                        arrow = ((ArrowItem) projectileStack.getItem()).createArrow(serverLevel, projectileStack, player, bowStack);
+                    }  else {
+                        arrow = new EtherealArrow(serverLevel, player, bowStack, projectileStack);
+                        if (arrow instanceof EtherealArrow etherealArrow) {
+                            Holder<Attribute> rangedDamageAttr = level.registryAccess()
+                                    .registryOrThrow(Registries.ATTRIBUTE)
+                                    .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                                    .orElse(null);
 
-                                if (rangedDamageAttr != null) {
-                                    AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
-                                    if (attrInstance != null) {
-                                        float damage = (float) attrInstance.getValue();
-                                        etherealArrow.setBaseDamage(damage / 1.5);
-                                    }
+                            if (rangedDamageAttr != null) {
+                                AttributeInstance attrInstance = player.getAttribute(rangedDamageAttr);
+                                if (attrInstance != null) {
+                                    float damage = (float) attrInstance.getValue();
+                                    etherealArrow.setBaseDamage(damage / 1.5);
                                 }
                             }
                         }
-
-                        applyPowerEnchantment(arrow, bowStack, level);
-                        applyKnockbackEnchantment(arrow, bowStack, player, level);
-                        applyFlameEnchantment(arrow, bowStack, level);
-                        applyBowDamageAttribute(arrow, player);
-                        tryApplyBowCrit(arrow, player, 1.5D);
-
-                        arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-                        arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
-
-                        serverLevel.addFreshEntity(arrow);
-
-                        if (!player.getAbilities().instabuild && !arrowConsumed) {
-                            projectileStack.shrink(1);
-                            arrowConsumed = true;
-                        }
                     }
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
-                    player.awardStat(Stats.ITEM_USED.get(this));
 
-                    if (!player.getAbilities().instabuild) {
-                        damageBow(bowStack, player, InteractionHand.MAIN_HAND);
+                    applyPowerEnchantment(arrow, bowStack, level);
+                    applyKnockbackEnchantment(arrow, bowStack, player, level);
+                    applyFlameEnchantment(arrow, bowStack, level);
+                    applyBowDamageAttribute(arrow, player);
+                    tryApplyBowCrit(arrow, player, 1.5D);
+
+                    arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+                    arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 2.5F, 1.0F);
+
+                    serverLevel.addFreshEntity(arrow);
+
+                    if (!player.getAbilities().instabuild && !arrowConsumed) {
+                        projectileStack.shrink(1);
+                        arrowConsumed = true;
                     }
+                }
+                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0F, 1.0F);
+                player.awardStat(Stats.ITEM_USED.get(this));
+
+                if (!player.getAbilities().instabuild) {
+                    damageBow(bowStack, player, InteractionHand.MAIN_HAND);
                 }
             }
         }
     }
 
+    private static boolean hasHunger(Player player) {
+        return player.getFoodData().getFoodLevel() >= HUNGER_COST;
+    }
+
+    /**
+     * Charges the shot as food exhaustion (4 exhaustion = 1 hunger point), the way vanilla charges
+     * sprinting and jumping: saturation drains first, then the food bar, and the server syncs the
+     * result to the client. Setting the food level directly skipped saturation and desynced the HUD
+     * (issue #1, visible with AppleSkin). Server side only.
+     */
     private boolean consumeHunger(Player player) {
-        int currentHunger = player.getFoodData().getFoodLevel();
-        if (currentHunger >= HUNGER_COST) {
-            player.getFoodData().setFoodLevel(currentHunger - HUNGER_COST);
+        if (hasHunger(player)) {
+            player.causeFoodExhaustion(4.0F * HUNGER_COST);
             return true;
         }
-
         player.displayClientMessage(Component.translatable("item.many_bows.ethereal_hunter.no_hunger")
                 .withStyle(ChatFormatting.RED), true);
         return false;
@@ -150,12 +158,16 @@ public class EtherealHunterBow extends ModBowItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack bowStack = player.getItemInHand(hand);
-        if (consumeHunger(player) || player.getAbilities().instabuild) {
+        // Only checks: the cost is paid on release, so starting or cancelling a draw is free.
+        if (player.getAbilities().instabuild || hasHunger(player)) {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(bowStack);
-        } else {
-            return InteractionResultHolder.fail(bowStack);
         }
+        if (!level.isClientSide) {
+            player.displayClientMessage(Component.translatable("item.many_bows.ethereal_hunter.no_hunger")
+                    .withStyle(ChatFormatting.RED), true);
+        }
+        return InteractionResultHolder.fail(bowStack);
     }
 
 
