@@ -93,6 +93,24 @@ public abstract class ModBowItem extends BowItem {
         return fallback;
     }
 
+    /**
+     * Returns how much the player's gear raises ranged_weapon:damage above its base value
+     * (0 if Ranged Weapon API is absent). Only modifiers count, so it adds on top of a bow's
+     * own damage instead of replacing it.
+     */
+    protected double getRangedWeaponGearBonus(Player player) {
+        Holder<Attribute> holder = player.level().registryAccess()
+                .registryOrThrow(Registries.ATTRIBUTE)
+                .getHolder(ResourceLocation.fromNamespaceAndPath("ranged_weapon", "damage"))
+                .orElse(null);
+        if (holder == null) return 0.0D;
+
+        AttributeInstance instance = player.getAttribute(holder);
+        if (instance == null) return 0.0D;
+
+        return Math.max(0.0D, instance.getValue() - instance.getBaseValue());
+    }
+
     /** Applies the player's bow damage attribute */
     protected void applyBowDamageAttribute(AbstractArrow arrow, Player player) {
         double mult = getBowDamageMultiplier(player);

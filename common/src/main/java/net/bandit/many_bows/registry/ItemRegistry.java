@@ -7,20 +7,22 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.item.*;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantments;
 
 public class ItemRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ManyBowsMod.MOD_ID, Registries.ITEM);
 
 
-    public static final RegistrySupplier<Item> EVENTIDE = ITEMS.register("eventide", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.EVENTIDE));
-    public static final RegistrySupplier<Item> WORLDEATER = ITEMS.register("worldeater", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.WORLDEATER));
-    public static final RegistrySupplier<Item> GODSPLITTER = ITEMS.register("godsplitter", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.GODSPLITTER));
+    public static final RegistrySupplier<Item> EVENTIDE = ITEMS.register("eventide", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).component(DataComponents.UNBREAKABLE, new Unbreakable(true)).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.EVENTIDE));
+    public static final RegistrySupplier<Item> WORLDEATER = ITEMS.register("worldeater", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).component(DataComponents.UNBREAKABLE, new Unbreakable(true)).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.WORLDEATER));
+    public static final RegistrySupplier<Item> GODSPLITTER = ITEMS.register("godsplitter", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).component(DataComponents.UNBREAKABLE, new Unbreakable(true)).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.GODSPLITTER));
     public static final RegistrySupplier<Item> BLUNTED_EDGE = ITEMS.register("blunted_edge", () -> new net.bandit.many_bows.item.RelicBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB).rarity(Rarity.EPIC), net.bandit.many_bows.item.RelicBow.Kind.BLUNTED));
     public static final RegistrySupplier<Item> DORMANT_CELESTIAL_BOW = ITEMS.register("dormant_celestial_bow", () -> new net.bandit.many_bows.item.DormantCelestialBow(new Properties().durability(2031).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));
     public static final RegistrySupplier<Item> WYRM_EFFIGY = ITEMS.register("wyrm_effigy", () -> new net.bandit.many_bows.item.WyrmEffigy(new Properties().stacksTo(1).arch$tab(TabRegistry.TOO_MANY_BOWS_TAB)));

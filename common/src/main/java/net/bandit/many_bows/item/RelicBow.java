@@ -188,8 +188,28 @@ public class RelicBow extends ModBowItem {
             );
         }
 
+        RelicConfig config = RelicConfig.get();
+        double configuredDamage = switch (kind) {
+            case EVENTIDE -> config.eventideDamage;
+            case WORLDEATER -> config.worldeaterDamage;
+            case GODSPLITTER -> config.godsplitterDamage;
+            case BLUNTED -> 5;
+        };
+
+        // Gear scaling for the final three only; Blunted Edge is a fixed-strength trial bow.
+        double gearDamage = kind != Kind.BLUNTED && config.useRangedWeaponAttribute
+                ? getRangedWeaponGearBonus(player) * Math.max(0, config.rangedDamageScaling)
+                : 0;
+        double damage = configuredDamage + gearDamage;
+
+        float abilityScale = 1;
+        if (kind != Kind.BLUNTED && config.scaleAbilitiesWithGear && configuredDamage > 0) {
+            abilityScale = (float) (damage / configuredDamage * getBowDamageMultiplier(player));
+        }
+
         for (ItemStack shot : shots) {
             RelicArrow arrow = new RelicArrow(server, player, shot, bow);
+            arrow.setAbilityScale(abilityScale);
 
             arrow.configure(
                     kind,
@@ -200,13 +220,6 @@ public class RelicBow extends ModBowItem {
                     !player.onGround(),
                     RelicData.read(bow).getInt("TrialShot")
             );
-
-            double damage = switch (kind) {
-                case EVENTIDE -> RelicConfig.get().eventideDamage;
-                case WORLDEATER -> RelicConfig.get().worldeaterDamage;
-                case GODSPLITTER -> RelicConfig.get().godsplitterDamage;
-                case BLUNTED -> 5;
-            };
 
             float speed = kind == Kind.GODSPLITTER ? 6 : 3;
 

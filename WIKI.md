@@ -119,7 +119,7 @@ Craft **Heart of the Wyrm + vanilla Bow + Dragon's Breath** in any arrangement t
 - **Guided projectile:** Fully charged ability arrows gently steer toward valid nearby targets ahead of them and destroy nearby arrows belonging to other shooters.
 - **Dragon dive:** Impact creates a dragon-breath trail from the firing position to the hit location, damaging, launching and igniting enemies along it. The trail is capped at 64 blocks.
 - **Dragonfire:** Impact leaves a damaging zone for **five seconds** by default, dealing damage once per second.
-- **Dominance:** Kills credited to this bow build charges. At **10 charges**, the next fully charged ability shot consumes them, doubles dive and dragonfire damage, and expands the dragonfire radius from **three to seven blocks**.
+- **Dominance:** Kills credited to this bow build charges. At **8 charges**, the next fully charged ability shot consumes them, doubles dive and dragonfire damage, and expands the dragonfire radius from **three to seven blocks**.
 - **Cooldown:** Special shots have a default **four-second cooldown**.
 
 Dragon effects use Minecraft particles and sounds; no custom dragon model is required.
@@ -144,7 +144,7 @@ Completing the final trial consumes Blunted Edge and awards **Godsplitter**.
 - Perfect arrows travel without gravity and can hit up to **five entities**.
 - Hits in the upper quarter of a target's body count as headshots and use a default **8× damage multiplier**.
 - Perfect hits normally deal **75% armor-bypassing damage**. Five consecutive perfect hits against the same target raise that to **100%**.
-- Perfect headshots execute non-boss targets at **15% maximum health or less**.
+- Perfect headshots execute non-boss targets at **25% maximum health or less**.
 - An imperfect release or an arrow missing its target resets armor-severance progress.
 
 ---
@@ -272,22 +272,27 @@ Most configurable bows have their own JSON file inside the `bows/` folder. Event
 
 ## 🌠 Relic Bow Configuration
 
-The shared file is **`config/too_many_bows/bows/forbidden_three.json`**. In development, look under your launch's `run/config/` folder. The values below are the current source defaults; existing configs can override them.
+The shared file is **`config/too_many_bows/bows/forbidden_three.json`**. In development, look under your launch's `run/config/` folder. The values below are the current source defaults; existing configs can override them. When the mod updates its relic defaults, any value still at the previous default is upgraded automatically on load (tracked by `configVersion`); values you have changed are kept.
 
 | Field | Default | Purpose |
 | --- | --- | --- |
-| `eventideDamage` | `25.0` | Eventide arrow damage setting |
-| `lanceDamage` | `50.0` | Eventide lance damage and constellation-link damage |
-| `finalMaxHealthFraction` | `0.18` | Extra maximum-health fraction on the final lance, before Alignment bonuses; extra damage is capped at 100 |
-| `worldeaterDamage` | `25.0` | Worldeater arrow damage setting |
-| `dragonDiveDamage` | `50.0` | Base dragon-dive damage |
-| `dragonfireDamage` | `26.0` | Dragonfire damage per pulse |
-| `godsplitterDamage` | `25.0` | Godsplitter arrow damage setting |
+| `eventideDamage` | `40.0` | Eventide arrow damage setting |
+| `lanceDamage` | `70.0` | Eventide lance damage and constellation-link damage |
+| `finalMaxHealthFraction` | `0.25` | Extra maximum-health fraction on the final lance, before Alignment bonuses |
+| `finalJudgmentCap` | `200.0` | Maximum extra damage the final lance can add |
+| `worldeaterDamage` | `40.0` | Worldeater arrow damage setting |
+| `dragonDiveDamage` | `75.0` | Base dragon-dive damage |
+| `dragonfireDamage` | `35.0` | Dragonfire damage per pulse |
+| `godsplitterDamage` | `50.0` | Godsplitter arrow damage setting |
 | `headshotMultiplier` | `8.0` | Godsplitter perfect-headshot multiplier |
-| `abilityCooldownTicks` | `80` | Eventide and Worldeater special-shot cooldown |
-| `maxDominance` | `10` | Charges required for an empowered Worldeater shot |
+| `executeHealthFraction` | `0.25` | Perfect headshots execute non-boss targets at or below this fraction of maximum health |
+| `abilityCooldownTicks` | `60` | Eventide and Worldeater special-shot cooldown |
+| `maxDominance` | `8` | Charges required for an empowered Worldeater shot |
 | `starfallDelayTicks` | `40` | Delay before Eventide's first lance; clamped to 10–100 ticks |
 | `dragonfireDurationTicks` | `100` | Dragonfire-zone duration; clamped to 20–180 ticks |
+| `useRangedWeaponAttribute` | `true` | Adds gear bonuses to `ranged_weapon:damage` (Ranged Weapon API) to relic arrow damage; ignored if the API is not installed |
+| `rangedDamageScaling` | `1.5` | Arrow damage added per point of `ranged_weapon:damage` from gear |
+| `scaleAbilitiesWithGear` | `true` | Lances, dragon dive and dragonfire grow by the same percentage gear and the Bow Damage attribute add to the arrow; final-lance max-health damage is unaffected |
 | `fragmentChance` | `0.25` | Celestial component chance in its matching chest |
 | `bluntedEdgeChance` | `0.18` | Additional Blunted Edge loot chance |
 | `affectPlayers` | `false` | Allows relic targeting/effects against players |
@@ -420,6 +425,7 @@ The **Power Crystal** is used to repair bows from this mod.
 
 - Some older bow mechanics still need fuller documentation; entries marked as undocumented should not be treated as confirmed ability descriptions.
 - Eventide, Worldeater and Godsplitter use a one-second full draw for their relic mechanics.
+- Eventide, Worldeater and Godsplitter are **unbreakable**. Their arrow damage also scales with gear that raises `ranged_weapon:damage` (Ranged Weapon API), and by default their abilities grow by the same percentage.
 - The acquisition instructions here describe the current Minecraft 1.21.1 source; older releases may differ.
 - Bows without listed special ammo use **normal arrows**.
 - More bows, synergies, and enchantments will be added as the mod evolves.

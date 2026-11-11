@@ -33,6 +33,8 @@ public class RelicArrow extends AbstractArrow {
     private boolean ready, perfect, empowered, airborne, impact;
     private int age, phase, trialShot;
     private double visualDominance;
+    // Gear multiplier captured at release; scales flat ability damage (lances, dive, dragonfire).
+    private float abilityScale = 1;
     private UUID targetId, bowId;
     private Vec3 origin = Vec3.ZERO;
     private final Map<Integer, Vec3> fallingStarDestinations = new HashMap<>();
@@ -76,6 +78,10 @@ public class RelicArrow extends AbstractArrow {
         for (ItemStack stack : player.getInventory().offhand)
             if (matches(stack)) return stack;
         return ItemStack.EMPTY;
+    }
+
+    public void setAbilityScale(float scale) {
+        this.abilityScale = Math.max(0, scale);
     }
 
     public void setRelicPiercing(byte level) {
@@ -149,7 +155,7 @@ public class RelicArrow extends AbstractArrow {
                     instanceof EnderDragon || target
                     instanceof WitherBoss || target.getType().is(RelicQuests.BOSSES);
 
-            if (!boss && headshot && target.getHealth() <= target.getMaxHealth() * 0.15f) damage = Math.max(damage, target.getHealth() + target.getAbsorptionAmount() + 1);
+            if (!boss && headshot && target.getHealth() <= target.getMaxHealth() * RelicConfig.get().executeHealthFraction) damage = Math.max(damage, target.getHealth() + target.getAbsorptionAmount() + 1);
             // 75% bypass damage, 25% ordinary projectile damage; fifth stack fully bypasses armor.
             float bypass = stacks == 5 ? 1 : 0.75f;
             if (isOnFire()) target.igniteForSeconds(5);
@@ -220,7 +226,7 @@ public class RelicArrow extends AbstractArrow {
         RelicData.edit(bow, t -> { for (int i = 0; i < 3; i++) t.remove("Star" + i); for (int i = 0; i < ids.size(); i++) t.putUUID("Star" + i, ids.get(i)); t.putLong("ConstellationTime", now); t.putInt("Alignment", alignment); });
         if (ids.size() == 3) for (UUID id : ids) {
             Entity entity = level.getEntity(id);
-            if (entity instanceof LivingEntity other && other != target && other.distanceTo(target) <= 64) { deal(other, RelicConfig.get().lanceDamage); beam(level, target.position().add(0, 1, 0), other.position().add(0, 1, 0), ParticleTypes.END_ROD); }
+            if (entity instanceof LivingEntity other && other != target && other.distanceTo(target) <= 64) { deal(other, RelicConfig.get().lanceDamage * abilityScale); beam(level, target.position().add(0, 1, 0), other.position().add(0, 1, 0), ParticleTypes.END_ROD); }
         }
     }
 
@@ -318,11 +324,11 @@ public class RelicArrow extends AbstractArrow {
             for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class,
                     new AABB(strike, strike).inflate(3))) {
                 float extra = lance == 4
-                        ? Math.min(100, target.getMaxHealth()
+                        ? Math.min(RelicConfig.get().finalJudgmentCap, target.getMaxHealth()
                         * Math.max(0, RelicConfig.get().finalMaxHealthFraction)
                         * (1 + RelicData.read(bow()).getInt("Alignment") * 0.15F))
                         : 0;
-                deal(target, RelicConfig.get().lanceDamage + extra);
+                deal(target, RelicConfig.get().lanceDamage * abilityScale + extra);
             }
         }
         if (phase >= delay + 40) discard();
@@ -336,7 +342,7 @@ public class RelicArrow extends AbstractArrow {
             beam(server, from, to, ParticleTypes.DRAGON_BREATH);
             for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class, new AABB(from, to).inflate(3))) {
                 if (distanceToSegment(target.position(), from, to) <= (empowered ? 4 : 2) && validTarget(target, getOwner())) {
-                    deal(target, RelicConfig.get().dragonDiveDamage * (empowered ? 2 : 1)); target.push(0, 0.7, 0); target.igniteForSeconds(4);
+                    deal(target, RelicConfig.get().dragonDiveDamage * abilityScale * (empowered ? 2 : 1)); target.push(0, 0.7, 0); target.igniteForSeconds(4);
                 }
             }
             server.playSound(null, blockPosition(), SoundEvents.ENDER_DRAGON_GROWL, SoundSource.PLAYERS, 1, 0.7f);
@@ -344,7 +350,7 @@ public class RelicArrow extends AbstractArrow {
 
         double radius = empowered ? 7 : 3;
         if (phase % 5 == 0) { server.sendParticles(ParticleTypes.DRAGON_BREATH, getX(), getY() + 0.3, getZ(), empowered ? 40 : 15, radius / 2, 0.25, radius / 2, 0.02); wings(server, position().add(0, empowered ? 8 : 3, 0), position().subtract(origin).normalize(), empowered ? 4 : 2); }
-        if (phase % 20 == 0) for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(radius, 2, radius))) if (target.distanceToSqr(this) <= radius * radius) deal(target, RelicConfig.get().dragonfireDamage * (empowered ? 2 : 1));
+        if (phase % 20 == 0) for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(radius, 2, radius))) if (target.distanceToSqr(this) <= radius * radius) deal(target, RelicConfig.get().dragonfireDamage * abilityScale * (empowered ? 2 : 1));
         if (phase >= Math.max(20, Math.min(180, RelicConfig.get().dragonfireDurationTicks))) discard();
     }
 
@@ -370,7 +376,7 @@ public class RelicArrow extends AbstractArrow {
     public void addAdditionalSaveData(CompoundTag t) {
         super.addAdditionalSaveData(t); t.putDouble("VisualDominance", visualDominance); t.putInt("RelicKind", kind.ordinal()); t.putBoolean("Ready", ready);
         t.putBoolean("Perfect", perfect); t.putBoolean("Empowered", empowered); t.putBoolean("Airborne", airborne);
-        t.putBoolean("Impact", impact); t.putInt("RelicAge", age); t.putInt("RelicPhase", phase); t.putInt("TrialShot", trialShot);
+        t.putBoolean("Impact", impact); t.putInt("RelicAge", age); t.putInt("RelicPhase", phase); t.putInt("TrialShot", trialShot); t.putFloat("AbilityScale", abilityScale);
         t.putDouble("OriginX", origin.x); t.putDouble("OriginY", origin.y); t.putDouble("OriginZ", origin.z);
         if (targetId != null) t.putUUID("RelicTarget", targetId); if (bowId != null) t.putUUID("RelicBowId", bowId);
         int i = 0; for (UUID id : hit) t.putUUID("RelicHit" + i++, id); t.putInt("RelicHits", i);
@@ -382,6 +388,7 @@ public class RelicArrow extends AbstractArrow {
         visualDominance = Math.max(0, Math.min(1, t.getDouble("VisualDominance"))); kind = RelicBow.Kind.values()[Math.max(0, Math.min(3, t.getInt("RelicKind")))];
         ready = t.getBoolean("Ready"); perfect = t.getBoolean("Perfect"); empowered = t.getBoolean("Empowered"); airborne = t.getBoolean("Airborne");
         impact = t.getBoolean("Impact"); age = t.getInt("RelicAge"); phase = t.getInt("RelicPhase"); trialShot = t.getInt("TrialShot");
+        abilityScale = t.contains("AbilityScale") ? Math.max(0, t.getFloat("AbilityScale")) : 1;
         origin = new Vec3(t.getDouble("OriginX"), t.getDouble("OriginY"), t.getDouble("OriginZ"));
         if (t.hasUUID("RelicTarget")) targetId = t.getUUID("RelicTarget"); if (t.hasUUID("RelicBowId")) bowId = t.getUUID("RelicBowId");
         hit.clear(); for (int i = 0; i < Math.min(5, t.getInt("RelicHits")); i++) if (t.hasUUID("RelicHit" + i)) hit.add(t.getUUID("RelicHit" + i));

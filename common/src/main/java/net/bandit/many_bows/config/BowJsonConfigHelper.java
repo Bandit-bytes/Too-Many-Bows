@@ -92,10 +92,18 @@ public final class BowJsonConfigHelper {
                 return defaults;
             }
 
+            T loaded;
             try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                T loaded = GSON.fromJson(reader, configClass);
-                return loaded != null ? loaded : defaults;
+                loaded = GSON.fromJson(reader, configClass);
             }
+            if (loaded == null) return defaults;
+
+            if (loaded instanceof MigratableConfig migratable && migratable.migrate()) {
+                try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                    GSON.toJson(loaded, writer);
+                }
+            }
+            return loaded;
         } catch (Exception e) {
             e.printStackTrace();
             return defaultSupplier.get();
