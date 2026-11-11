@@ -58,7 +58,7 @@ public class GravewireBow extends ModBowItem {
         }
 
         int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
         if (power < 0.1F) {
             return;
         }
@@ -231,15 +231,6 @@ public class GravewireBow extends ModBowItem {
         return level.registryAccess()
                 .registryOrThrow(Registries.ENCHANTMENT)
                 .getHolderOrThrow(enchantmentKey);
-    }
-
-    public static float getPowerForTime(int charge) {
-        float f = (float) charge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-        return f;
     }
 
     @Override

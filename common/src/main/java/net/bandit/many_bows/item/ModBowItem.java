@@ -1,6 +1,7 @@
 package net.bandit.many_bows.item;
 
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -26,8 +27,49 @@ public abstract class ModBowItem extends BowItem {
 
     private static final float FLETCHERS_SAVE_CHANCE = 0.25F;
 
+    private static final ResourceLocation BOW_DRAW_SPEED_ID =
+            ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_draw_speed");
+
+    private static final float DEFAULT_PULL_TICKS = 16.0F;
+    private static final float MIN_DRAW_SPEED = 0.05F;
+
     protected ModBowItem(Properties properties) {
         super(properties);
+    }
+
+    /**
+     * Single source of truth for draw time. Used by the server (shot power) and the
+     * client (pull animation) so both reach full draw on the same tick.
+     *
+     * @return ticks needed to reach full draw: config base / bow_draw_speed attribute
+     */
+    public static float getPullTicks(LivingEntity entity) {
+        Float configured = ManyBowsConfigHolder.get().globalBowPullSpeed;
+        float base = configured != null && configured > 0.0F ? configured : DEFAULT_PULL_TICKS;
+        return base / getDrawSpeedMultiplier(entity);
+    }
+
+    /** Returns the entity's bow_draw_speed attribute value (1.0 if missing/unregistered) */
+    public static float getDrawSpeedMultiplier(LivingEntity entity) {
+        if (entity == null) return 1.0F;
+
+        Holder<Attribute> holder = entity.level().registryAccess()
+                .registryOrThrow(Registries.ATTRIBUTE)
+                .getHolder(BOW_DRAW_SPEED_ID)
+                .orElse(null);
+        if (holder == null) return 1.0F;
+
+        AttributeInstance instance = entity.getAttribute(holder);
+        if (instance == null) return 1.0F;
+
+        return Math.max(MIN_DRAW_SPEED, (float) instance.getValue());
+    }
+
+    /** Vanilla bow power curve, scaled to the entity's draw time instead of a fixed 20 ticks */
+    public static float getPowerForTime(int charge, LivingEntity entity) {
+        float f = charge / getPullTicks(entity);
+        f = (f * f + f * 2.0F) / 3.0F;
+        return Math.min(f, 1.0F);
     }
 
     /**

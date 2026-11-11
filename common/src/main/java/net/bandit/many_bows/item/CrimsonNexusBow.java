@@ -65,7 +65,7 @@ public class CrimsonNexusBow extends ModBowItem {
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-            float power = getPowerForTime(charge);
+            float power = getPowerForTime(charge, entity);
 
             if (power >= 0.1F) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -105,15 +105,6 @@ public class CrimsonNexusBow extends ModBowItem {
         projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
     }
 //Fixed
-    public static float getPowerForTime(int pCharge) {
-        float f = (float)pCharge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-
-        return f;
-    }
 
     @Override
     public Predicate<ItemStack> getAllSupportedProjectiles() {

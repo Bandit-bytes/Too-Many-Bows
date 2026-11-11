@@ -47,7 +47,7 @@ public class SonicBoomBow extends ModBowItem {
 
             if (!arrowStack.isEmpty() || hasInfinity || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
+                float power = getPowerForTime(charge, entity);
 
                 if (power >= 0.1F) {
                     List<ItemStack> projectiles = draw(bowStack, arrowStack, player);
@@ -148,12 +148,6 @@ public class SonicBoomBow extends ModBowItem {
         return level.registryAccess()
                 .registryOrThrow(Registries.ENCHANTMENT)
                 .getHolderOrThrow(enchantmentKey);
-    }
-
-    public static float getPowerForTime(int pCharge) {
-        float f = (float) pCharge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        return Math.min(f, 1.0F);
     }
 
     @Override

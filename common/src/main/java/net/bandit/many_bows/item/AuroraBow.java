@@ -44,7 +44,7 @@ public class AuroraBow extends ModBowItem {
 
             if (!arrowStack.isEmpty() || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
+                float power = getPowerForTime(charge, entity);
 
                 if (power >= 0.1F) {
                     if (consumeRiftShard(player, 1)) {

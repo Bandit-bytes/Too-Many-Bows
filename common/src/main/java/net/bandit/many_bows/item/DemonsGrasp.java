@@ -37,7 +37,7 @@ public class DemonsGrasp extends ModBowItem {
             ItemStack itemStack2 = player.getProjectile(itemStack);
             if (!itemStack2.isEmpty()) {
                 int j = this.getUseDuration(itemStack, livingEntity) - i;
-                float f = getPowerForTime(j);
+                float f = getPowerForTime(j, livingEntity);
                 if (!((double)f < 0.1)) {
                     List<ItemStack> list = draw(itemStack, itemStack2, player);
                     if (level instanceof ServerLevel) {

@@ -42,7 +42,7 @@ public class EtherealHunterBow extends ModBowItem {
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player) {
             int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-            float power = getPowerForTime(charge);
+            float power = getPowerForTime(charge, entity);
 
             if (power >= 0.1F && (consumeHunger(player) || player.getAbilities().instabuild)) {
                 if (level instanceof ServerLevel serverLevel) {

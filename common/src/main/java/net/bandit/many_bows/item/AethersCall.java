@@ -1,6 +1,5 @@
 package net.bandit.many_bows.item;
 
-import net.bandit.many_bows.client.PullSpeedItem;
 import net.bandit.many_bows.entity.AethersCallArrow;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.ChatFormatting;
@@ -48,7 +47,7 @@ public class AethersCall extends ModBowItem  {
         }
 
         int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
 
         if (power < 0.1F) {
             return;
@@ -149,15 +148,6 @@ public class AethersCall extends ModBowItem  {
 
     protected void shootProjectile(LivingEntity shooter, Projectile projectile, int index, float velocity, float inaccuracy, float angle, @Nullable LivingEntity target) {
         projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
-    }
-
-    public static float getPowerForTime(int charge) {
-        float f = (float) charge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-        return f;
     }
 
     @Override

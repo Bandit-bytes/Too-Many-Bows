@@ -57,7 +57,7 @@ public class CursedFlameBow extends ModBowItem {
 
             if (!arrowStack.isEmpty() || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
+                float power = getPowerForTime(charge, entity);
 
                 if (power >= 0.1F) {
                     List<ItemStack> projectiles = draw(bowStack, arrowStack, player);
@@ -165,16 +165,6 @@ public class CursedFlameBow extends ModBowItem {
         projectile.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0F, velocity, inaccuracy);
     }
 
-    public static float getPowerForTime(int pCharge) {
-        float f = (float)pCharge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-
-        return f;
-    }
-
     @Override
     public Predicate<ItemStack> getAllSupportedProjectiles() {
         return ARROW_ONLY;
@@ -224,7 +214,7 @@ public class CursedFlameBow extends ModBowItem {
 
         int useDuration = this.getUseDuration(stack, user);
         int charge = useDuration - remainingUseDuration;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, user);
 
         if (power < 0.25f) return;
 

@@ -1,24 +1,16 @@
 package net.bandit.many_bows.client;
 import net.bandit.many_bows.item.RelicBow;
 import net.bandit.many_bows.item.DormantCelestialBow;
+import net.bandit.many_bows.item.ModBowItem;
 
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.item.ItemPropertiesRegistry;
-import net.bandit.many_bows.ManyBowsMod;
 import net.bandit.many_bows.client.renderer.*;
 import net.bandit.many_bows.entity.SoulhoardArrow;
-import net.minecraft.core.Holder;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.bandit.many_bows.config.ManyBowsConfigHolder;
 import net.bandit.many_bows.registry.EntityRegistry;
 import net.bandit.many_bows.registry.ItemRegistry;
 import net.minecraft.client.renderer.entity.NoopRenderer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.item.Item;
 
 import java.util.List;
@@ -84,23 +76,11 @@ public class ClientInit {
                     if (entity == null) return 0.0F;
                     if (entity.getUseItem() != stack) return 0.0F;
 
-                    float basePullTicks = ManyBowsConfigHolder.CONFIG.globalBowPullSpeed;
-
-                    if (item instanceof PullSpeedItem psi) {
-                        basePullTicks = psi.getPullTicks(stack, entity);
-                    }
-
-                    boolean relicDraw = item instanceof net.bandit.many_bows.item.RelicBow || item instanceof net.bandit.many_bows.item.DormantCelestialBow;
-                    if (relicDraw) basePullTicks = 20.0F;
-                    float drawSpeed = 1.0F;
-                    if (!relicDraw && entity instanceof LivingEntity living) {
-                        AttributeInstance inst = living.getAttribute(BOW_DRAW_SPEED_HOLDER);
-                        if (inst != null) {
-                            drawSpeed = (float) inst.getValue();
-                        }
-                    }
-
-                    float pullTicks = basePullTicks / Math.max(0.05F, drawSpeed);
+                    // Must match the server-side power curve in ModBowItem.getPowerForTime so the
+                    // model hits its last frame on the same tick the shot reaches full power.
+                    // Relic/Dormant bows use the vanilla 20-tick draw and ignore draw speed.
+                    boolean relicDraw = item instanceof RelicBow || item instanceof DormantCelestialBow;
+                    float pullTicks = relicDraw ? 20.0F : ModBowItem.getPullTicks(entity);
 
                     int used = stack.getUseDuration(entity) - entity.getUseItemRemainingTicks();
                     return (float) used / pullTicks;
@@ -111,14 +91,6 @@ public class ClientInit {
                 (stack, level, entity, seed) ->
                         entity != null && entity.isUsingItem() && entity.getUseItem() == stack ? 1.0F : 0.0F);
     }
-
-    private static final Holder<Attribute> BOW_DRAW_SPEED_HOLDER =
-            BuiltInRegistries.ATTRIBUTE.getHolderOrThrow(
-                    ResourceKey.create(
-                            Registries.ATTRIBUTE,
-                            ResourceLocation.fromNamespaceAndPath(ManyBowsMod.MOD_ID, "bow_draw_speed")
-                    )
-            );
 
 
     public static void registerEntityRenderers() {

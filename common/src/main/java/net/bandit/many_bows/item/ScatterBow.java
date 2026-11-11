@@ -49,7 +49,7 @@ public class ScatterBow extends ModBowItem {
 
         boolean hasInfinity = hasInfinityEnchantment(bowStack, level);
         int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-        float power = getPowerForTime(charge);
+        float power = getPowerForTime(charge, entity);
         if (power < 0.1F) return;
 
         ScatterBowConfig config = config();
@@ -162,12 +162,6 @@ tryApplyBowCrit(arrow, player, config.crit_damage_multiplier);
         return level.registryAccess()
                 .registryOrThrow(Registries.ENCHANTMENT)
                 .getHolderOrThrow(enchantmentKey);
-    }
-
-    public static float getPowerForTime(int charge) {
-        float f = (float) charge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        return Math.min(f, 1.0F);
     }
 
     @Override

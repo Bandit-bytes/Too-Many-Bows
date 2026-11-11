@@ -41,7 +41,7 @@ public class TwinShadowsBow extends ModBowItem {
 
             if (!projectiles.isEmpty() || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
+                float power = getPowerForTime(charge, entity);
 
                 if (power >= 0.1F) {
                     if (level instanceof ServerLevel serverLevel) {
@@ -100,12 +100,6 @@ public class TwinShadowsBow extends ModBowItem {
         }
     }
 
-
-    public static float getPowerForTime(int pCharge) {
-        float f = (float) pCharge / 16.0F;
-        f = (f * f + f * 2.0F) / 3.0F;
-        return Math.min(f, 1.0F);
-    }
 
     @Override
     public Predicate<ItemStack> getAllSupportedProjectiles() {

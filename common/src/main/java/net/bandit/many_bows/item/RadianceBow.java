@@ -46,7 +46,7 @@ public class RadianceBow extends ModBowItem {
     public void releaseUsing(ItemStack bowStack, Level level, LivingEntity entity, int chargeTime) {
         if (entity instanceof Player player && !level.isClientSide()) {
             int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-            float power = getPowerForTime(charge);
+            float power = getPowerForTime(charge, entity);
 
             boolean hasInfinity = hasInfinityEnchantment(bowStack, level);
             boolean hasXP = consumeExperience(player) || hasInfinity || player.getAbilities().instabuild;

@@ -45,7 +45,7 @@ public class WebstringVolleyBow extends ModBowItem {
 
             if (!projectiles.isEmpty() || hasInfinity || player.getAbilities().instabuild) {
                 int charge = this.getUseDuration(bowStack, entity) - chargeTime;
-                float power = getPowerForTime(charge);
+                float power = getPowerForTime(charge, entity);
 
                 if (power >= 0.1F) {
                     if (level instanceof ServerLevel serverLevel) {
