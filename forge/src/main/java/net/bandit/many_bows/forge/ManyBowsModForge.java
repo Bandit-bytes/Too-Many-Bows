@@ -2,12 +2,14 @@ package net.bandit.many_bows.forge;
 
 import dev.architectury.platform.forge.EventBuses;
 import net.bandit.many_bows.ManyBowsMod;
+import net.bandit.many_bows.client.renderer.AethersCallArrowRenderer;
 import net.bandit.many_bows.client.renderer.AncientSageArrowRenderer;
 import net.bandit.many_bows.client.renderer.AstralArrowRenderer;
 import net.bandit.many_bows.client.renderer.AuroraArrowRenderer;
 import net.bandit.many_bows.client.renderer.CursedFlameArrowRenderer;
 import net.bandit.many_bows.client.renderer.DragonsBreathArrowRenderer;
 import net.bandit.many_bows.client.renderer.DuskArrowRenderer;
+import net.bandit.many_bows.client.renderer.EtherealArrowRenderer;
 import net.bandit.many_bows.client.renderer.FlameArrowRenderer;
 import net.bandit.many_bows.client.renderer.FrostbiteArrowRenderer;
 import net.bandit.many_bows.client.renderer.HunterArrowRenderer;
@@ -18,9 +20,11 @@ import net.bandit.many_bows.client.renderer.LightningArrowRenderer;
 import net.bandit.many_bows.client.renderer.RadianceArrowRenderer;
 import net.bandit.many_bows.client.renderer.SentinelArrowRenderer;
 import net.bandit.many_bows.client.renderer.ShulkerBlastArrowRenderer;
+import net.bandit.many_bows.client.renderer.SolarArrowRenderer;
 import net.bandit.many_bows.client.renderer.SonicBoomProjectileRenderer;
 import net.bandit.many_bows.client.renderer.SpectralArrowRenderer;
 import net.bandit.many_bows.client.renderer.TidalArrowRenderer;
+import net.bandit.many_bows.client.renderer.TorchbearerArrowRenderer;
 import net.bandit.many_bows.client.renderer.VenomArrowRenderer;
 import net.bandit.many_bows.client.renderer.VitalityArrowRenderer;
 import net.bandit.many_bows.client.renderer.WebstringArrowRenderer;
@@ -179,6 +183,22 @@ public final class ManyBowsModForge {
         event.registerEntityRenderer(
                 EntityRegistry.IRONCLAD_ARROW.get(),
                 IroncladArrowRenderer::new
+        );
+        event.registerEntityRenderer(
+                EntityRegistry.ETHEREAL_ARROW.get(),
+                EtherealArrowRenderer::new
+        );
+        event.registerEntityRenderer(
+                EntityRegistry.TORCHBEARER_ARROW.get(),
+                TorchbearerArrowRenderer::new
+        );
+        event.registerEntityRenderer(
+                EntityRegistry.SOLAR_ARROW.get(),
+                SolarArrowRenderer::new
+        );
+        event.registerEntityRenderer(
+                EntityRegistry.AETHERS_CALL_ARROW.get(),
+                AethersCallArrowRenderer::new
         );
     }
 }
